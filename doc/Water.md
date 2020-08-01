@@ -7,3 +7,5 @@ https://alexanderameye.github.io/simple-water.html
 https://darkcatgame.tistory.com/30?category=806332
 
 https://github.com/simplestargame/UniversalOceanShaderGraph
+
+https://www.youtube.com/watch?v=LyiRALUOQqo&list=PL412Ym60h6uvBOpPSP-tcnINt971OD7ZC

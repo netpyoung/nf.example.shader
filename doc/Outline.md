@@ -75,15 +75,8 @@ https://gpgstudy.com/forum/viewtopic.php?t=5869
 - silhouette outline
 - https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch12.md
 
-- ScriptableRendererFeature
-  -  public abstract void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData);
-  -  public abstract void Create();
-
-- ScriptableRenderPass
-
 
 https://roystan.net/articles/outline-shader.html
-https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@9.0/api/UnityEngine.Rendering.Universal.ScriptableRendererFeature.html
 https://alexanderameye.github.io/outlineshader.html
 
 - <https://docs.unity3d.com/Manual/SL-CameraDepthTexture.html>
