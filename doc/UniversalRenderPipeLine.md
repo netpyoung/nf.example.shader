@@ -1,6 +1,8 @@
 # SRP(Scriptable Render Pipeline)
 
+- [Dev Weeks: URP 기본 구성과 흐름](https://www.youtube.com/watch?v=QRlz4-pAtpY)
 - [Unity SRP와 LWRP에 대한 모든 것!](https://www.youtube.com/watch?v=MuzLdCXoJ9I)
+- [Custom SRP](https://catlikecoding.com/unity/tutorials/custom-srp/)
 - [Dev Weeks: URP 셰이더 뜯어보기](https://www.youtube.com/watch?v=9K1uOihvNyg)
 
 UniversalRenderPipelineAsset.asset 
@@ -8,6 +10,7 @@ UniversalRenderPipelineAsset.asset
 // 기본 CameraTarget
 
 ```cs
+[CreateAssetMenu(menuName = "CreateAsset/MyRenderPipeLine")]
 MyRenderPipelineAsset : RenderPipelineAsset
 {
     protected override IRenderPipeline InternalCreatePipeline();
@@ -17,6 +20,7 @@ MyRenderPiepline : RenderPipeline
 {
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
+        context.SetupCameraProperties(camera); // cmd전에 설정해주자(빠른 지우기)
         var cmd = new CommandBuffer();
         cmd.ClearRenderTarget
         context.ExecuteCommandBuffer(cmd); // enqueue cmd
@@ -48,6 +52,11 @@ MyRenderPiepline : RenderPipeline
       };
     }
 }
+
+
+var cmd = new CommandBuffer();
+cmd.BeginSample(string sampleName); // profiler begin
+cmd.EndSample(string sampleName);   // profiler end
 ```
 
 ``` shader

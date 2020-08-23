@@ -1,6 +1,6 @@
-tags: outline , 아웃라인
+# Outline
 
-vertex stencilmask matcap fresnel
+tags: outline , 아웃라인
 
 ## 2-pass
 
@@ -14,14 +14,13 @@ Pass
 Pass
 {
     Name "Front"
+    Cull Back
 
     Tags
     {
         "LightMode" = "UniversalForward"
     }
-    Cull Back
 }
-
 ```
 
 ### Scale확장
@@ -57,23 +56,20 @@ v.vertex.xyz += outlineOffset;
 o.vertex = TransformObjectToHClip(v.vertex.xyz);
 ```
 
-폴리곤 오프셋 = thickness x dist x fovx / width 
-
-
-[외곽선 렌더링 구현에 관한 허접한 정리](https://gamedevforever.com/18)
-https://gpgstudy.com/forum/viewtopic.php?t=5869
-
+- [외곽선 렌더링 구현에 관한 허접한 정리](https://gamedevforever.com/18)
+- <https://gpgstudy.com/forum/viewtopic.php?t=5869>
+  - `폴리곤 오프셋 = thickness x dist x fovx / width `
 
 ### normal 확장 with smooth
 
-  - 1. 모델설정변경방법.. `.fbx -> Model, Normal & Tangent Normals -> Normals:Calculate, Smoothing Angel:180`
-  - 2. smooth노멀 미리 굽는 방법
-    - <https://blog.naver.com/mnpshino/221495979665>
+- 모델설정변경방법..
+  - `.fbx -> Model, Normal & Tangent Normals -> Normals:Calculate, Smoothing Angel:180`
+- smooth노멀 미리 굽는 방법
+  - <https://blog.naver.com/mnpshino/221495979665>
 
 ## 후처리
 
-- silhouette outline
-- https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch12.md
+- <https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch12.md>
 
 
 https://roystan.net/articles/outline-shader.html

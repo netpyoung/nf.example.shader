@@ -22,3 +22,13 @@ grabpass
 
 
   https://teofilobd.github.io/unity/shaders/urp/graphics/2020/05/18/From-Built-in-to-URP.html
+  
+ref:
+- https://github.com/lettier/3d-game-shaders-for-beginners
+- https://github.com/ozlael/PlannarShadowForUnity
+- [Coding Adventure: Procedural Moons and Planets](https://www.youtube.com/watch?v=lctXaT9pxA0)
+- 피효과: https://github.com/keijiro/BloodFx
+- 카메라 : https://assetstore.unity.com/packages/vfx/shaders/fullscreen-camera-effects/camera-filter-pack-18433
+- 번쩍임 : http://baba-s.hatenablog.com/entry/2019/09/17/140000
+- https://github.com/JiepengTan/FishManShaderTutorial
+- https://github.com/ya7gisa0/Unity-Raindrops
