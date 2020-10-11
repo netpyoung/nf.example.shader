@@ -100,7 +100,7 @@
     #else
                     half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
     #ifdef POSTERIZE
-                    col = pow(col, 0.4545);
+                    col = pow(abs(col), 0.4545);
                     float3 c = RgbToHsv(col);
                     c.z = round(c.z * _PosterizationCount) / _PosterizationCount;
                     col = float4(HsvToRgb(c), col.a);
