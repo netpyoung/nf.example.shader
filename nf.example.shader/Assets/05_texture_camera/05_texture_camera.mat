@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: 04_dissolve
-  m_Shader: {fileID: 4800000, guid: 5498a0982e2f8c342b12425c0841861b, type: 3}
+  m_Name: 05_texture_camera
+  m_Shader: {fileID: 4800000, guid: 7a359a7266d511e4b9aad02441d0f677, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -88,7 +88,7 @@ Material:
     - _BaseColor: {r: 0, g: 0.060203552, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EdgeColor1: {r: 1, g: 0, b: 0, a: 1}
-    - _EdgeColor2: {r: 0, g: 0.1254902, b: 32, a: 1}
+    - _EdgeColor2: {r: 0, g: 0.20135927, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
 --- !u!114 &4337821417488378588
