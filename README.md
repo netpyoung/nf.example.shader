@@ -387,3 +387,29 @@ GAF - Neumann, Kelemen, Schlick, GGX
 ## 꽃잎이동
 
 버텍스칼라랑 타임값가지고 버텍스 포지션값 변경
+
+## ==================
+시차맵핑(parallax mapping)
+- offset mapping/ photonic mapping/ virtual displace mapping ...
+
+Normal Mapping은 normal만...
+Parallax Mapping은 높이(height)도 활용하여 텍스쳐 좌표보정=> 깊이감 향상
+
+rgb는 Tangent Space Normal값
+a  는 Height값
+
+https://catlikecoding.com/unity/tutorials/rendering/part-20/
+
+``` hlsl
+float height = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv).w;
+float3 V = normalize(GetWorldSpaceViewDir(IN.positionWS));
+float2 E = -(V.xy / V.z); // eye
+float2 offset = _Parallax * height * E;
+float2 uv = IN.uv + offset;
+```
+
+![./Parallax.jpg](./Parallax.jpg)
+
+==============
+Window> Rendering > Lighting> Environment> Envrionment> Skybox Material
+Material > Skybox/Cubemap
