@@ -6,26 +6,24 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 ![./LinearRendering-ColorSpaceSetting.png](./LinearRendering-ColorSpaceSetting.png)
 
-## Gamma / Linear Color Space 차이
+## Gamma / Linear Color Space 결과물 차이
 
 - [unity: Linear or gamma workflow](https://docs.unity3d.com/2021.1/Documentation/Manual/LinearRendering-LinearOrGammaWorkflow.html)
-
-일단 결과물부터 확인해보자.
 
 ![./lineargammahead.png](./lineargammahead.png)
 ![./LinearLighting-2.jpg](./LinearLighting-2.jpg)
 
 이러한 조명 강도, 블렌딩 차이는 어디서 오는 것일까?
 
-## Gamma와 Linear
+## Gamma와 Linear의 관계
 
-같은 RGB값이라도 Linear와 Gamma에서 보여지는 색이 다르다.
+같은 RGB값이라도 Linear와 Gamma상태에서 보여지는 색이 다르다.
 
 ![./linear-gamma-white-blackc.png](./linear-gamma-white-blackc.png)
 
 - 감마 보정([wiki: Gamma correction](https://en.wikipedia.org/w/index.php?title=Gamma_correction))
 
-가운데 45도 선이 Linear(Gamma: 1.0)이며, 나머지는 감마 보정이다(위로는 Encode, 아레로는 Decode)
+가운데 45도 선이 Linear(Gamma: 1.0)이며, 나머지는 감마 보정이다(위로는 Encode(0.45), 아레로는 Decode(2.2))
 
 ![./gammacurves.png](./gammacurves.png)
 
@@ -37,33 +35,33 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 - [wiki: sRGB](https://en.wikipedia.org/wiki/SRGB) : standard RGB color space.
 
-## Gamma / Linear Color Space 환경
+## Gamma / Linear Color Space 작업 환경
 
 ![./An+image+comparing+gamma+and+linear+pipelines.png](./An+image+comparing+gamma+and+linear+pipelines.png)
 
 ### 감마 보정 환경
 
-| 환경   | Gamma correction | 설명                                        |
-|--------|------------------|---------------------------------------------|
-| 작업   | decode -> encode | 포토샵 기본셋팅: 편집(decode), 저장(encode) |
-| 셰이더 | -                | 셰이더 계산은 Linear 환경이다.              |
+| 환경   | Gamma correction            | 설명                                     |
+|--------|-----------------------------|------------------------------------------|
+| 포토샵 | decode(2.2) -> encode(0.45) | 포토샵 기본셋팅: 편집(Gamma), 저장(sRGB) |
+| 셰이더 | 1                           | 셰이더 계산은 Linear 환경이다            |
 
 ### Rendering - Gamma Color Space
 
-| 환경           | 공간      | 설명                       |
-|----------------|-----------|----------------------------|
-| 저장           | sRGB      | 하드디스크                 |
-| 셰이더         | Linear    | sRGB 상태 텍스쳐           |
-| 출력           | __Gamma__ | decode되어서 모니터에 출력 |
+| 환경   | 공간      | 설명                       |
+|--------|-----------|----------------------------|
+| 저장   | sRGB      | 포토샵 이미지 파일         |
+| 셰이더 | Linear    | `sRGB`상태의 이미지 데이터 |
+| 출력   | __Gamma__ | decode되어서 모니터에 출력 |
 
 ### Rendering - Linear Color Space
 
 | 환경           | 공간       | 설명                         |
 |----------------|------------|------------------------------|
-| 저장           | sRGB       | 하드디스크                   |
-| __이미지보정__ | -          | sRGB Check(Gamma decode적용) |
-| 셰이더         | Linear     | decode가 적용된 텍스쳐       |
-| __저장__       | sRGB       | sRGB로 한번 변환이 된다      |
+| 저장           | sRGB       | 포토샵 이미지 파일           |
+| __이미지옵션__ | -          | sRGB Check(Gamma decode적용) |
+| 셰이더         | Linear     | `Gamma`상태의 이미지 데이터  |
+| __변환__       | sRGB       | sRGB로 한번 변환이 된다      |
 | 출력           | __Linear__ | decode되어서 모니터에 출력   |
 
 ## Linear Color Space에서 작업시 주의할 점
@@ -92,23 +90,39 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 1. 데이터를 그대로 다루는것은 Linear로
 2. 나머지 Albedo / Emmission는 sRGB 체크로 Gamma Decode 하도록
 
-| Image                      | sRGB |                                        |
-|----------------------------|------|----------------------------------------|
-| Albedo                     | O    | Gamma Decode 적용                      |
-| Albedo + Smoothness(alpha) | O    | sRGB는 RGB값에만 적용. Alpha는 미적용. |
-| DataTexture                | X    | 데이터 그대로 사용                     |
-| NormalMap                  | -    | 데이터 그대로 사용                     |
+| Image                      | sRGB     |                                        |
+|----------------------------|----------|----------------------------------------|
+| Albedo                     | O        | Gamma Decode 적용                      |
+| Albedo + Smoothness(alpha) | O        | sRGB는 RGB값에만 적용. Alpha는 미적용. |
+| DataTexture                | X        | 데이터 그대로 사용                     |
+| NormalMap                  | 옵션없음 | 데이터 그대로 사용                     |
 
 ### UI 텍스쳐의 Alpha값
 
+- Linear환경으로 보다 풍부한 표현력을 얻었지만, UI색상의 알파블랜딩이 제대로 되지 않는 현상이 있다.
+  - Linear개념으로 보면 정확한 계산이지만, 포토샵 작업자 관점에서는 아니다.
+- sRGB옵션은 RGB에만 영향을 줌으로, Alpha를 처리함에 있어 추가 작업을 해 주어야 한다.
+
+![./ui_alpha_blend_problem.jpg](./ui_alpha_blend_problem.jpg)
+
+몇가지 방법이 있다
+
+- 포토샵 강제 설정하거나...
+- UI카메라와 SRP의 활용하거나..
+
 #### Photoshop 설정
 
+- 처음부터 Linear로 저장시켜버리자
 - Color Settings: Blend RPG Colors Using Gamma: 1.00
-- 공수가 많이 든다... 작업하기 불편...
+- 공수가 많이 든다... 디자이너들이 작업하기 불편...
 
 #### UI카메라 + SRP
 
+- UI카메라를 따로 두어서 UI Alpha에 미리 감마를 적용시켜주자.
+- 그리고 Game카메라와 잘 섞어주자.
+
 1. UITexture sRPG해제
+   - sRGB상태 데이터 그대로 쓰고 Alpha만 어떻게 잘 처리할 것이다.
 2. Main Camera
    1. Camera> Rendering> Culling Mask> Uncheck UI
 3. UI Camera
