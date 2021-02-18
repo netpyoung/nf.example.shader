@@ -117,35 +117,36 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
    3. Camera> Rendering> Culling Mask> UI
 4. UI Canvas
    1. Canvas> Render Camera> UI Camera
-5. PipelineAsset.asset
-   1. General> Renderer List> Add Last GammaUIFix
-6. SRP를 이용
+5. PipelineAsset 설정
+   1. _CameraColorTexture를 활용: Quality> Anti Aliasing (MSAA)> 2x 이상
+6. RenderFeature 작성
    1. Game 카메라(Linear공간)를 Gamma 공간으로 변환
    2. 변환된 Game카메라의 출력결과 + UI카메라 출력결과
    3. 합친 결과(Gamma Space)를 Linear Space로 변경시켜주기
+7. 새로운 Renderer 추가와 작성한 Feature추가
+   1. General> Renderer List> Add Last GammaUIFix
 
 ![./LinearGammaURPFix.jpg](./LinearGammaURPFix.jpg)
 
 ``` hlsl
-Cull Off
-ZWrite Off
-ZTest Always
+// _CameraColorTexture 활성화는 PipelineAsset> Quality> Anti Aliasing (MSAA)> 2x 이상으로 하면 됨.
 
-float4 frag (v2f i) : SV_Target
-{
-   float4 uicol = tex2D(_MainTex, i.uv); //ui in lighter color
-   uicol.a = LinearToGammaSpace(uicol.a); //make ui alpha in lighter color
+// 1. DrawUIIntoRTPass
+//    cmd.SetRenderTarget(UIRenderTargetID);
+//    cmd.ClearRenderTarget(clearDepth: true, clearColor: true, Color.clear);
+// 2. BlitPass
+//    cmd.Blit(DrawUIIntoRTPass.UIRenderTargetID, _colorHandle, _material);
 
-   float4 col = tex2D(_CameraColorTexture, i.uv); //3d in normal color
-   col.rgb = LinearToGammaSpace(col.rgb); //make 3d in lighter color
+float4 uiColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+uiColor.a = LinearToGamma22(uiColor.a);
 
-   float4 result;
-   result.rgb = lerp(col.rgb,uicol.rgb,uicol.a); //do linear blending
-   result.rgb = GammaToLinearSpace(result.rgb); //make result normal color
-   result.a = 1;
+float4 mainColor = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, i.uv);
+mainColor.rgb = LinearToGamma22(mainColor.rgb);
 
-   return result;
-}
+float4 finalColor;
+finalColor.rgb = lerp(mainColor.rgb, uiColor.rgb, uiColor.a);
+finalColor.rgb = Gamma22ToLinear(finalColor.rgb);
+finalColor.a = 1;
 ```
 
 ## Ref
@@ -160,5 +161,5 @@ float4 frag (v2f i) : SV_Target
 - [선형(Linear) 렌더링에서의 UI 작업할때 요령](https://chulin28ho.tistory.com/476)
 - [201205 Unity Linear color space에서 UI의 alpha 값이 바뀌는 문제에 대하여..](https://illu.tistory.com/1430)
 - [3D scene need Linear but UI need Gamma](https://cmwdexint.com/2019/05/30/3d-scene-need-linear-but-ui-need-gamma/)
-- https://medium.com/@abdulla.aldandarawy/unity-always-be-linear-1a30db4765db
-- https://forum.reallusion.com/308094/1-PBR-Linear-Workflow
+- [1 - PBR Linear Workflow](https://forum.reallusion.com/308094/1-PBR-Linear-Workflow)
+- [[Unity] Always Be Linear: Shader-Based Gamma Correction](https://medium.com/@abdulla.aldandarawy/unity-always-be-linear-1a30db4765db)

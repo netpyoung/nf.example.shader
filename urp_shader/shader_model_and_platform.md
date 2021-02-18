@@ -21,12 +21,19 @@
 
 ## 안드로이드와 그래픽 라이브러리
 
-| Graphic Library | Android API | Android version | 코드명     |
-|-----------------|-------------|-----------------|------------|
-| es2.0           | 8           | 2.2.x           | Froyo      |
-| es3.0           | 18          | 4.3.x           | Jelly Bean |
-| es3.1           | 21          | 5.0             | Lollipop   |
-| Vulkan          | 24          | 7.0             | Nougat     |
+| Graphic Library | Android API | version | 코드명     | Linear지원 |
+|-----------------|-------------|---------|------------|------------|
+| es2.0           | 8           | 2.2.x   | Froyo      | x          |
+| es3.0           | 18          | 4.3.x   | Jelly Bean | O          |
+| es3.1           | 21          | 5.0     | Lollipop   | O          |
+| Vulkan          | 24          | 7.0     | Nougat     | O          |
+
+## Linear지원 사양
+
+| platform | Graphic Library        | version                                 |
+|----------|------------------------|-----------------------------------------|
+| Android  | OpenGL ES 3.0 / Vulkan | Android 4.3 / API level 18 / Jelly Bean |
+| iOS      | Metal                  | 8.0                                     |
 
 ## 레퍼런스 디바이스
 
@@ -48,59 +55,3 @@
 - <https://developer.android.com/ndk/guides/graphics/getting-started?hl=ko>
 - <https://forum.unity.com/threads/severe-banding-with-webgl-on-chrome.310326/#post-2035482>
 - <https://blog.mozilla.org/futurereleases/2015/03/03/an-early-look-at-webgl-2/>
-
-=========
-_CameraDepthTexture
-_CameraDepthAttachment
-_CameraNormalsTexture
-_CameraOpaqueTexture 불투명 채널에서 렌더링 된 후
-_CameraColorTexture  반투명 채널이 렌더링 된 후
-
-universal/Shared/Library/DeclareDepthTexture.hlsl   _CameraDepthTexture
-universal/Shared/Library/DeclareNormalsTexture.hlsl _CameraNormalsTexture
-universal/Shared/Library/DeclareOpaqueTexture.hlsl  _CameraOpaqueTexture
-
-===============
-모바일에서 활용할 수 있는 URP 기반 게임 개발 템플릿 프로젝트
-https://www.youtube.com/watch?v=QqTeElxbTA0
-
-dpi설정부분
-http://www.unitysquare.co.kr/growwith/resource/#;
-==========
-Dev Weeks: A3 Still Alive - Technical Art Review
-https://www.youtube.com/watch?v=ufNYLgE2WGA
-
-water
-fog
-hair
-footprint
-==
-Unity Tutorial - Emissive Lighting & Post Processing
-https://www.youtube.com/watch?v=sAH0mj0tGMo
-
-=================================
-
-Shader 코드 디버깅
-https://docs.unity3d.com/Manual/SL-DebuggingD3D11ShadersWithVS.html
-https://docs.microsoft.com/en-us/visualstudio/debugger/graphics/visual-studio-graphics-diagnostics?view=vs-2019&WT.mc_id=DT-MVP-4038148
-
-https://www.sysnet.pe.kr/Default.aspx?mode=2&sub=0&pageno=0&detail=1&wid=11693
-#pragma enable_d3d11_debug_symbols
-
-빈C++ project
-
-``` txt
-Project Property Pages
-  - Platform> x64
-  - Configure Properties> Debugging> Command> exe path
-  - Configure Properties> Debugging> Command Arguments> -force-d3d11
-```
-
-Debugging 중에 Capture Frame
-
-=================
-
-https://assetstore.unity.com/packages/vfx/shaders/flat-kit-toon-shading-and-water-143368
-
-
-===============================

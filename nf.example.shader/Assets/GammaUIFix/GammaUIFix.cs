@@ -3,9 +3,14 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class GammaUIFixRenderer : ScriptableRendererFeature
+public class GammaUIFix : ScriptableRendererFeature
 {
     public Material material;
+
+    public GammaUIFix()
+    {
+    }
+
     public override void Create()
     {
     }
@@ -16,7 +21,7 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
 
         DrawUIIntoRTPass DrawUIIntoRTPass = new DrawUIIntoRTPass(RenderPassEvent.BeforeRenderingTransparents, cameraColorTarget);
         BlitPass BlitRenderPassesToScreen = new BlitPass(RenderPassEvent.AfterRenderingTransparents, cameraColorTarget, material);
-        
+
         renderer.EnqueuePass(DrawUIIntoRTPass);
         renderer.EnqueuePass(BlitRenderPassesToScreen);
     }
@@ -25,9 +30,8 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
 
     class DrawUIIntoRTPass : ScriptableRenderPass
     {
-        public static int ShaderPropertyID = Shader.PropertyToID("_UITex");
-
-        public static RenderTargetIdentifier RenderTargetID = new RenderTargetIdentifier(ShaderPropertyID);
+        public static int UITemporaryRT = Shader.PropertyToID("UITemporaryRT");
+        public static RenderTargetIdentifier UIRenderTargetID = new RenderTargetIdentifier(UITemporaryRT);
 
         public DrawUIIntoRTPass(RenderPassEvent renderPassEvent, RenderTargetIdentifier colorHandle)
         {
@@ -38,14 +42,14 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
         {
             RenderTextureDescriptor descriptor = cameraTextureDescriptor;
             descriptor.colorFormat = RenderTextureFormat.Default;
-            cmd.GetTemporaryRT(ShaderPropertyID, descriptor);
+            cmd.GetTemporaryRT(UITemporaryRT, descriptor);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             CommandBuffer cmd = CommandBufferPool.Get("Draw UI Into RT Pass");
 
-            cmd.SetRenderTarget(RenderTargetID);
+            cmd.SetRenderTarget(UIRenderTargetID);
             cmd.ClearRenderTarget(clearDepth: true, clearColor: true, Color.clear);
 
             context.ExecuteCommandBuffer(cmd);
@@ -80,9 +84,9 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
         {
             CommandBuffer cmd = CommandBufferPool.Get("Blit Pass");
 
-            cmd.Blit(DrawUIIntoRTPass.RenderTargetID, _colorHandle, _material);
-            context.ExecuteCommandBuffer(cmd);
+            cmd.Blit(DrawUIIntoRTPass.UIRenderTargetID, _colorHandle, _material);
 
+            context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
 
@@ -93,7 +97,7 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
                 throw new ArgumentNullException("cmd");
             }
 
-            cmd.ReleaseTemporaryRT(DrawUIIntoRTPass.ShaderPropertyID);
+            cmd.ReleaseTemporaryRT(DrawUIIntoRTPass.UITemporaryRT);
 
             base.FrameCleanup(cmd);
         }
