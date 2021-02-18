@@ -1,6 +1,10 @@
 # Linear / Gamma
 
-Unity에서 Linear
+Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
+
+`Edit> Project Settings> Player> Other Settings> Rendering> Color Space`
+
+![./LinearRendering-ColorSpaceSetting.png](./LinearRendering-ColorSpaceSetting.png)
 
 ## Gamma / Linear Color Space 차이
 
@@ -25,8 +29,6 @@ Unity에서 Linear
 
 ![./gammacurves.png](./gammacurves.png)
 
-- 감마 보정에는 Ecode와 Decode가 있다.
-
 | Gamma correction | Gamma value  | 공간        |
 |------------------|--------------|-------------|
 | encode           | 0.45 (1/2.2) | sRGB        |
@@ -48,23 +50,21 @@ Unity에서 Linear
 
 ### Rendering - Gamma Color Space
 
-| 환경           | 공간      | 설명                                  |
-|----------------|-----------|---------------------------------------|
-| 저장           | sRGB      | 하드디스크                            |
-| __이미지보정__ | sRGB      | Gamma에선 이미지 보정 안함            |
-| 셰이더         | Linear    | sRGB 공간 텍스쳐 + Linear Shader 연산 |
-| __저장__       | Linear    | 별다른 일을 안함                      |
-| 출력           | __Gamma__ | decode되어서 모니터에 출력            |
+| 환경           | 공간      | 설명                       |
+|----------------|-----------|----------------------------|
+| 저장           | sRGB      | 하드디스크                 |
+| 셰이더         | Linear    | sRGB 상태 텍스쳐           |
+| 출력           | __Gamma__ | decode되어서 모니터에 출력 |
 
 ### Rendering - Linear Color Space
 
-| 환경           | 공간       | 설명                                    |
-|----------------|------------|-----------------------------------------|
-| 저장           | sRGB       | 하드디스크                              |
-| __이미지보정__ | Linear     | sRGB Check(Gamma decode적용)            |
-| 셰이더         | Linear     | Linear 공간 텍스쳐 + Linear Shader 연산 |
-| __저장__       | sRGB       | sRGB로 한번 변환이 된다                 |
-| 출력           | __Linear__ | decode되어서 모니터에 출력              |
+| 환경           | 공간       | 설명                         |
+|----------------|------------|------------------------------|
+| 저장           | sRGB       | 하드디스크                   |
+| __이미지보정__ | -          | sRGB Check(Gamma decode적용) |
+| 셰이더         | Linear     | decode가 적용된 텍스쳐       |
+| __저장__       | sRGB       | sRGB로 한번 변환이 된다      |
+| 출력           | __Linear__ | decode되어서 모니터에 출력   |
 
 ## Linear Color Space에서 작업시 주의할 점
 
@@ -87,6 +87,8 @@ Unity에서 Linear
 
 ### sRGB로 보정이 필요한 텍스쳐 구분
 
+![./sRGB_ColorTexture.JPG](./sRGB_ColorTexture.JPG)
+
 1. 데이터를 그대로 다루는것은 Linear로
 2. 나머지 Albedo / Emmission는 sRGB 체크로 Gamma Decode 하도록
 
@@ -99,37 +101,32 @@ Unity에서 Linear
 
 ### UI 텍스쳐의 Alpha값
 
+#### Photoshop 설정
+
+- Color Settings: Blend RPG Colors Using Gamma: 1.00
+- 공수가 많이 든다... 작업하기 불편...
+
 #### UI카메라 + SRP
 
 1. UITexture sRPG해제
-2. SRP를 이용
-   1. UI 카메라
-   2. Game 카메라(Linear공간)를 Gamma 공간으로 변환
-   3. 변환된 Game카메라의 출력결과 + UI카메라 출력결과
-3. 합친 결과(Gamma Space)를 Linear Space로 변경시켜주기
+2. Main Camera
+   1. Camera> Rendering> Culling Mask> Uncheck UI
+3. UI Camera
+   1. Camera> Render Type> OverLay
+   2. Camera> Rendering> Renderer> GameUIFix
+   3. Camera> Rendering> Culling Mask> UI
+4. UI Canvas
+   1. Canvas> Render Camera> UI Camera
+5. PipelineAsset.asset
+   1. General> Renderer List> Add Last GammaUIFix
+6. SRP를 이용
+   1. Game 카메라(Linear공간)를 Gamma 공간으로 변환
+   2. 변환된 Game카메라의 출력결과 + UI카메라 출력결과
+   3. 합친 결과(Gamma Space)를 Linear Space로 변경시켜주기
 
-## UI문제
-
-방법1. 텍스처를 포토샵에서 linear color space 로변환
-  Color Settings: Blend RPG Colors Using Gamma: 1.00
-  공수가 많이든다...
-방법2.
- UITexture sRPG해제(텍스쳐 감마공간 그대로 사용) 
- 게임 전용 카메라(리니어상태임) => LinearToGamma : pow(color, 0.45454); : Gamma Space
- UI 전용카메라(감마그대로임) : Gamma Space
- 게임 전용카메라 Blend UI 전용카메라 (GammaSpace) => GammaToLinear : pow(color, 2.2); : Linear Space
- 최종렌더는 Linear Space
-
-
-URPSettings
-> Renderer1 - Forward
-> Renderer2 - UI renderer
-
-Canvas> Render Camera> UI Camera
-UI Camera> Rendering> Renderer> GammaUIFix
+![./LinearGammaURPFix.jpg](./LinearGammaURPFix.jpg)
 
 ``` hlsl
-
 Cull Off
 ZWrite Off
 ZTest Always
@@ -163,6 +160,5 @@ float4 frag (v2f i) : SV_Target
 - [선형(Linear) 렌더링에서의 UI 작업할때 요령](https://chulin28ho.tistory.com/476)
 - [201205 Unity Linear color space에서 UI의 alpha 값이 바뀌는 문제에 대하여..](https://illu.tistory.com/1430)
 - [3D scene need Linear but UI need Gamma](https://cmwdexint.com/2019/05/30/3d-scene-need-linear-but-ui-need-gamma/)
-
-https://medium.com/@abdulla.aldandarawy/unity-always-be-linear-1a30db4765db
-https://forum.reallusion.com/308094/1-PBR-Linear-Workflow
+- https://medium.com/@abdulla.aldandarawy/unity-always-be-linear-1a30db4765db
+- https://forum.reallusion.com/308094/1-PBR-Linear-Workflow

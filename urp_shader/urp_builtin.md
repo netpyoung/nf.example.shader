@@ -201,3 +201,7 @@ https://github.com/hebory?before=Y3Vyc29yOnYyOpK5MjAyMC0xMS0wOVQyMjo0MToyOCswOTo
 
 - 헤어 그림자
   - https://zhuanlan.zhihu.com/p/232450616
+
+
+Bulit-in URP
+GammaToLinearSpace Gamma22ToLinear com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl
