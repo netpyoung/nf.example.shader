@@ -6,7 +6,6 @@ using UnityEngine.Rendering.Universal;
 public class GammaUIFixRenderer : ScriptableRendererFeature
 {
     public Material material;
-
     public override void Create()
     {
     }
@@ -17,7 +16,7 @@ public class GammaUIFixRenderer : ScriptableRendererFeature
 
         DrawUIIntoRTPass DrawUIIntoRTPass = new DrawUIIntoRTPass(RenderPassEvent.BeforeRenderingTransparents, cameraColorTarget);
         BlitPass BlitRenderPassesToScreen = new BlitPass(RenderPassEvent.AfterRenderingTransparents, cameraColorTarget, material);
-
+        
         renderer.EnqueuePass(DrawUIIntoRTPass);
         renderer.EnqueuePass(BlitRenderPassesToScreen);
     }

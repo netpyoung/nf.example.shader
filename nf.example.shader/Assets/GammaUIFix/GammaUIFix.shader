@@ -2,18 +2,10 @@
 {
     Properties
     {
-        //_UITex ("UI Texture", 2D) = "white" {}
-        //[HideInInspector] _CameraColorTexture("Camera Color", 2D) = "white" {}
     }
 
     SubShader
     {
-        Tags
-        {
-            "RenderType" = "Opaque"
-            "RenderPipeline" = "UniversalPipeline"
-        }
-
         Cull Off
         ZWrite Off
         ZTest Always
@@ -63,15 +55,15 @@
                 half4 uiColor = SAMPLE_TEXTURE2D(_UITex, sampler_UITex, IN.uv); //ui in lighter color
                 uiColor.a = LinearToGamma22(uiColor.a); //make ui alpha in lighter color
 
-                half4 mainColor = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, IN.uv); //3d in normal color
-                mainColor.rgb = LinearToGamma22(mainColor.rgb); //make 3d in lighter color
+                half4 gameColor = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, IN.uv); //3d in normal color
+                gameColor.rgb = LinearToGamma22(gameColor.rgb); //make 3d in lighter color
 
                 half4 finalColor;
-                finalColor.rgb = lerp(mainColor.rgb, uiColor.rgb, uiColor.a); //do linear blending
+                finalColor.rgb = lerp(gameColor.rgb, uiColor.rgb, uiColor.a); //do linear blending
                 finalColor.rgb = Gamma22ToLinear(finalColor.rgb); //make result normal color
                 finalColor.a = 1;
 
-                return mainColor;
+                return uiColor;
             }
             ENDHLSL
         }
