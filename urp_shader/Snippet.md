@@ -56,12 +56,22 @@ FresnelLerp() UnityStandardBRDF.cginc
 MSAA - Multi-Sampling Anti-Aliasing의 
 FFR - https://developer.oculus.com/documentation/native/android/mobile-ffr/
 =========
-_CameraDepthTexture
-_CameraDepthAttachment
-_CameraNormalsTexture
-_CameraOpaqueTexture 불투명 채널에서 렌더링 된 후
-_CameraColorTexture  반투명 채널이 렌더링 된 후 
-  - PipelineAsset> Quality> Anti Aliasing (MSAA)> 2x 이상.
+GrabPass
+
+BlitPass
+
+
+| texture                |                              |
+|------------------------|------------------------------|
+| _CameraDepthTexture    |                              |
+| _CameraDepthAttachment |                              |
+| _CameraNormalsTexture  |                              |SampleSceneDepth
+| _CameraOpaqueTexture   | 불투명 채널에서 렌더링 된 후 | SceneColor
+| _CameraColorTexture    | 반투명 채널이 렌더링 된 후   |
+
+### 주의
+  - `_CameraColorTexture`
+    - PipelineAsset> Quality> Anti Aliasing (MSAA)> 2x 이상.
 
 universal/Shared/Library/DeclareDepthTexture.hlsl   _CameraDepthTexture
 universal/Shared/Library/DeclareNormalsTexture.hlsl _CameraNormalsTexture

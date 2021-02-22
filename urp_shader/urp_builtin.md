@@ -145,6 +145,10 @@ Built-in	URP
 float4 ComputeScreenPos (float4 clipPos)	float4 ComputeScreenPos(float4 positionCS)	Include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl”
 float4 ComputeGrabScreenPos (float4 clipPos)	Gone.
 
+
+ComputeScreenPos deprecated - https://github.com/Unity-Technologies/Graphics/pull/2529
+GetVertexPositionInputs().positionNDC 
+
 ## Depth
 
 Built-in	URP	 
