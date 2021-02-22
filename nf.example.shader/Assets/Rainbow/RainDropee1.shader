@@ -110,10 +110,18 @@ Shader "RainDropee1"
                 T = TransformObjectToWorldDir(tangent.xyz);
                 B = cross(N, T) * tangent.w * unity_WorldTransformParams.w;
             }
-
+            
             inline half3 CombineTBN(in half3 tangentNormal, in half3 T, in half3  B, in half3 N)
             {
                 return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
+            }
+
+            inline half3x3 GetTBN(in half3 T, in half3 B, in half3 N)
+            {
+                T = normalize(T);
+                B = normalize(B);
+                N = normalize(N);
+                return float3x3(T, B, N);
             }
 
             Varyings vert(Attributes IN)
@@ -129,7 +137,7 @@ Shader "RainDropee1"
                 return OUT;
             }
 
-            half EdgeMask(half droplet, half edgeWidth)
+            inline half EdgeMask(half droplet, half edgeWidth)
             {
                 // 내부에 작은 검은 마스크를 만들어 결과적으로 흰색 테두리 효과.
 
@@ -143,13 +151,11 @@ Shader "RainDropee1"
                 // 0.04 ~ 0 | 0 ~ 0.05 ~ 0.9 | 0.9 ~ 0.95 // distance 0.05
                 // 0        | 0 ~ 1    ~ 18  | 18  ~ 19   // divide   0.05
                 // 0        | 0 ~ 1          | 1          // smoothstep
-                half edgeMask = smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
-
                 // 1        | 1 ~ 0          | 0           // 1 - x
-                return 1 - edgeMask;
+                return 1 - smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
             }
 
-            half RippleFade(half dropletTime)
+            inline half RippleFade(half dropletTime)
             {                
                 // ripple: 잔물결
                 // 시간에따른 Fade in / out 효과
@@ -157,7 +163,7 @@ Shader "RainDropee1"
                 return abs(sin(dropletTime * PI));
             }
 
-            half InterpolationTime(half time, half rainSpeed)
+            inline half InterpolationTime(half time, half rainSpeed)
             {
                 //half interpolationTime = abs(sin(time * rainSpeed * PI));
                 //// clamp(x, a, b)
@@ -181,7 +187,7 @@ Shader "RainDropee1"
                 half droplet1 = SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, IN.uv).r - emissive1;
                 half edgeMask1 = EdgeMask(droplet1, _EdgeWidth);
                 half rippleFade1 = RippleFade(dropletTime1);
-                // return half4(droplet1, edgeMask1, rippleFade1, 1); // sample preview
+                // return half4(droplet1, edgeMask1, rippleFade1, 1); // sample
 
                 half2 dropletOffset = half2(_DropletOffsetX, _DropletOffsetY);
                 half dropletTime2 = (time + _TimeOffset) * _RainSpeed;
@@ -189,35 +195,39 @@ Shader "RainDropee1"
                 half droplet2 = SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, IN.uv + dropletOffset).r - emissive2;
                 half edgeMask2 = EdgeMask(droplet2, _EdgeWidth);
                 half rippleFade2 = RippleFade(dropletTime2);
-                // return half4(droplet2, edgeMask2, rippleFade2, 1); // sample preview
+                // return half4(droplet2, edgeMask2, rippleFade2, 1); // sample
 
-                half interpolationTime = InterpolationTime(time, _RainSpeed);
+                half interpolationTime = InterpolationTime(time, _RainSpeed); // same as rippleFade1
 
-                half ripple1 = edgeMask1 * rippleFade1;
-                half ripple2 = edgeMask2 * rippleFade2;
-                half ripple = lerp(ripple1, ripple2, interpolationTime);
-                // return half4(ripple, ripple, ripple, 1); // sample preview
+                half rippleMask1 = edgeMask1 * rippleFade1;
+                half rippleMask2 = edgeMask2 * rippleFade2;
+                half rippleMask = lerp(rippleMask1, rippleMask2, interpolationTime);
+                // return half4(rippleMask, rippleMask, rippleMask, 1); // sample
 
-                half3 dropletTangentNormal1 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv));
-                half3 dropletTangentNormal2 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv + dropletOffset));
-                half3 dropletTangentNormal = lerp(dropletTangentNormal1, dropletTangentNormal2, interpolationTime);
-                //return half4(dropletTangentNormal, 1); // sample preview
+                half3 dropletNormalTS1 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv));
+                half3 dropletNormalTS2 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv + dropletOffset));
+                half3 dropletNormalTS = lerp(dropletNormalTS1, dropletNormalTS2, interpolationTime);
+                // return half4(dropletNormalTS, 1); // sample
 
                 // BlendNomral
                 // - com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl
-                half3 mainTangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
-                half3 blendedTangentNormal = BlendNormal(mainTangentNormal, dropletTangentNormal);
-                half3 tangentNormal = lerp(mainTangentNormal, blendedTangentNormal, ripple);
+                half3 mainNormalTS = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+                half3 blendedNormalTS = BlendNormal(mainNormalTS, dropletNormalTS);
+                // return half4(blendedNormalTS, 1); // sample
+
+                half3 finalNormalTS = lerp(mainNormalTS, blendedNormalTS, rippleMask);
+                // return half4(finalNormalTS, 1); // sample
 
                 Light light = GetMainLight();
-                half3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
+                half3x3 TBN = GetTBN(IN.T, IN.B, IN.N);
+                half3 N = mul(finalNormalTS, TBN);
                 half3 L = normalize(light.direction);
 
                 half NdotL = max(0.0, dot(N, L));
 
                 half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
-                half3 diffuse = (mainColor * _WaterColor * _WaterBrightness + ripple * 0.5) * NdotL;
+                half3 diffuse = (mainColor * _WaterColor.rgb * _WaterBrightness + rippleMask * 0.5) * NdotL;
                
                 return half4(diffuse, 1);
             }

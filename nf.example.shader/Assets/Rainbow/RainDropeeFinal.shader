@@ -1,4 +1,4 @@
-Shader "RainDropee2"
+Shader "RainDropeeFinal"
 {
     // ref: 
     // - https://deepspacebanana.github.io/blog/shader/art/unreal%20engine/Rainy-Surface-Shader-Part-1
@@ -120,6 +120,14 @@ Shader "RainDropee2"
                     return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
                 }
 
+                inline half3x3 GetTBN(in half3 T, in half3 B, in half3 N)
+                {
+                    T = normalize(T);
+                    B = normalize(B);
+                    N = normalize(N);
+                    return float3x3(T, B, N);
+                }
+
                 Varyings vert(Attributes IN)
                 {
                     Varyings OUT = (Varyings)0;
@@ -133,7 +141,7 @@ Shader "RainDropee2"
                     return OUT;
                 }
 
-                half EdgeMask(half droplet, half edgeWidth)
+                inline half EdgeMask(half droplet, half edgeWidth)
                 {
                     // 내부에 작은 검은 마스크를 만들어 결과적으로 흰색 테두리 효과.
 
@@ -147,13 +155,11 @@ Shader "RainDropee2"
                     // 0.04 ~ 0 | 0 ~ 0.05 ~ 0.9 | 0.9 ~ 0.95 // distance 0.05
                     // 0        | 0 ~ 1    ~ 18  | 18  ~ 19   // divide   0.05
                     // 0        | 0 ~ 1          | 1          // smoothstep
-                    half edgeMask = smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
-
                     // 1        | 1 ~ 0          | 0           // 1 - x
-                    return 1 - edgeMask;
+                    return 1 - smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
                 }
 
-                half RippleFade(half dropletTime)
+                inline half RippleFade(half dropletTime)
                 {
                     // ripple: 잔물결
                     // 시간에따른 Fade in / out 효과
@@ -161,7 +167,7 @@ Shader "RainDropee2"
                     return abs(sin(dropletTime * PI));
                 }
 
-                half InterpolationTime(half time, half rainSpeed)
+                inline half InterpolationTime(half time, half rainSpeed)
                 {
                     //half interpolationTime = abs(sin(time * rainSpeed * PI));
                     //// clamp(x, a, b)
@@ -194,13 +200,13 @@ Shader "RainDropee2"
 
                 half interpolationTime = InterpolationTime(time, _RainSpeed);
 
-                half ripple1 = edgeMask1 * rippleFade1;
-                half ripple2 = edgeMask2 * rippleFade2;
-                half ripple = lerp(ripple1, ripple2, interpolationTime);
+                half rippleMask1 = edgeMask1 * rippleFade1;
+                half rippleMask2 = edgeMask2 * rippleFade2;
+                half rippleMask = lerp(rippleMask1, rippleMask2, interpolationTime);
 
-                half3 dropletTangentNormal1 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv));
-                half3 dropletTangentNormal2 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv + dropletOffset));
-                half3 dropletTangentNormal = lerp(dropletTangentNormal1, dropletTangentNormal2, interpolationTime);
+                half3 dropletNormalTS1 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv));
+                half3 dropletNormalTS2 = UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, IN.uv + dropletOffset));
+                half3 dropletNormalTS = lerp(dropletNormalTS1, dropletNormalTS2, interpolationTime);
 
 
                 half vertexNormalMaskAlongXAxis = abs(normalize(IN.N).x);
@@ -215,7 +221,7 @@ Shader "RainDropee2"
                     SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakGMaskUVs.bg).g,
                     vertexNormalMaskAlongXAxis
                 );
-                // return half4(streakGMask, streakGMask, streakGMask, 1); // sample preview
+                // return half4(streakGMask, streakGMask, streakGMask, 1); // sample
 
                 // streak B - panning
                 half3 streakBPanningUVs = (positionWS - gsPositionWS) / (2 * _StreakTiling);
@@ -226,47 +232,47 @@ Shader "RainDropee2"
                     SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakBPanningUVs.bg).b,
                     vertexNormalMaskAlongXAxis
                 );
-                // return half4(streakBPanning, streakBPanning, streakBPanning, 1); // sample preview
+                // return half4(streakBPanning, streakBPanning, streakBPanning, 1); // sample
 
                 half streakMask = saturate((streakGMask - saturate(pow(streakBPanning, 8))) * 5);
-                // return half4(streakMask, streakMask, streakMask, 1); // sample preview
+                // return half4(streakMask, streakMask, streakMask, 1); // sample
 
                 half3 streakNormal = lerp(
                     UnpackNormal(SAMPLE_TEXTURE2D(_RainStreakNormalTex, sampler_RainStreakNormalTex, streakBPanningUVs.rg)),
                     UnpackNormal(SAMPLE_TEXTURE2D(_RainStreakNormalTex, sampler_RainStreakNormalTex, streakBPanningUVs.bg)),
                     vertexNormalMaskAlongXAxis
                 );
-                // return half4(streakNormal, 1); // sample preview
+                // return half4(streakNormal, 1); // sample
 
                 streakNormal = lerp(half3(0.5, 0.5, 1), streakNormal, streakMask);
-                // return half4(streakNormal, 1); // sample preview
+                // return half4(streakNormal, 1); // sample
 
-                half zGradient = CombineTBN(half3(0, 0, 1), IN.T, IN.B, IN.N).y;
-                zGradient *= 1.1;
-                zGradient = clamp(zGradient, 0, 1);
-                // return half4(zGradient, zGradient, zGradient, 1); // sample preview
+                half yGradient = CombineTBN(half3(0, 0, 1), IN.T, IN.B, IN.N).y;
+                yGradient *= 1.1;
+                yGradient = clamp(yGradient, 0, 1);
+                // return half4(yGradient, yGradient, yGradient, 1); // sample
 
                 // BlendNomral
                 // - com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl
-                half3 mainTangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
-                half3 blendedTangentNormal = BlendNormal(mainTangentNormal, lerp(dropletTangentNormal, streakNormal, zGradient));
-                half3 tangentNormal = lerp(mainTangentNormal, blendedTangentNormal, ripple);
+                half3 mainNormalTS = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+                half3 blendedNormalTS = BlendNormal(mainNormalTS, lerp(dropletNormalTS, streakNormal, yGradient));
+                half3 finalNormalTS = lerp(mainNormalTS, blendedNormalTS, rippleMask);
 
                 Light light = GetMainLight();
-                half3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
+                half3 N = CombineTBN(finalNormalTS, IN.T, IN.B, IN.N);
                 half3 L = normalize(light.direction);
 
                 half NdotL = max(0.0, dot(N, L));
 
                 half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
-                half finalMask = lerp(streakMask, ripple, zGradient);
+                half finalMask = lerp(streakMask, rippleMask, yGradient);
 
                 // return half4(finalMask, finalMask, finalMask, 1);
 
-                half3 diffuse = (mainColor * _WaterColor * _WaterBrightness + finalMask * 0.5) * NdotL;
+                half3 diffuse = (mainColor * _WaterColor.rgb * _WaterBrightness + finalMask * 0.5) * NdotL;
 
-                return half4(diffuse, 1); // sample preview
+                return half4(diffuse, 1); // sample
             }
             ENDHLSL
         }
