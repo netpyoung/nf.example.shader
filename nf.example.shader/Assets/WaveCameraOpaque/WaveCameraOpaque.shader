@@ -1,6 +1,9 @@
 Shader "WaveCameraOpaque"
 {
     // ref: [LWRP(URP) 에서 굴절(Refraction) 만들기](https://chulin28ho.tistory.com/555)
+    // Queue / RenderType 확인.
+    // PipelineAsset> General> Opaque Texture> 체크.
+
     Properties
     {
     }
