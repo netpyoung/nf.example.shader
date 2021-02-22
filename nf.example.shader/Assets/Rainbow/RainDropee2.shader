@@ -19,6 +19,7 @@ Shader "RainDropee2"
 
         _DropletPatternPackTex("Pattern Map(Packed)", 2D) = "" {}
         _DropletNormalTex("Droplet Normal", 2D) = "" {}
+        _RainStreakNormalTex("Rain Streak Normal", 2D) = "" {}
         _DropletOffsetX("Droplet Offset X", Float) = 0.1
         _DropletOffsetY("Droplet Offset Y", Float) = 0.1
         _RainSpeed("Rain Speed", Range(0, 1)) = 1
@@ -62,6 +63,8 @@ Shader "RainDropee2"
             SAMPLER(sampler_DropletPatternPackTex);
             TEXTURE2D(_DropletNormalTex);
             SAMPLER(sampler_DropletNormalTex);
+            TEXTURE2D(_RainStreakNormalTex);
+            SAMPLER(sampler_RainStreakNormalTex);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
@@ -69,6 +72,7 @@ Shader "RainDropee2"
 
                 float4 _DropletPatternPackTex_ST;
                 float4 _DropletNormalTex_ST;
+                float4 _RainStreakNormalTex_ST;
 
                 half _DropletOffsetX;
                 half _DropletOffsetY;
@@ -174,7 +178,7 @@ Shader "RainDropee2"
                 // _Time : https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
                 half time = _Time.y;
 
-                // steak A - droplet
+                // streak A - droplet
                 half dropletTime1 = time * _RainSpeed;
                 half emissive1 = (1 - frac(dropletTime1));
                 half droplet1 = SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, IN.uv).r - emissive1;
@@ -208,54 +212,51 @@ Shader "RainDropee2"
                 half3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
                 half3 L = normalize(light.direction);
 
-                half NdotL = max(0.0, dot(N, L));
-
-                half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-                half3 diffuse = (mainColor * _WaterColor * _WaterBrightness + ripple * 0.5) * NdotL;
 
                 half zGradient = CombineTBN(half3(0, 0, 1), IN.T, IN.B, IN.N).y;
                 zGradient *= 1.1;
                 zGradient = clamp(zGradient, 0, 1);
-                
-                // steak G - mask
+                // return half4(zGradient, zGradient, zGradient, 1); // sample preview
+
+                half vertexNormalMaskAlongXAxis = abs(normalize(IN.N).x);
+
+                // streak G - mask
                 half3 positionWS = IN.positionWS;
                 half3 gsPositionWS = half3(0, 0, 0);
-                half3 steakGMaskUVs = (positionWS - gsPositionWS) / _StreakTiling;
-                steakGMaskUVs.b /= _StreakLength;
-                half steakGMask = lerp(
-                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, steakGMaskUVs.rg).g,
-                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, steakGMaskUVs.bg).g,
-                    IN.N.x
+                half3 streakGMaskUVs = (positionWS - gsPositionWS) / ( 2 * _StreakTiling);
+                streakGMaskUVs.y /= _StreakLength;
+                half streakGMask = lerp(
+                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakGMaskUVs.rg).g,
+                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakGMaskUVs.bg).g,
+                    vertexNormalMaskAlongXAxis
                 );
-                // return half4(steakGMask, steakGMask, steakGMask, 1); // sample preview
+                // return half4(streakGMask, streakGMask, streakGMask, 1); // sample preview
                 
-                // steak B - panning
-                half3 steakBPanningUVs = (positionWS - gsPositionWS) / (2 * _StreakTiling);
-                steakBPanningUVs.y /= _StreakLength;
-                steakBPanningUVs.y += time * _RainSpeed;
-                half steakBPanning = lerp(
-                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, steakBPanningUVs.rg).b,
-                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, steakBPanningUVs.bg).b,
-                    IN.N.x
+                // streak B - panning
+                half3 streakBPanningUVs = (positionWS - gsPositionWS) / (2 * _StreakTiling);
+                streakBPanningUVs.y /= _StreakLength;
+                streakBPanningUVs.y += (time * _RainSpeed);
+                half streakBPanning = lerp(
+                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakBPanningUVs.rg).b,
+                    SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, streakBPanningUVs.bg).b,
+                    vertexNormalMaskAlongXAxis
                 );
-                // return half4(steakBPanning, steakBPanning, steakBPanning, 1); // sample preview
+                // return half4(streakBPanning, streakBPanning, streakBPanning, 1); // sample preview
 
-                half streakMask = saturate((steakGMask - saturate(pow(steakBPanning.r, 8))) * 5);
+                half streakMask = saturate((streakGMask - saturate(pow(streakBPanning, 8))) * 5);
+                // return half4(streakMask, streakMask, streakMask, 1); // sample preview
 
-                // steak normal
-                half3 z = lerp(
-                    UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, steakGMaskUVs.rg)),
-                    UnpackNormal(SAMPLE_TEXTURE2D(_DropletNormalTex, sampler_DropletNormalTex, steakGMaskUVs.bg)),
-                    IN.N.x
+                half3 streakNormal = lerp(
+                    UnpackNormal(SAMPLE_TEXTURE2D(_RainStreakNormalTex, sampler_RainStreakNormalTex, streakBPanningUVs.rg)),
+                    UnpackNormal(SAMPLE_TEXTURE2D(_RainStreakNormalTex, sampler_RainStreakNormalTex, streakBPanningUVs.bg)),
+                    vertexNormalMaskAlongXAxis
                 );
-                return half4(z, 1);
+                // return half4(streakNormal, 1); // sample preview
 
-                half3 steakNormal = lerp(half3(0.5, 0.5, 1), z, streakMask);
-                return half4(steakNormal, 1);
-                
+                streakNormal = lerp(half3(0.5, 0.5, 1), streakNormal, streakMask);
+                return half4(streakNormal, 1); // sample preview
             }
             ENDHLSL
-
         }
     }
 }

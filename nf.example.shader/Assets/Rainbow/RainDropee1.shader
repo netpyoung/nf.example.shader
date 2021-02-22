@@ -174,7 +174,7 @@ Shader "RainDropee1"
                 // _Time : https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
                 half time = _Time.y;
                 
-                // steak A - droplet
+                // streak A - droplet
                 half dropletTime1 = time * _RainSpeed;
                 // frac: 소수점이하 리턴.
                 half emissive1 = (1 - frac(dropletTime1)); // 0.99 ~ 0
