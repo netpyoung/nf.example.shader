@@ -85,104 +85,104 @@ Shader "RainDropeeFinal"
 
                 half _StreakTiling;
                 half _StreakLength;
-                CBUFFER_END
+            CBUFFER_END
 
-                struct Attributes
-                {
-                    float4 positionOS   : POSITION;
-                    float3 normalOS     : NORMAL;
-                    float4 tangent      : TANGENT;
-                    float2 uv           : TEXCOORD0;
-                };
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float3 normalOS     : NORMAL;
+                float4 tangent      : TANGENT;
+                float2 uv           : TEXCOORD0;
+            };
 
-                struct Varyings
-                {
-                    float4 positionHCS      : SV_POSITION;
-                    float2 uv               : TEXCOORD0;
+            struct Varyings
+            {
+                float4 positionHCS      : SV_POSITION;
+                float2 uv               : TEXCOORD0;
 
-                    float3 T                : TEXCOORD1;
-                    float3 B                : TEXCOORD2;
-                    float3 N                : TEXCOORD3;
+                float3 T                : TEXCOORD1;
+                float3 B                : TEXCOORD2;
+                float3 N                : TEXCOORD3;
 
-                    float3 positionWS       : TEXCOORD4;
-                };
+                float3 positionWS       : TEXCOORD4;
+            };
 
-                // ----------
-                inline void ExtractTBN(in half3 normalOS, in float4 tangent, inout half3 T, inout half3  B, inout half3 N)
-                {
-                    N = TransformObjectToWorldNormal(normalOS);
-                    T = TransformObjectToWorldDir(tangent.xyz);
-                    B = cross(N, T) * tangent.w * unity_WorldTransformParams.w;
-                }
+            // ----------
+            inline void ExtractTBN(in half3 normalOS, in float4 tangent, inout half3 T, inout half3  B, inout half3 N)
+            {
+                N = TransformObjectToWorldNormal(normalOS);
+                T = TransformObjectToWorldDir(tangent.xyz);
+                B = cross(N, T) * tangent.w * unity_WorldTransformParams.w;
+            }
 
-                inline half3 CombineTBN(in half3 tangentNormal, in half3 T, in half3  B, in half3 N)
-                {
-                    return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
-                }
+            inline half3 CombineTBN(in half3 tangentNormal, in half3 T, in half3  B, in half3 N)
+            {
+                return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
+            }
 
-                inline half3x3 GetTBN(in half3 T, in half3 B, in half3 N)
-                {
-                    T = normalize(T);
-                    B = normalize(B);
-                    N = normalize(N);
-                    return float3x3(T, B, N);
-                }
+            inline half3x3 GetTBN(in half3 T, in half3 B, in half3 N)
+            {
+                T = normalize(T);
+                B = normalize(B);
+                N = normalize(N);
+                return float3x3(T, B, N);
+            }
 
-                Varyings vert(Attributes IN)
-                {
-                    Varyings OUT = (Varyings)0;
-                    OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-                    OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT = (Varyings)0;
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
-                    ExtractTBN(IN.normalOS, IN.tangent, OUT.T, OUT.B, OUT.N);
+                ExtractTBN(IN.normalOS, IN.tangent, OUT.T, OUT.B, OUT.N);
 
-                    OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 
-                    return OUT;
-                }
+                return OUT;
+            }
 
-                inline half EdgeMask(half droplet, half edgeWidth)
-                {
-                    // 내부에 작은 검은 마스크를 만들어 결과적으로 흰색 테두리 효과.
+            inline half EdgeMask(half droplet, half edgeWidth)
+            {
+                // 내부에 작은 검은 마스크를 만들어 결과적으로 흰색 테두리 효과.
 
-                    // 0  0.05        0.95 1
-                    // |--|--------------|-|
-                    // 검        회        흰
+                // 0  0.05        0.95 1
+                // |--|--------------|-|
+                // 검        회        흰
 
-                    // smoothstep(min, max, x);
-                    // - [min, max]사이의 Hermite 보간
+                // smoothstep(min, max, x);
+                // - [min, max]사이의 Hermite 보간
 
-                    // 0.04 ~ 0 | 0 ~ 0.05 ~ 0.9 | 0.9 ~ 0.95 // distance 0.05
-                    // 0        | 0 ~ 1    ~ 18  | 18  ~ 19   // divide   0.05
-                    // 0        | 0 ~ 1          | 1          // smoothstep
-                    // 1        | 1 ~ 0          | 0           // 1 - x
-                    return 1 - smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
-                }
+                // 0.04 ~ 0 | 0 ~ 0.05 ~ 0.9 | 0.9 ~ 0.95 // distance 0.05
+                // 0        | 0 ~ 1    ~ 18  | 18  ~ 19   // divide   0.05
+                // 0        | 0 ~ 1          | 1          // smoothstep
+                // 1        | 1 ~ 0          | 0           // 1 - x
+                return 1 - smoothstep(0, 1, distance(droplet, 0.05) / edgeWidth);
+            }
 
-                inline half RippleFade(half dropletTime)
-                {
-                    // ripple: 잔물결
-                    // 시간에따른 Fade in / out 효과
-                    // sin PI값을 사용.
-                    return abs(sin(dropletTime * PI));
-                }
+            inline half RippleFade(half dropletTime)
+            {
+                // ripple: 잔물결
+                // 시간에따른 Fade in / out 효과
+                // sin PI값을 사용.
+                return abs(sin(dropletTime * PI));
+            }
 
-                inline half InterpolationTime(half time, half rainSpeed)
-                {
-                    //half interpolationTime = abs(sin(time * rainSpeed * PI));
-                    //// clamp(x, a, b)
-                    //// => max(a, min(b, x));
-                    //// | x < a             | a
-                    //// |             b < x | b
-                    //// |     a < x < b     | x
-                    //return clamp(interpolationTime, 0, 1);
-                    return abs(sin(time * rainSpeed * PI));
-                }
+            inline half InterpolationTime(half time, half rainSpeed)
+            {
+                //half interpolationTime = abs(sin(time * rainSpeed * PI));
+                //// clamp(x, a, b)
+                //// => max(a, min(b, x));
+                //// | x < a             | a
+                //// |             b < x | b
+                //// |     a < x < b     | x
+                //return clamp(interpolationTime, 0, 1);
+                return abs(sin(time * rainSpeed * PI));
+            }
 
-                half4 frag(Varyings IN) : SV_Target
-                {
-                    // _Time : https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-                    half time = _Time.y;
+            half4 frag(Varyings IN) : SV_Target
+            {
+                // _Time : https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+                half time = _Time.y;
 
                 // streak A - droplet
                 half dropletTime1 = time * _RainSpeed;
