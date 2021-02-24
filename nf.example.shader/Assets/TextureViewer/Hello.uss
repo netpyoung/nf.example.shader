@@ -1,0 +1,5 @@
+.portrait .img {
+    background-color: white;
+    width: 55;
+    height: 55;
+}

@@ -129,7 +129,7 @@ Shader "Marschener"
                 half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
                 half3 diffuse = _Kd * sinTL;
-                half3 specular = _Ks * pow(TdotL * TdotV + sinTL * sinTV, _SpecularPow);
+                half3 specular = _Ks * pow(max(0.0, TdotL * TdotV + sinTL * sinTV), _SpecularPow);
                 
                 half4 finalColor = half4(diffuse * mainColor + specular, 0);
 

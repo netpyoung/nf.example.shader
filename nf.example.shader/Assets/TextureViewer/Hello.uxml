@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Label text="Hello World! From UXML" />
+
+    <editor:ObjectField label="UXML Field" name="ObjectField" type="UnityEngine.Texture2D, UnityEngine.CoreModule" />
+  <engine:Toggle label="UXML Field" name="the-uxml-field1" />
+  <engine:Toggle label="UXML Field" name="the-uxml-field2" />
+  <engine:Toggle label="UXML Field" name="the-uxml-field3" />
+  <engine:VisualElement class="portrait">
+    <engine:Image class="img" name="image" />
+    <engine:Button name="AddButton" class="addButton" />
+  </engine:VisualElement>
+  <engine:Button name="AddButton2" class="addButton" />
+
+  <engine:Label text="Hello World! From UXML" />
+</engine:UXML>

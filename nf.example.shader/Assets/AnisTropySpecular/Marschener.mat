@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Marschener
-  m_Shader: {fileID: 4800000, guid: 908d4f71b84a7064b9ae06b9bcf106a2, type: 3}
+  m_Shader: {fileID: 4800000, guid: 80417c70ea217cf45bc6dcdfdeaba47a, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
