@@ -13,7 +13,7 @@ Shader "WaveCameraOpaque"
         Tags
         {
             "Queue" = "Transparent" // ***
-            "RenderType" = "Opaque"
+            "RenderType" = "Transparent"
             "RenderPipeline" = "UniversalPipeline"
         }
 
@@ -29,7 +29,7 @@ Shader "WaveCameraOpaque"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl" // SampleSceneColor
 
             //TEXTURE2D(_CameraOpaqueTexture);
             //SAMPLER(sampler_CameraOpaqueTexture);
@@ -150,6 +150,7 @@ Shader "WaveCameraOpaque"
                 Unity_FresnelEffect_float(N, V, 0.27, fresnelEffect);
                 fresnelEffect = 1 - fresnelEffect * 0.02;
                 
+                // SampleSceneColor - com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl
                 half3 mainColor = SampleSceneColor(screenUV + noise * fresnelEffect);
                 return half4(mainColor, 1);
             }

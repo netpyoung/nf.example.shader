@@ -2,6 +2,17 @@
 
  SubSurfaceScattering (피하산란)
 
+## Fake SSS
+
+[Chapter 16. Real-Time Approximations to Subsurface Scattering](https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch16.html)
+16.2 Simple Scattering Approximations
+float diffuse = max(0, dot(L, N));
+float wrap_diffuse = max(0, (dot(L, N) + wrap) / (1 + wrap));
+
+wrap_diffuse를 이용 스킨LUT 텍스쳐를 생성하고, LUT텍스쳐를 이용 light값을 얻어온다.
+
+16.3 Simulating Absorption Using Depth Maps
+깊이맵을 이용.
 
 ## 
 BRDF Texture
@@ -51,8 +62,7 @@ Silhouette
 
 
 ## ref
-Chapter 16. Real-Time Approximations to Subsurface Scattering
-https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch16.html
+
 SubSurfaceScattering + UDK Custom Shader 권오찬
 
 https://blog.naver.com/mnpshino/221442188568

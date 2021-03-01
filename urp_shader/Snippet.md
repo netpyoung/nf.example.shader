@@ -56,6 +56,9 @@ FresnelLerp() UnityStandardBRDF.cginc
 MSAA - Multi-Sampling Anti-Aliasing의 
 FFR - https://developer.oculus.com/documentation/native/android/mobile-ffr/
 =========
+ColorMask 0 은 모야
+
+=========
 GrabPass
 
 BlitPass
@@ -76,6 +79,7 @@ BlitPass
 universal/Shared/Library/DeclareDepthTexture.hlsl   _CameraDepthTexture
 universal/Shared/Library/DeclareNormalsTexture.hlsl _CameraNormalsTexture
 universal/Shared/Library/DeclareOpaqueTexture.hlsl  _CameraOpaqueTexture
+
 
 ===============
 모바일에서 활용할 수 있는 URP 기반 게임 개발 템플릿 프로젝트

@@ -4,8 +4,7 @@
 TRANSFER_SHADOW
 TRANSFER_SHADOW_CASTER
 
-[셰도우캐스터(ShadowCaster)를 활용한 그림자 생성 변경](https://blueasa.tistory.com/1139)
-
+[[1023 박민수] 깊이_버퍼_그림자_1](https://www.slideshare.net/MoonLightMS/1023-1)
 
 
 ## 바닥그림자

@@ -1,5 +1,9 @@
 # a
 
+방향과 거리 그리고 파장.
+
+방향, 크기, 마스킹(영역)
+
 - <https://github.com/XJINE/Unity_NormalVisualizerWithGizmo>
 - [Low Complexity, High Fidelity: The Rendering of INSIDE](https://www.youtube.com/watch?v=RdN06E6Xn9E)
 
