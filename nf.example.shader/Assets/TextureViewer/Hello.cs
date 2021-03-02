@@ -8,7 +8,7 @@ using UnityEditor.UIElements;
 // - https://github.com/andydbc/unity-texture-packer
 
 // channel split?
-// Read/Write Enable : CPU / GPU¸Ş¸ğ¸® »ç¿ë ÁÖÀÇ»çÇ×.
+// Read/Write Enable : CPU / GPUë©”ëª¨ë¦¬ ì‚¬ìš© ì£¼ì˜ì‚¬í•­.
 
 // Gamma decode / encode
 
@@ -53,7 +53,7 @@ public class Hello : EditorWindow
         });
 
         var img = root.Q<Image>("image");
-        
+
         var btn = root.Q<Button>("AddButton");
         btn.clicked += () =>
         {
@@ -66,12 +66,15 @@ public class Hello : EditorWindow
                 var pixels = yy.GetPixels32();
                 for (int i = 0; i < pixels.Length; ++i)
                 {
-                    pixels[i].r = 0;
-                    pixels[i].g = 0;
+                    //pixels[i].r = (byte)(255 - pixels[i].r);
+                    //pixels[i].g = (byte)(127 - pixels[i].g);
+                    //pixels[i].b = (byte)(255 - pixels[i].b);
                 }
                 n.SetPixels32(pixels);
                 n.Apply();
                 img.image = n;
+                byte[] _bytes = n.EncodeToPNG();
+                System.IO.File.WriteAllBytes("X.png", _bytes);
             }
         };
     }
