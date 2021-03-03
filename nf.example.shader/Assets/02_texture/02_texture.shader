@@ -43,7 +43,7 @@
 
 			Varyings vert(Attributes IN)
 			{
-				Varyings OUT;
+				Varyings OUT = (Varyings) 0;
 
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _Texture);
