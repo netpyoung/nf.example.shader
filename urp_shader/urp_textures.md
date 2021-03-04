@@ -1,11 +1,11 @@
 _CameraColorTexture
-![./_CameraColorTexture.png](_CameraColorTexture.png)
+![./urp_shader_res/_CameraColorTexture.png](./urp_shader_res/_CameraColorTexture.png)
 
 _CameraDepthNormalsTexture
-![./_CameraDepthNormalsTexture.png](_CameraDepthNormalsTexture.png)
+![./_CameraDepthNormalsTexture.png](./urp_shader_res/_CameraDepthNormalsTexture.png)
 
 _CameraDepthTexture
-![./_CameraDepthTexture.png](_CameraDepthTexture.png)
+![./urp_shader_res/_CameraDepthTexture.png](./urp_shader_res/_CameraDepthTexture.png)
 com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
 SampleSceneDepth
 LoadSceneDepth

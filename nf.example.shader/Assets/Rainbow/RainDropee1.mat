@@ -126,7 +126,7 @@ Material:
     - _StreakLength: 1
     - _StreakTiling: 1
     - _Surface: 0
-    - _TimeOffset: 0.57
+    - _TimeOffset: 0.5
     - _WaterBrightness: 0.84
     - _WorkflowMode: 1
     - _ZWrite: 1

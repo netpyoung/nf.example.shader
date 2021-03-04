@@ -5,19 +5,19 @@
 
 Specular 구할때 보통 pow쓰는데 이때 제곱되어 지는 횟수를 줄여봐보자
 
-![./powgraph.gif](./powgraph.gif)
+![./powgraph.gif](./res/powgraph.gif)
 
 이 그래프에서 예를들어 n=4와 n=16을 비교할때, n=4의 그래프의 기울기와 시작 위치를 얼추 조절하면 오차야 있겠지만, n=16그래프와 비슷해 질 것이다.
 
-![./n4n16gif](./n4n16.gif)
+![./n4n16gif](./res/n4n16.gif)
 
 그럼 기울기와 오프셋을 구하는 것은 위 문서에 나와있다.
 
 이걸 활용해보자.
 
-![./powtable1.gif](./powtable1.gif)
+![./powtable1.gif](./res/powtable1.gif)
 
-![./powtable2.gif](./powtable2.gif)
+![./powtable2.gif](./res/powtable2.gif)
 
 예를들어, pow(x, 18)을 구하고자 한다면,
 

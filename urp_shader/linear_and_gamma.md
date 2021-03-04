@@ -4,14 +4,14 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 `Edit> Project Settings> Player> Other Settings> Rendering> Color Space`
 
-![./LinearRendering-ColorSpaceSetting.png](./LinearRendering-ColorSpaceSetting.png)
+![./LinearRendering-ColorSpaceSetting.png](./urp_shader_res/LinearRendering-ColorSpaceSetting.png)
 
 ## Gamma / Linear Color Space 결과물 차이
 
 - [unity: Linear or gamma workflow](https://docs.unity3d.com/2021.1/Documentation/Manual/LinearRendering-LinearOrGammaWorkflow.html)
 
-![./lineargammahead.png](./lineargammahead.png)
-![./LinearLighting-2.jpg](./LinearLighting-2.jpg)
+![./lineargammahead.png](./urp_shader_res/lineargammahead.png)
+![./LinearLighting-2.jpg](./urp_shader_res/LinearLighting-2.jpg)
 
 이러한 조명 강도, 블렌딩 차이는 어디서 오는 것일까?
 
@@ -19,13 +19,13 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 같은 RGB값이라도 Linear와 Gamma상태에서 보여지는 색이 다르다.
 
-![./linear-gamma-white-blackc.png](./linear-gamma-white-blackc.png)
+![./linear-gamma-white-blackc.png](./urp_shader_res/linear-gamma-white-blackc.png)
 
 - 감마 보정([wiki: Gamma correction](https://en.wikipedia.org/w/index.php?title=Gamma_correction))
 
 가운데 45도 선이 Linear(Gamma: 1.0)이며, 나머지는 감마 보정이다(위로는 Encode(0.45), 아레로는 Decode(2.2))
 
-![./gammacurves.png](./gammacurves.png)
+![./urp_shader_res/gammacurves.png](./urp_shader_res/gammacurves.png)
 
 | Gamma correction | Gamma value  | 공간        |
 |------------------|--------------|-------------|
@@ -37,7 +37,7 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 ## Gamma / Linear Color Space 작업 환경
 
-![./An+image+comparing+gamma+and+linear+pipelines.png](./An+image+comparing+gamma+and+linear+pipelines.png)
+![./urp_shader_res/An+image+comparing+gamma+and+linear+pipelines.png](./urp_shader_res/An+image+comparing+gamma+and+linear+pipelines.png)
 
 ### 감마 보정 환경
 
@@ -85,7 +85,7 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 
 ### sRGB로 보정이 필요한 텍스쳐 구분
 
-![./sRGB_ColorTexture.JPG](./sRGB_ColorTexture.JPG)
+![./urp_shader_res/sRGB_ColorTexture.JPG](./sRGB_ColorTexture.JPG)
 
 1. 데이터를 그대로 다루는것은 Linear로
 2. 나머지 Albedo / Emmission는 sRGB 체크로 Gamma Decode 하도록
@@ -103,7 +103,7 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
   - Linear개념으로 보면 정확한 계산이지만, 포토샵 작업자 관점에서는 아니다.
 - sRGB옵션은 RGB에만 영향을 줌으로, Alpha를 처리함에 있어 추가 작업을 해 주어야 한다.
 
-![./ui_alpha_blend_problem.jpg](./ui_alpha_blend_problem.jpg)
+![./urp_shader_res/ui_alpha_blend_problem.jpg](./urp_shader_res/ui_alpha_blend_problem.jpg)
 
 몇가지 방법이 있다
 
@@ -140,7 +140,7 @@ Unity에는 Gamma와 Linear를 선택할 수 있는 Color Space항목이 있다.
 7. 새로운 Renderer 추가와 작성한 Feature추가
    1. General> Renderer List> Add Last GammaUIFix
 
-![./LinearGammaURPFix.jpg](./LinearGammaURPFix.jpg)
+![./urp_shader_res/LinearGammaURPFix.jpg](./urp_shader_res/LinearGammaURPFix.jpg)
 
 ``` hlsl
 // _CameraColorTexture 활성화는 PipelineAsset> Quality> Anti Aliasing (MSAA)> 2x 이상으로 하면 됨.

@@ -78,7 +78,7 @@ vert()
     return 1 or 0;
 }
 ```
-![./cascade.jpg](./cascade.jpg)
+![./urp_shader_res/cascade.jpg](./urp_shader_res/cascade.jpg)
 
 ``` hlsl
 // com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl
