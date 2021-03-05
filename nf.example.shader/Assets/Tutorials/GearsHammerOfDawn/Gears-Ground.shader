@@ -9,7 +9,9 @@
     Properties
     {
         [Toggle]
-        _Debug("Debug", Float) = 0
+        _DebugColor("Debug Color", Float) = 0
+        [Toggle]
+        _DebugRotate("Debug Rotate", Float) = 0
 
         [NoScaleOffset] _NoiseTex("Noise Texture", 2D) = "white" {}
 
@@ -38,7 +40,9 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            #pragma shader_feature_local _DEBUG_OFF _DEBUG_ON
+            #pragma shader_feature_local _DEBUGCOLOR_OFF _DEBUGCOLOR_ON
+            #pragma shader_feature_local _DEBUGROTATE_OFF _DEBUGROTATE_ON
+            
 
             TEXTURE2D(_NoiseTex);     SAMPLER(sampler_NoiseTex);
 
@@ -60,12 +64,12 @@
             {
                 float4 positionHCS  : SV_POSITION;
                 float3 N            : TEXCOORD0;
-#if _DEBUG_ON
+#if _DEBUGCOLOR_ON
                 float3 color        : TEXCOORD1;
 #endif
             };
 
-            void Rotate(inout half4 vertex, inout half3 normal, half3 center, half3 around, half angle)
+            void Rotate(inout half4 vertex, inout half3 normal, half3 center, half3 n, half angle)
             {
                 // 이동행렬
                 // | 1 0 0 x |
@@ -87,39 +91,24 @@
                 );
 
                 //Calculate some values that are used often
-                around.x = -around.x;
-                around = normalize(around);
+                n.x = -n.x;
+                n = normalize(n);
 
+                // n축 angle회전 행렬.
+                // ref: https://www.3dgep.com/3d-math-primer-for-game-programmers-matrices/#Rotation_about_an_arbitrary_axis
                 half s = sin(angle);
                 half c = cos(angle);
                 half ic = 1.0 - c;
-
-                // 회전행렬
-                // X 축
-                // |    1    0    0  0 |
-                // |    0  cos -sin  0 |
-                // |    0  sin  cos  0 |
-                // |    0    0    0  1 |
-                // Y 축
-                // |  cos    0  sin  0 |
-                // |    0    1    0  0 |
-                // | -sin    0  cos  0 |
-                // |    0    0    0  1 |
-                // Z 축
-                // |  cos  -sin    0  0 |
-                // |  sin   cos    0  0 |
-                // |    0     0    1  0 |
-                // |    0     0    0  1 |
                 half4x4 rotation = half4x4(
-                    ic * around.x * around.x + c           , ic * around.x * around.y - s * around.z, ic * around.z * around.x + s * around.y, 0,
-                    ic * around.x * around.y + s * around.z, ic * around.y * around.y + c           , ic * around.y * around.z - s * around.x, 0,
-                    ic * around.z * around.x - s * around.y, ic * around.y * around.z + s * around.x, ic * around.z * around.z + c           , 0,
-                    0                                      , 0                                      , 0                                      , 1
+                    ic * n.x * n.x + c      , ic * n.x * n.y - s * n.z, ic * n.z * n.x + s * n.y, 0,
+                    ic * n.x * n.y + s * n.z, ic * n.y * n.y + c      , ic * n.y * n.z - s * n.x, 0,
+                    ic * n.z * n.x - s * n.y, ic * n.y * n.z + s * n.x, ic * n.z * n.z + c      , 0,
+                    0                       , 0                       , 0                       , 1
                 );
 
                 //Rotate the vertex and its normal
                 vertex = mul(translationT, mul(rotation, mul(translation, vertex)));
-                normal = mul(translationT, mul(rotation, mul(translation, float4(normal, 0.0f)))).xyz;
+                normal = mul(translationT, mul(rotation, mul(translation, half4(normal, 0.0f)))).xyz;
             }
 
             Varyings vert(Attributes IN)
@@ -132,26 +121,33 @@
                 // 중심점 이동 [0, 1] => [-0.5, 0.5].
                 half2 uvDir = IN.uv - 0.5f;
 
-                half scaledSequence = _Sequence * 1.52 - 0.02;
-                half sequenceVal = pow(1 - (noiseTexVal + 1) * length(uvDir), _Exp) * scaledSequence;
+                half sequenceScale = _Sequence * 1.52 - 0.02; // 하드코딩으로(* 1.52 - 0.02) 범위조정.
 
-                half3 center = half3(2.0f * uvDir, 0);
-                half3 around = cross(half3(uvDir, 0), half3(noiseTexVal * 0.1f, 0, 1));
+                // length(uvDir)을 이용하여, 중심에 가까울 수록 흰색(1), 멀어질수록 검정색(0)
+                half sequenceVal = pow(1 - (noiseTexVal + 1) * length(uvDir), _Exp) * sequenceScale;
+
+#if _DEBUGROTATE_OFF
+                half3 center = half3(2.0f * uvDir, 0);                                  // [-0.5, 0.5] => [-1, 1]
+                half3 around = cross(half3(uvDir, 0), half3(noiseTexVal * 0.1, 0, 1));
                 half angle = sequenceVal * _Rot;
-
                 Rotate(IN.positionOS, IN.normal, center, around, angle);
+#endif
 
-                IN.positionOS.z += sin(sequenceVal * 2) * (noiseTexVal + 1) * _Height;
+                // 높이: 노이즈 색깔별(noiseTexVal + 1)로 띄우고, PI주기인 sin을 이용하여 굴곡형성.
+                IN.positionOS.z += (noiseTexVal + 1) * _Height * sin(sequenceVal * 2);
+                // 넓이: uv의 y를 뒤짚어서 양옆으로 넓히기.
                 IN.positionOS.xy -= normalize(half2(IN.uv.x, 1 - IN.uv.y) - 0.5) * sequenceVal * noiseTexVal;
 
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.N = TransformObjectToWorldDir(IN.normal);
 
-#if _DEBUG_ON
-                OUT.color = noiseTexVal;
+#if _DEBUGCOLOR_ON
+                // OUT.color = noiseTexVal;
+                // OUT.color = half3(uvDir, 0);
+                // OUT.color = length(uvDir);
+                OUT.color = sequenceVal;
                 // OUT.color = half3(IN.uv, 0);
                 // OUT.color = IN.positionOS.xyz;
-                // OUT.color = sequenceVal;
 #endif
                 return OUT;
             }
@@ -164,7 +160,7 @@
                 half3 N = normalize(IN.N);
                 half NdotL = dot(N, L);
 
-#if _DEBUG_ON
+#if _DEBUGCOLOR_ON
                 return half4(NdotL * IN.color, 1);
 #else
                 return half4(NdotL, NdotL, NdotL, 1);

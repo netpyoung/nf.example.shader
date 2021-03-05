@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Gears-Ground
   m_Shader: {fileID: 4800000, guid: aae6e5eaef5fb2140b970485834067ab, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _DEBUGCOLOR_ON _DEBUG_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -91,22 +91,25 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _Debug: 1
+    - _DebugColor: 1
+    - _DebugRotate: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _Exp: 5
+    - _Exp: 4.8
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Height: 0.5
+    - _Height: 0.58
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Rot: 50
-    - _Sequence: 0
+    - _Rot: 44
+    - _Sequence: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
