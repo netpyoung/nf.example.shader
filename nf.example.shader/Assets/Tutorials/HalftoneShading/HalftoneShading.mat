@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RainDropee2
-  m_Shader: {fileID: 4800000, guid: 9b1a7f9c27be1cc45b5b07c25942b650, type: 3}
+  m_Name: HalftoneShading
+  m_Shader: {fileID: 4800000, guid: b0dd1d36e46972042b9a1911634d6e93, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -39,28 +39,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _DropletNormalTex:
-        m_Texture: {fileID: 2800000, guid: 3afbf9d69d9e968488eca4ed7c8817cb, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DropletPatternPackTex:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: ce25563f7e74fce47a8cbacf3efaa7e8, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _NormalTex:
-        m_Texture: {fileID: 2800000, guid: 05b1d5a76019f8745924268b742bde2f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -71,12 +59,8 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _PatternPackTex:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _RainStreakNormalTex:
-        m_Texture: {fileID: 2800000, guid: f46594e68181b094f9033102caaa894e, type: 3}
+    - _PatternTex:
+        m_Texture: {fileID: 2800000, guid: a5c5448468d38a140b102665bd0100a9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -105,13 +89,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DropletOffsetX: -0.09
-    - _DropletOffsetY: 0
-    - _DropletSpeed: 1
-    - _DropletSpeed1: 1
-    - _DropletSpeed2: 1
     - _DstBlend: 0
-    - _EdgeWidth: 0.05
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
@@ -120,18 +98,18 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RainSpeed: 1
     - _ReceiveShadows: 1
+    - _RemapInputMax: 1
+    - _RemapInputMin: 0
+    - _RemapOutputMax: 1
+    - _RemapOutputMin: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: 1
     - _SrcBlend: 1
-    - _StreakLength: 1
-    - _StreakTiling: 1
+    - _Substract: 0
     - _Surface: 0
-    - _TimeOffset: 0.5
-    - _WaterBrightness: 0.84
+    - _Tilling: 80
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
@@ -139,9 +117,8 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _WaterColor: {r: 0.6018156, g: 0.754867, b: 0.990566, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &8065639486922064815
+--- !u!114 &1721469728149724625
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

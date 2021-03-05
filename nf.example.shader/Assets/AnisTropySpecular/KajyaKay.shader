@@ -1,4 +1,4 @@
-Shader "KajyaKay"
+ï»¿Shader "KajyaKay"
 {
     // ref: https://blog.naver.com/sorkelf/40185948507
     Properties
@@ -105,14 +105,14 @@ Shader "KajyaKay"
                 Light light = GetMainLight();
 
                 // Sphere
-                // T | r | ¿À¸¥ÂÊ
-                // B | g | À§ÂÊ
-                // N | b | Á÷°¢
+                // T | r | ì˜¤ë¥¸ìª½
+                // B | g | ìœ„ìª½
+                // N | b | ì§ê°
 
-                // ³í¹®¿¡¼­ T. ¹æÇâÀº ¸Ó¸®¸¦ÇâÇÑ À§ÂÊ ¹æÇâ.
+                // ë…¼ë¬¸ì—ì„œ T. ë°©í–¥ì€ ë¨¸ë¦¬ë¥¼í–¥í•œ ìœ„ìª½ ë°©í–¥.
                 // half3 T = normalize(IN.T);
 
-                // Sphere¿¡¼­´Â B°¡ À§ÂÊÀÌ¹Ç·Î B·ÎÇØ¾ß ¿øÇÏ´Â ¹æÇâÀÌ ³ª¿Â´Ù.
+                // Sphereì—ì„œëŠ” Bê°€ ìœ„ìª½ì´ë¯€ë¡œ Bë¡œí•´ì•¼ ì›í•˜ëŠ” ë°©í–¥ì´ ë‚˜ì˜¨ë‹¤.
                 half3 T = normalize(IN.B);
                 half3 N = normalize(IN.N);
                 half3 L = normalize(light.direction);

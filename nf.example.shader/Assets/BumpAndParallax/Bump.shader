@@ -1,4 +1,4 @@
-Shader "example/Bump"
+﻿Shader "example/Bump"
 {
 	Properties
 	{

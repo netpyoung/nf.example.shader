@@ -1,4 +1,4 @@
-Shader "OverwatchShield"
+ï»¿Shader "OverwatchShield"
 {
     // ref:
     // - https://lexdev.net/tutorials/case_studies/overwatch_shield.html
@@ -84,9 +84,9 @@ Shader "OverwatchShield"
 
                 half4 pulseTerm = pulseColor * _Color * _PulseIntensity;
                 pulseTerm *= abs(
-                    sin(_Time.y * _PulseTimeScale               // ½Ã°£ ºü¸£±â.
-                        - horizontalDist * _PulsePosScale       // ÁÂ¿ì ÀÌµ¿.
-                        + pulseColor.r * _PulseTexOffsetScale   // r°ª¿¡ ´ëÇÑ °¡ÁßÄ¡.
+                    sin(_Time.y * _PulseTimeScale               // ì‹œê°„ ë¹ ë¥´ê¸°.
+                        - horizontalDist * _PulsePosScale       // ì¢Œìš° ì´ë™.
+                        + pulseColor.r * _PulseTexOffsetScale   // rê°’ì— ëŒ€í•œ ê°€ì¤‘ì¹˜.
                     )
                 );
 

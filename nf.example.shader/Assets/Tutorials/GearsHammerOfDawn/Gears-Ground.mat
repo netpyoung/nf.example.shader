@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RainDropeeGraph
-  m_Shader: {fileID: 4800000, guid: e562e92414aee574fb7ec830aa3f6a3a, type: 3}
+  m_Name: Gears-Ground
+  m_Shader: {fileID: 4800000, guid: aae6e5eaef5fb2140b970485834067ab, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,22 +19,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - Texture2D_1233906b4fa648f28922b21485c46e05:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_167b737e376048c192bfda6968aaa6a7:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_78d8795fc2df4e4fb48d56e5840bc8d9:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_911ee6a5d7064d9f93129fedca50c122:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -55,28 +39,24 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _DropletNormalTex:
-        m_Texture: {fileID: 2800000, guid: 3afbf9d69d9e968488eca4ed7c8817cb, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DropletPatternPackTex:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: ce25563f7e74fce47a8cbacf3efaa7e8, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NormalTex:
-        m_Texture: {fileID: 2800000, guid: 05b1d5a76019f8745924268b742bde2f, type: 3}
+    - _Noise:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: f240cf581956f6b44a9a5a9226c4953b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -85,18 +65,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _PatternPackTex:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_35d365c195da4afa9586219810c7f164_Texture_1:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_dcef86d5f7244e3785489978fd6b149e_Texture_1:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -116,7 +84,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_61e855b0e77743c09b2a4716195baa60: 0.05
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -126,33 +93,25 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DropletOffsetX: 0.1
-    - _DropletOffsetY: 0.1
-    - _DropletSpeed: 1
-    - _DropletSpeed1: 1
-    - _DropletSpeed2: 1
     - _DstBlend: 0
-    - _EdgeWidth: 0.05
     - _EnvironmentReflections: 1
+    - _Exp: 5
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _Height: 0.5
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RainSpeed: 1
     - _ReceiveShadows: 1
+    - _Rot: 50
+    - _Sequence: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: 1
     - _SrcBlend: 1
-    - _StreakLength: 1
-    - _StreakTiling: 1
     - _Surface: 0
-    - _TimeOffset: 0.5
-    - _WaterBrightness: 0.4
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
@@ -160,9 +119,8 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _WaterColor: {r: 0.5, g: 0.7, b: 1, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &8065639486922064815
+--- !u!114 &8771533049493115640
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

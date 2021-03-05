@@ -1,4 +1,4 @@
-Shader "example/Gouraud"
+﻿Shader "example/Gouraud"
 {
 	Properties
 	{

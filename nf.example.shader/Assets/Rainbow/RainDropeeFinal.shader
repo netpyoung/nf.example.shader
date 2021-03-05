@@ -192,7 +192,7 @@ Shader "RainDropeeFinal"
                 half rippleFade1 = RippleFade(dropletTime1);
 
                 half2 dropletOffset = half2(_DropletOffsetX, _DropletOffsetY);
-                half dropletTime2 = (time + _TimeOffset) * _RainSpeed;
+                half dropletTime2 = time * _RainSpeed + _TimeOffset;
                 half emissive2 = (1 - frac(dropletTime2));
                 half droplet2 = SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, IN.uv + dropletOffset).r - emissive2;
                 half edgeMask2 = EdgeMask(droplet2, _EdgeWidth);

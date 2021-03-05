@@ -4,6 +4,8 @@
 [Intersection Material using Shader Graph in Unity](https://www.youtube.com/watch?v=ayd8L6ZyCvw)
 [FORCE FIELD in Unity - SHADER GRAPH](https://www.youtube.com/watch?v=NiOGWZXBg4Y)
 
+https://www.taodudu.cc/news/show-2015342.html
+https://zhuanlan.zhihu.com/p/328955585
 
 ``` hlsl
 half3 combinedTex = SAMPLE_TEXTURE2D(_CombinedTex, sampler_CombinedTex, IN.uv).rgb;
@@ -167,26 +169,23 @@ OUT.positionNDC = vertexInputs.positionNDC;
 // frag
 half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
 half sceneRawDepth = SampleSceneDepth(screenUV);
-half scene01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);
 
-// _ProjectionParams.z : (1 - far/near) / far 
-half depth = scene01Depth * _ProjectionParams.z - IN.positionNDC.w;
-half intersectGradient = 1 - min(depth, 1.0f);
-```
+// --------------------------------------------
+// 0 ~ 1을 _ProjectionParams.z : far plane 으로 늘려주자
+half scene01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);   //  [Near / Far, 1]
+half sceneEyeDepth = scene01Depth * _ProjectionParams.z;            //  [Near, Far]
+// -----------------------------------------------
+half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams); //  [Near, Far]
+// -----------------------------------------------
+float fragmentEyeDepth = positionNDC.w;
+// -----------------------------------------------
+float fragmentEyeDepth = -positionWS.z;
+// -----------------------------------------------
 
-
-``` hlsl
-// vert
-VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-OUT.positionWS = vertexInputs.positionWS;
-OUT.positionNDC = vertexInputs.positionNDC;
-
-// frag
-half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
-half sceneRawDepth = SampleSceneDepth(screenUV);
-half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
-half fragmentEyeDepth = -TransformWorldToView(IN.positionWS).z;
+// 물체와의 거리를 빼면
 half depth = sceneEyeDepth - fragmentEyeDepth;
+
+// 얼마나 앞에 나와있는지 알 수 있다.
 half intersectGradient = 1 - min(depth, 1.0f);
 ```
 

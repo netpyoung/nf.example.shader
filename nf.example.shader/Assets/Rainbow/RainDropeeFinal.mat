@@ -105,8 +105,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DropletOffsetX: 0.5
-    - _DropletOffsetY: 0.5
+    - _DropletOffsetX: -0.09
+    - _DropletOffsetY: 0
     - _DropletSpeed: 1
     - _DropletSpeed1: 1
     - _DropletSpeed2: 1
@@ -120,7 +120,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RainSpeed: 0.5
+    - _RainSpeed: 0.33
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
@@ -131,7 +131,7 @@ Material:
     - _StreakTiling: 1
     - _Surface: 0
     - _TimeOffset: 0.5
-    - _WaterBrightness: 0.84
+    - _WaterBrightness: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
@@ -139,7 +139,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _WaterColor: {r: 0.61459595, g: 0.8734683, b: 0.9811321, a: 1}
+    - _WaterColor: {r: 0.6375223, g: 0.77425325, b: 0.8301887, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &8065639486922064815
 MonoBehaviour:

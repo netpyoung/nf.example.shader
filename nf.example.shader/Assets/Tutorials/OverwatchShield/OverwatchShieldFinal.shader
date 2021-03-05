@@ -1,4 +1,4 @@
-Shader "OverwatchShieldFinal"
+ÔªøShader "OverwatchShieldFinal"
 {
     // ref:
     // - https://lexdev.net/tutorials/case_studies/overwatch_shield.html
@@ -128,9 +128,9 @@ Shader "OverwatchShieldFinal"
                 half4 pulseColor = combinedTex.g;
                 half4 pulseTerm = pulseColor * _BaseColor * _PulseIntensity;
                 pulseTerm *= abs(
-                    sin(_Time.y * _PulseTimeScale               // Ω√∞£ ∫¸∏£±‚.
-                        - horizontalDist * _PulsePosScale       // ¡¬øÏ ¿Ãµø.
-                        + pulseColor * _PulseTexOffsetScale     // PulseColorø° ¥Î«— ∞°¡ﬂƒ°.
+                    sin(_Time.y * _PulseTimeScale               // ÏãúÍ∞Ñ Îπ†Î•¥Í∏∞.
+                        - horizontalDist * _PulsePosScale       // Ï¢åÏö∞ Ïù¥Îèô.
+                        + pulseColor * _PulseTexOffsetScale     // PulseColorÏóê ÎåÄÌïú Í∞ÄÏ§ëÏπò.
                     )
                 );
 
@@ -152,7 +152,9 @@ Shader "OverwatchShieldFinal"
 
                 // InterSection
                 half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
-                half depth = Linear01Depth(SampleSceneDepth(screenUV), _ZBufferParams) * _ProjectionParams.z - IN.positionNDC.w;
+                half sceneZ = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
+                half partZ = IN.positionNDC.w;
+                half depth = sceneZ - partZ;
                 half intersectGradient = 1 - min(depth, 1.0f);
                 half3 intersectTerm = _EdgeColor.rgb * pow(intersectGradient, _IntersectExponent) * _IntersectIntensity;
 

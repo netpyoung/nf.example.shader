@@ -1,4 +1,4 @@
-Shader "OverwatchShield3"
+﻿Shader "OverwatchShield3"
 {
     // ref:
     // - https://lexdev.net/tutorials/case_studies/overwatch_shield.html
@@ -91,13 +91,9 @@ Shader "OverwatchShield3"
 
                 half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
 
-
-                //half depth1 = Linear01Depth(SampleSceneDepth(screenUV), _ZBufferParams) * _ProjectionParams.z - IN.positionNDC.w;
-                //return half4(depth1, depth1, depth1, 1);
-                float sceneZ = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
-                float partZ = -TransformWorldToView(IN.positionWS).z;
+                half sceneZ = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
+                half partZ = IN.positionNDC.w;
                 half depth = sceneZ - partZ;
-                return half4(depth, depth, depth, 1);
 
                 half intersectGradient = 1 - min(depth, 1.0f);
                 half3 intersectTerm = _Color * pow(intersectGradient, _IntersectExponent) * _IntersectIntensity;

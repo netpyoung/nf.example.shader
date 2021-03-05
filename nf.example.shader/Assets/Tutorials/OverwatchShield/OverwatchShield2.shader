@@ -1,4 +1,4 @@
-Shader "OverwatchShield2"
+﻿Shader "OverwatchShield2"
 {
     // ref:
     // - https://lexdev.net/tutorials/case_studies/overwatch_shield.html

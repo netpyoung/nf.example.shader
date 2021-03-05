@@ -1,4 +1,4 @@
-﻿Shader "example/00_basic"
+Shader "example/00_basic"
 {
 	SubShader
 	{
