@@ -6,14 +6,16 @@ URP
 - https://github.com/Unity-Technologies/UniversalRenderingExamples
 - https://github.com/phi-lira/UniversalShaderExamples
 
-
 ## include
-| Content         | Built-in        | URP                                                                       |
-|-----------------|-----------------|---------------------------------------------------------------------------|
-| Core            | Unity.cginc     | Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl     |
-| Light           | AutoLight.cginc | Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl |
-| Shadows         | AutoLight.cginc | Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl  |
-| Surface shaders | Lighting.cginc  | None, but you can find a side project for this here                       |
+
+| Content         | Built-in        | URP                                                              |
+|-----------------|-----------------|------------------------------------------------------------------|
+| Core            | Unity.cginc     | com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl     |
+| Light           | AutoLight.cginc | com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl |
+| Shadows         | AutoLight.cginc | com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl  |
+| Surface shaders | Lighting.cginc  | None, but you can find a side project for this here              |
+
+
 
 ``` hlsl
 o.vertex = UnityObjectToClipPos(v.vertex);
@@ -148,6 +150,24 @@ float4 ComputeGrabScreenPos (float4 clipPos)	Gone.
 
 ComputeScreenPos deprecated - https://github.com/Unity-Technologies/Graphics/pull/2529
 GetVertexPositionInputs().positionNDC 
+
+## Camera Texture
+
+|                      |                         |
+|----------------------|-------------------------|
+| _CameraDepthTexture  | Camera.depthTextureMode |
+| _CameraOpaqueTexture | GrabPass                |
+
+fixed depth = SAMPLE_DEPTH_TEXTURE(texture, sampler, uv);
+
+``` shader
+GrabPass
+{
+    "_GrabPass"
+}
+sampler2D _GrabPass
+fixed4 fGrapPass = tex2Dproj(_GrabPass, i.screenPosition + 0.5f);
+```
 
 ## Depth
 

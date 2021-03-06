@@ -76,31 +76,70 @@ Shader <shader-name>
 
 ## Tags
 
-``` hlsl
+Queue
 
-"Queue"
-Background	1000	(ex. skyboxes)
-Geometry	2000	(default)
-AlphaTest	2450
-Transparent	3000
-Overlay		4000	(ex. lens flares)
+| min  | default | max  |             | order               |
+|------|---------|------|-------------|---------------------|
+| 0    | 100     | 1499 | Background  | render First / back |
+| 1500 | 2000    | 2399 | Geometry    |                     |
+| 2400 | 2450    | 2699 | AlphaTest   |                     |
+| 2700 | 3000    | 3599 | Transparent |                     |
+| 3600 | 4000    | 5000 | Overlay     | render last / front |
 
-```
+IgnoreProjector
 
 ## Properties
+
 ``` hlsl
-float4 Color = (r, g, b, a)
+Float           | float  |
+Range(min, max) | float  |
 
-2D = "", "white", "black", "gray", "bump" // for     power of 2 size
-Rect "", "white", "black", "gray", "bump" // for non-power of 2 size
+Vector          | float4 | (x, y, z, w)
+Color           | float4 | (r, g, b, a)
 
-// https://docs.unity3d.com/kr/2018.4/Manual/class-Cubemap.html
-Cube "", "white", "black", "gray", "bump"
+2D              | float4 | "", "white", "black", "gray", "bump" // for     power of 2 size
+Rect            | float4 | "", "white", "black", "gray", "bump" // for non-power of 2 size
 
-float Range(min, max) 
-float * Float 
-float4 * Vector (x, y, z, w)
+Cube            | float4 | "", "white", "black", "gray", "bump"
+
 ```
+
+| color string | RGBA            |
+|--------------|-----------------|
+| white        | 1,1,1,1         |
+| black        | 0,0,0,0         |
+| gray         | 0.5,0.5,0.5,0.5 |
+| bump         | 0.5,0.5,1,0.5   |
+| red          | 1,0,0,0         |
+
+## Properties attributes
+
+``` hlsl
+[HideInInspector]
+[NoScaleOffset]   - name##_ST 사용안할때
+[Normal]          - 텍스쳐 설정 normal아니면 경고
+[HDR]
+
+[Gamma]           - indicates that a float/vector property is specified as sRGB value in the UI
+(just like colors are), and possibly needs conversion according to color space used. See Properties in Shader Programs.
+[PerRendererData]  - indicates that a texture property will be coming from per-renderer data in the form of a MaterialPropertyBlock. Material inspector changes the texture slot UI for these properties.
+
+[MainTexture]
+[MainColor]
+```
+
+## Blend
+
+대표적인 Blend 옵션 조합
+
+|          |                  |                                               |
+|----------|------------------|-----------------------------------------------|
+| SrcAlpha | OneMinusSrcAlpha | Alpha Blend                                   |
+| One      | One              | Additive(Without alpha, black is Transparent) |
+| SrcAlpha | One              | Additive(With Alpha)                          |
+| One      | OneMinusDstColor | Soft Additive                                 |
+| DstColor | Zero             | Multiplicative                                |
+| DstColor | SrcColor         | 2x Multiplicative                             |
 
 ## HLSLPROGRAM
 
