@@ -125,3 +125,10 @@ https://assetstore.unity.com/packages/vfx/shaders/flat-kit-toon-shading-and-wate
 
 
 ===============================
+
+
+## if / ifdef / defined
+
+#if (defined FLAG_A) || (defined FLAG_B) 처럼 사용할 수 있지만,
+
+#ifdef(FLAG_A) || #ifdef(FLAG_B) 처럼 사용하지는 못합니다.

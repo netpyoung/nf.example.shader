@@ -6,16 +6,10 @@
 
     Properties
     {
-        _Color("Color", Color) = (1, 0, 0, 1)
-        [HDR]_Emission("Emission", Color) = (1, 1, 1, 1)
+        [HDR] _Color("Color", Color) = (1, 0, 0, 1)
 
-        //0 = start of the sequence (small beam at the bottom), 1 = end of sequence (large beam)
         _Sequence("Sequence Value", Range(0,1)) = 0.1
-
-        //Changes the width of the whole beam
         _Width("Width Multiplier", Range(1,3)) = 2
-
-        //Noise
         _NoiseFrequency("Noise Frequency", Range(1,100)) = 50.0
         _NoiseLength("Noise Length", Range(0.01,1.0)) = 0.25
         _NoiseIntensity("Noise Intensity", Range(0,0.1)) = 0.02
@@ -42,7 +36,6 @@
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
-                half4 _Emission;
 
                 half _Sequence;
                 half _Width;
@@ -71,14 +64,31 @@
                 half beamHeight = 20;
                 half pi = 3.141;
 
-                half scaledSeq = (1.0f - _Sequence) * 2.0f - 1.0f; //Invert the sequence value and scale it to [-1;1]
-                half scaledHeightMax = scaledSeq * beamHeight; //The sequence value scaled with the height of the beam object
+                // [-1, 1]
+                half scaledSeq = (1.0f - _Sequence) * 2.0f - 1.0f;
+
+                // [-beamHeight, beamHeight]
+                half scaledHeightMax = scaledSeq * beamHeight;
+
+                // 높이 비율에 대한 cos값.
                 half cosVal = cos(pi * (IN.positionOS.z / beamHeight - scaledSeq));
 
-                half width = lerp(0.05f * (beamHeight - scaledHeightMax + 0.5f), cosVal, pow(smoothstep(scaledHeightMax - 8.0f, scaledHeightMax, IN.positionOS.z), 0.1f));
-                width = lerp(width, 0.4f, smoothstep(scaledHeightMax, scaledHeightMax + 10.0f, IN.positionOS.z));
+                half width = lerp(
+                    0.05f * (beamHeight - scaledHeightMax + 0.5f),
+                    cosVal,
+                    pow(smoothstep(scaledHeightMax - 8.0f, scaledHeightMax, IN.positionOS.z), 0.1f)
+                );
 
+                width = lerp(
+                    width,
+                    0.4f,
+                    smoothstep(scaledHeightMax, scaledHeightMax + 10.0f, IN.positionOS.z)
+                );
+
+				// 넓이 조정.
                 IN.positionOS.xy *= width * _Width;
+				
+				// 좌우 진폭조정.
                 IN.positionOS.xy += sin(_Time.y * _NoiseFrequency + IN.positionOS.z * _NoiseLength) * _NoiseIntensity * _Sequence;
 
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
@@ -95,7 +105,7 @@
 
                 half NdotL = max(0, dot(N, L));
 
-                half4 finalColor = _Color * NdotL + _Emission;
+                half4 finalColor = _Color * NdotL;
                 return finalColor;
             }
             ENDHLSL
