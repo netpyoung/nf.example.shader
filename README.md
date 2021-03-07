@@ -2,6 +2,7 @@
 
 ## URP
 
+- [Linear And Gamma](./urp_shader/linear_and_gamma.md)
 - #include
 - URP Pass tags: LightMode
 - Property attributes
@@ -9,8 +10,9 @@
 
 ## Shader
 
-- Swizzling
-- Vector Transform
+- [Vector](./doc/Vector.md)
+  - Transform
+  - Swizzling
 - UV
 - Coordinate
 - Blend
@@ -62,6 +64,6 @@
 - Texture Combine
 - ramp
 - BRDF Map
-- better pow
+- [better pow](./doc/SpecularPowApproximation.md)
 
 ## package and tool
