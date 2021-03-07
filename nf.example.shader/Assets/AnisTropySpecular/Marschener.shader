@@ -1,6 +1,6 @@
 Shader "Marschener"
 {
-    // ref: https://blog.naver.com/sorkelf/40185948507
+    // ref: https://blog.naver.com/sorkelf/40186644136
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
