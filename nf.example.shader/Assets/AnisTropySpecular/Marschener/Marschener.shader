@@ -119,7 +119,7 @@ Shader "Marschener"
 
             half SpecularStrand(half dotTH, half strength, half exponent)
             {
-                // Strand : °¡´Ú
+                // Strand : ï¿½ï¿½ï¿½ï¿½
                 half sinTH = sqrt(1.0 - dotTH * dotTH);
                 half dirAtten = smoothstep(-1.0, 0.0, dotTH);
                 return dirAtten * strength * pow(sinTH, exponent);
@@ -127,19 +127,19 @@ Shader "Marschener"
                 
             half4 frag(Varyings  IN) : SV_Target
             {
-                half normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+                half3 normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
 
                 Light light = GetMainLight();
 
-                // Sphere
-                // T | r | ¿À¸¥ÂÊ
-                // B | g | À§ÂÊ
-                // N | b | Á÷°¢
+// Sphere
+                // T | r | ì˜¤ë¥¸ìª½
+                // B | g | ìœ„ìª½
+                // N | b | ì§ê°
 
-                // ³í¹®¿¡¼­ T. ¹æÇâÀº ¸Ó¸®¸¦ÇâÇÑ À§ÂÊ ¹æÇâ.
+                // ë…¼ë¬¸ì—ì„œ T. ë°©í–¥ì€ ë¨¸ë¦¬ë¥¼í–¥í•œ ìœ„ìª½ ë°©í–¥.
                 // half3 T = normalize(IN.T);
 
-                // Sphere¿¡¼­´Â B°¡ À§ÂÊÀÌ¹Ç·Î B·ÎÇØ¾ß ¿øÇÏ´Â ¹æÇâÀÌ ³ª¿Â´Ù.
+                // Sphereì—ì„œëŠ” Bê°€ ìœ„ìª½ì´ë¯€ë¡œ Bë¡œí•´ì•¼ ì›í•˜ëŠ” ë°©í–¥ì´ ë‚˜ì˜¨ë‹¤.
                 half3 T = normalize(IN.B);
                 //half3 N = CombineTBN(normalTex, IN.T, IN.B, IN.N);
                 half3 N = normalize(IN.N);

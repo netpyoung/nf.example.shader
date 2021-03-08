@@ -14,17 +14,29 @@
 			"RenderType" = "Opaque"
 			"RenderPipeline" = "UniversalRenderPipeline"
 		}
-		LOD 100
 
 		Pass
 		{
 			Name "Outline"
+
+			Tags
+			{
+				"LightMode" = "SRPDefaultUnlit"
+			}
+
 			Cull Front
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#pragma target 3.5
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+			CBUFFER_START(UnityPerMaterial)
+				float _OutlineThickness;
+				float4 _OutlineColor;
+			CBUFFER_END
 
 			struct appdata
 			{
@@ -41,15 +53,11 @@
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
-			CBUFFER_START(UnityPerMaterial)
-			uniform float _OutlineThickness;
-			uniform float4 _OutlineColor;
-			CBUFFER_END
-
 			inline float2 TransformViewToProjection(float2 v)
 			{
 				return mul((float2x2)UNITY_MATRIX_P, v);
 			}
+
 			v2f vert(appdata v)
 			{
 				v2f o;
@@ -96,10 +104,10 @@
 			#pragma vertex vert
 			#pragma fragment frag
 
+			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+
 			CBUFFER_START(UnityPerMaterial)
-			TEXTURE2D(_MainTex);
-			SAMPLER(sampler_MainTex);
-			float4 _MainTex_ST;
+				float4 _MainTex_ST;
 			CBUFFER_END
 
 			struct appdata

@@ -16,10 +16,10 @@
 			}
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			struct Attributes
 			{
@@ -34,8 +34,7 @@
 				float2 uv : TEXCOORD0;
 			};
 
-			TEXTURE2D(_Texture);
-			SAMPLER(sampler_Texture);
+			TEXTURE2D(_Texture);		SAMPLER(sampler_Texture);
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _Texture_ST;
@@ -44,6 +43,7 @@
 			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _Texture);

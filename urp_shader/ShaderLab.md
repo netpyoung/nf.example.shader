@@ -74,20 +74,6 @@ Shader <shader-name>
 }
 ```
 
-## Tags
-
-Queue
-
-| min  | default | max  |             | order               |
-|------|---------|------|-------------|---------------------|
-| 0    | 100     | 1499 | Background  | render First / back |
-| 1500 | 2000    | 2399 | Geometry    |                     |
-| 2400 | 2450    | 2699 | AlphaTest   |                     |
-| 2700 | 3000    | 3599 | Transparent |                     |
-| 3600 | 4000    | 5000 | Overlay     | render last / front |
-
-IgnoreProjector
-
 ## Properties
 
 ``` hlsl
@@ -127,6 +113,59 @@ Cube            | float4 | "", "white", "black", "gray", "bump"
 [MainTexture]
 [MainColor]
 ```
+
+## Tags
+
+``` hlsl
+Tags
+{
+    "RenderPipeline" = "UniversalRenderPipeline"
+    "LightMode" = "UniversalForward"
+    "RenderType" = "Opaque"
+    "Queue" = "Geometry"
+    "IgnoreProjector" = "True"
+}
+```
+
+### Queue
+
+렌더링 순서
+
+`Geometry+1`, `Geometry-1` 과 같이 가중치 적용가능
+
+| min  | default | max  |             | order               |
+|------|---------|------|-------------|---------------------|
+| 0    | 100     | 1499 | Background  | render First / back |
+| 1500 | 2000    | 2399 | Geometry    |                     |
+| 2400 | 2450    | 2699 | AlphaTest   |                     |
+| 2700 | 3000    | 3599 | Transparent |                     |
+| 3600 | 4000    | 5000 | Overlay     | render last / front |
+
+### IgnoreProjector
+
+TODO
+
+### LihgtMode
+
+- <https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@10.3/manual/urp-shaders/urp-shaderlab-pass-tags.html>
+
+| LightMode            | URP / Built-in |                                               |
+|----------------------|----------------|-----------------------------------------------|
+| UniversalForward     | URP            | Forward Rendering                             |
+| UniversalGBuffer     | URP            | Deferred Rendering                            |
+| UniversalForwardOnly | URP            | Forward & Deferred Rendering                  |
+| Universal2D          | URP            | for 2D light                                  |
+| ShadowCaster         | URP            | depth from the perspective of lights          |
+| DepthOnly            | URP            | depth from the perspective of a Camera        |
+| Meta                 | URP            | executes this Pass only when baking lightmaps |
+| SRPDefaultUnlit      | URP (기본값)   | draw an extra Pass  (ex. Outline)             |
+| Always               | Built-in       |                                               |
+| ForwardAdd           | Built-in       |                                               |
+| PrepassBase          | Built-in       |                                               |
+| PrepassFinal         | Built-in       |                                               |
+| Vertex               | Built-in       |                                               |
+| VertexLMRGBM         | Built-in       |                                               |
+| VertexLM             | Built-in       |                                               |
 
 ## Blend
 
@@ -219,25 +258,3 @@ Pass
     ENDCG
 }
 ```
-
-## LihgtMode
-
-- <https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@10.3/manual/urp-shaders/urp-shaderlab-pass-tags.html>
-
-| LightMode            | URP / Built-in |                                               |
-|----------------------|----------------|-----------------------------------------------|
-| UniversalForward     | URP            | Forward Rendering                             |
-| UniversalGBuffer     | URP            | Deferred Rendering                            |
-| UniversalForwardOnly | URP            | Forward & Deferred Rendering                  |
-| Universal2D          | URP            | for 2D light                                  |
-| ShadowCaster         | URP            | depth from the perspective of lights          |
-| DepthOnly            | URP            | depth from the perspective of a Camera        |
-| Meta                 | URP            | executes this Pass only when baking lightmaps |
-| SRPDefaultUnlit      | URP (기본값)   | draw an extra Pass  (ex. Outline)             |
-| Always               | Built-in       |                                               |
-| ForwardAdd           | Built-in       |                                               |
-| PrepassBase          | Built-in       |                                               |
-| PrepassFinal         | Built-in       |                                               |
-| Vertex               | Built-in       |                                               |
-| VertexLMRGBM         | Built-in       |                                               |
-| VertexLM             | Built-in       |                                               |

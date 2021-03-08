@@ -101,7 +101,7 @@
 
             half4 frag(Varyings IN) : SV_Target
             {
-                half normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+                half3 normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
                 
                 Light light = GetMainLight();
                 // Sphere

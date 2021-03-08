@@ -13,8 +13,9 @@
 - [Vector](./doc/Vector.md)
   - Transform
   - Swizzling
-- UV
 - Coordinate
+- UV
+- [Normal Map(Bump Map)](./doc/NormalMap.md)
 - Blend
 - Cull
 - Stencil
@@ -35,7 +36,6 @@
 - [AnisTropy Specular](./doc/HairAnisotropic.md)
   - KajyaKay
   - Marschener
-- Normal Map(Bump Map)
 - Etc
   - BRDF(Bidirectional Reflectance Distribution Function)
     - Ashikhmin Shirley

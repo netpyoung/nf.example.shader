@@ -1,13 +1,19 @@
-Shader "example/Parallax"
+Shader "NormalMapYminus"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_BumpMap("Normal Map", 2D) = "bump" {}
-		_Parallax("Parallax", Float) = 0.03
+
+		// Texture Type> Default
+		// sRGB (Color Texture)> uncheck
+		[NoScaleOffset] _NormalTex("Normal Map", 2D) = "bump" {}
+		
+
+		[Toggle(ENABLE_NORMALMAP)]
+		_EnableNormalMap("NormalMap?", Float) = 0
 	}
 
-		SubShader
+	SubShader
 	{
 		Pass
 		{
@@ -22,20 +28,19 @@ Shader "example/Parallax"
 
 			HLSLPROGRAM
 			#pragma target 3.5
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
 			#pragma vertex vert
 			#pragma fragment frag
 
-			TEXTURE2D(_MainTex);
-			SAMPLER(sampler_MainTex);
-			TEXTURE2D(_BumpMap);
-			SAMPLER(sampler_BumpMap);
+			#pragma shader_feature_local ENABLE_NORMALMAP
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+			TEXTURE2D(_NormalTex);		SAMPLER(sampler_NormalTex);
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _MainTex_ST;
-				float4 _BumpMap_ST;
 				float _Parallax;
 			CBUFFER_END
 
@@ -55,6 +60,7 @@ Shader "example/Parallax"
 				float3 T                : TEXCOORD1;
 				float3 B                : TEXCOORD2;
 				float3 N                : TEXCOORD3;
+
 				float3 positionWS       : TEXCOORD4;
 			};
 
@@ -73,47 +79,42 @@ Shader "example/Parallax"
 			Varyings  vert(Attributes IN)
 			{
 				Varyings OUT = (Varyings)0;
+				ZERO_INITIALIZE(Varyings, OUT);
+
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
 				ExtractTBN(IN.normalOS, IN.tangent, OUT.T, OUT.B, OUT.N);
 
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+
 				return OUT;
 			}
 
 			half4 frag(Varyings  IN) : SV_Target
 			{
-				float height = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv).a;
-				float3 V = normalize(GetWorldSpaceViewDir(IN.positionWS));
-				float2 E = -(V.xy / V.z); // eye
-				float2 offset = _Parallax * height * E;
-				float2 uv = IN.uv + offset;
-					
-				float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
+				half3 normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
 
-				float3 tangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv));
+				// Unity는 Y+를 쓴다.
+				// DirectX는 Y-를 쓴다.
+				normalTex.y *= -1;  // 유니티에서 y-를 쓰려면 g값을 뒤집어준다.
+
 				Light light = GetMainLight();
-
-				float3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
-				float3 L = normalize(light.direction);
-				float3 H = normalize(L + V);
-
-				float NdotL = saturate(dot(N, L));
-				float NdotH = saturate(dot(N, H));
-				float NdotV = saturate(dot(N, V));
-				float VdotH = saturate(dot(V, H));
-				float LdotH = saturate(dot(L, H));
-
-				half3 lightColor = light.color;
-
-				half3 diffuse = NdotL * tex.rgb;
-
-
+#if ENABLE_NORMALMAP
+				half3 N = CombineTBN(normalTex, IN.T, IN.B, IN.N);
+#else
+				half3 N = normalize(IN.N);
+#endif
+				half3 L = normalize(light.direction);
 				half3 R = reflect(-L, N);
-				half3 VdotR = max(0.0, dot(V, R));
-				half3 specular = pow(VdotR, 22);
-				return half4((diffuse + specular) * lightColor, 1);
+
+				half NdotL = saturate(dot(N, L));
+
+				half3 diffuse = NdotL * mainTex;
+				half3 reflect = pow(saturate(dot(N, R)), 22);
+
+				return half4(diffuse + reflect, 1);
 			}
 			ENDHLSL
 		}

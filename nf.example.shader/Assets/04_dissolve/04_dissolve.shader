@@ -17,15 +17,16 @@
 		{
 			Tags
 			{
-				"RenderType" = "Opaque"
 				"RenderPipeline" = "UniversalRenderPipeline"
+				"LightMode" = "SRPDefaultUnlit"
+				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			struct Attributes
 			{
@@ -39,11 +40,8 @@
 				float2 uv : TEXCOORD0;
 			};
 
-			TEXTURE2D(_Texture);
-			SAMPLER(sampler_Texture);
-
-			TEXTURE2D(_TexDissolve);
-			SAMPLER(sampler_TexDissolve);
+			TEXTURE2D(_Texture);		SAMPLER(sampler_Texture);
+			TEXTURE2D(_TexDissolve);	SAMPLER(sampler_TexDissolve);
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _Texture_ST;
@@ -59,6 +57,7 @@
 			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _Texture);
@@ -68,12 +67,9 @@
 
 			half4 frag(Varyings IN) : SV_Target
 			{
-				float cutout = SAMPLE_TEXTURE2D(_TexDissolve, sampler_TexDissolve, IN.uv).r;
-				if (cutout < _Amount)
-				{
-					discard;
-				}
-
+				half cutout = SAMPLE_TEXTURE2D(_TexDissolve, sampler_TexDissolve, IN.uv).r;
+				clip(cutout - _Amount);
+				
 				half4 color = SAMPLE_TEXTURE2D(_Texture, sampler_Texture, IN.uv);
 				if (cutout < color.a && cutout < _DissolveLevel + _EdgeWidth)
 				{
