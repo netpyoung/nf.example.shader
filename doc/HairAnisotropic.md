@@ -7,9 +7,7 @@
 - https://ko.wikipedia.org/wiki/비등방성
 ```
 
-
-
-- Kajya-Kay 모델                -
+- Kajya-Kay 모델
   - 짧은머리는 괜춘. 빛의 산란효과는 별로
 - Steve Marschner 모델                      - SIGGRAPH 2003
   - 빛의 산란효과 개선(반사/내부산란/투과)
@@ -56,3 +54,8 @@ half specular = pow(sinTH, specularPower);
 | R   | 반사 |
 | TRT | 산란 |
 | TT  | 투과 |
+
+- 2개의 반사를 이용.
+  - Tangent를 이동 (+ TangentShiftTex)
+  - 1번째 반사(RR)
+  - 두번째반사(TRT) (+ SpecularMaskTex)

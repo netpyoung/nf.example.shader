@@ -153,9 +153,12 @@ Shader "Marschener"
                 half3 T1 = ShiftTangent(T, N, _PrimaryShift + shiftTexVal);
                 half3 T2 = ShiftTangent(T, N, _SecondaryShift + shiftTexVal);
 
-                half3 specular = SpecularStrand(dot(T1, H), _S1Strength, _S1Exponent);
-                specular += SAMPLE_TEXTURE2D(_HairSpeckMaskTex, sampler_HairSpeckMaskTex, IN.uv) * SpecularStrand(dot(T2, H), _S2Strength, _S2Exponent);
-                
+                half3 specular1 = SpecularStrand(dot(T1, H), _S1Strength, _S1Exponent);
+                half3 specular2 = SpecularStrand(dot(T2, H), _S2Strength, _S2Exponent);
+
+                half3 specular2Mask = SAMPLE_TEXTURE2D(_HairSpeckMaskTex, sampler_HairSpeckMaskTex, IN.uv).rgb;
+                half3 specular = specular1 + specular2 * specular2Mask;
+
                 //half specularAttenuation = saturate(1.75 * NdotL + 0.25);
                 //specular *= specularAttenuation;
 

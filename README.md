@@ -32,7 +32,7 @@
     - GGX
     - Schlick Fresnel
 - Depth
-- AnisTropy Specular
+- [AnisTropy Specular](./doc/HairAnisotropic.md)
   - KajyaKay
   - Marschener
 - Normal Map(Bump Map)
