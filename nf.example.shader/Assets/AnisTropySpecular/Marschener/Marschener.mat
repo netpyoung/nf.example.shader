@@ -48,11 +48,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HairShiftTex:
-        m_Texture: {fileID: 2800000, guid: 2d72808448e5c1049b23f9ffe3c85304, type: 3}
+        m_Texture: {fileID: 2800000, guid: be09d3265406cfa419d258c9d1b02cc7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HairSpeckMaskTex:
+        m_Texture: {fileID: 2800000, guid: 26d48775b8186e046a08d9637cff9962, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 902565fc97a5e8a4da37713c2d4bec2f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 91a306c941c8edf43ac04e26b2a27214, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -60,7 +64,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalTex:
-        m_Texture: {fileID: 2800000, guid: 1a5c87b8c1448184585cde3d2493ad4e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1071026dfce8b044fb24e06b019b83e2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -107,8 +111,16 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _PrimaryShift: -0.5
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _S1Exponent: 50
+    - _S1Sterngth: 1
+    - _S1Strength: 0.3
+    - _S2Exponent: 50
+    - _S2Sterngth: 1
+    - _S2Strength: 0.3
+    - _SecondaryShift: -0.5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

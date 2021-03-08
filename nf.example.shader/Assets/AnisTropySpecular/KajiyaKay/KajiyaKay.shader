@@ -1,14 +1,15 @@
-Shader "Marschener"
+ï»¿Shader "KajiyaKay"
 {
-    // ref: https://blog.naver.com/sorkelf/40186644136
+    // ref: https://blog.naver.com/sorkelf/40185948507
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        [Normal]_NormalTex("Normal Map", 2D) = "bump" {}
         _HairShiftTex("Hair Shift", 2D) = "" {}
         _HairAlphaTex("Hair Alpha", 2D) = "" {}
-        _Kd("Diffuse Multiply", Float) = 1
-        _Ks("Specular Multiply", Float) = 1
-        _SpecularPow("", Range(10, 50)) = 20
+        _Kd("Diffuse Strength", Float) = 1
+        _Ks("Specular Strength", Float) = 1
+        _SpecularExponent("Specular Exponent", Range(10, 50)) = 20
     }
     SubShader
     {
@@ -30,12 +31,10 @@ Shader "Marschener"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl" // For BlendNormal
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_HairShiftTex);
-            SAMPLER(sampler_HairShiftTex);
-            TEXTURE2D(_HairAlphaTex);
-            SAMPLER(sampler_HairAlphaTex);
+            TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
+            TEXTURE2D(_NormalTex);      SAMPLER(sampler_NormalTex);
+            TEXTURE2D(_HairShiftTex);   SAMPLER(sampler_HairShiftTex);
+            TEXTURE2D(_HairAlphaTex);   SAMPLER(sampler_HairAlphaTex);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
@@ -43,7 +42,7 @@ Shader "Marschener"
                 float4 _HairAlphaTex_ST;
                 half _Ks;
                 half _Kd;
-                half _SpecularPow;
+                half _SpecularExponent;
             CBUFFER_END
 
             struct Attributes
@@ -88,7 +87,7 @@ Shader "Marschener"
                 return float3x3(T, B, N);
             }
 
-            Varyings  vert(Attributes IN)
+            Varyings vert(Attributes IN)
             {
                 Varyings OUT = (Varyings)0;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
@@ -100,21 +99,22 @@ Shader "Marschener"
                 return OUT;
             }
 
-            half4 frag(Varyings  IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
+                half normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+                
                 Light light = GetMainLight();
-
                 // Sphere
-                // T | r | ¿À¸¥ÂÊ
-                // B | g | À§ÂÊ
-                // N | b | Á÷°¢
+                // T | r | ì˜¤ë¥¸ìª½
+                // B | g | ìœ„ìª½
+                // N | b | ì§ê°
 
-                // ³í¹®¿¡¼­ T. ¹æÇâÀº ¸Ó¸®¸¦ÇâÇÑ À§ÂÊ ¹æÇâ.
+                // ë…¼ë¬¸ì—ì„œ T. ë°©í–¥ì€ ë¨¸ë¦¬ë¥¼í–¥í•œ ìœ„ìª½ ë°©í–¥.
                 // half3 T = normalize(IN.T);
 
-                // Sphere¿¡¼­´Â B°¡ À§ÂÊÀÌ¹Ç·Î B·ÎÇØ¾ß ¿øÇÏ´Â ¹æÇâÀÌ ³ª¿Â´Ù.
+                // Sphereì—ì„œëŠ” Bê°€ ìœ„ìª½ì´ë¯€ë¡œ Bë¡œí•´ì•¼ ì›í•˜ëŠ” ë°©í–¥ì´ ë‚˜ì˜¨ë‹¤.
                 half3 T = normalize(IN.B);
-                half3 N = normalize(IN.N);
+                half3 N = CombineTBN(normalTex, IN.T, IN.B, IN.N);
                 half3 L = normalize(light.direction);
                 half3 V = TransformWorldToViewDir(IN.positionWS);
                 half3 H = normalize(L + V);
@@ -129,7 +129,7 @@ Shader "Marschener"
                 half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
                 half3 diffuse = _Kd * sinTL;
-                half3 specular = _Ks * pow(max(0.0, TdotL * TdotV + sinTL * sinTV), _SpecularPow);
+                half3 specular = _Ks * pow(max(0.0, TdotL * TdotV + sinTL * sinTV), _SpecularExponent);
                 
                 half4 finalColor = half4(diffuse * mainColor + specular, 0);
 

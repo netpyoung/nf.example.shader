@@ -1,14 +1,22 @@
-ÔªøShader "KajyaKay"
+Shader "Marschener"
 {
-    // ref: https://blog.naver.com/sorkelf/40185948507
+    // ref: https://blog.naver.com/sorkelf/40186644136
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        [Normal]_NormalTex("Normal Map", 2D) = "bump" {}
+
         _HairShiftTex("Hair Shift", 2D) = "" {}
         _HairAlphaTex("Hair Alpha", 2D) = "" {}
-        _Kd("Diffuse Multiply", Float) = 1
-        _Ks("Specular Multiply", Float) = 1
-        _SpecularPow("", Range(10, 50)) = 20
+        _HairSpeckMaskTex("Hair Mask", 2D) = "" {}
+
+        _PrimaryShift("Primary Shift", Float) = 0
+        _SecondaryShift("Secondary Shift", Float) = 0
+
+        _S1Strength("Specular1 Strength", Float) = 1
+        _S1Exponent("Specular1 Exponent", Range(10, 50)) = 20
+        _S2Strength("Specular2 Strength", Float) = 1
+        _S2Exponent("Specular2 Exponent", Range(10, 50)) = 20
     }
     SubShader
     {
@@ -30,20 +38,21 @@
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl" // For BlendNormal
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_HairShiftTex);
-            SAMPLER(sampler_HairShiftTex);
-            TEXTURE2D(_HairAlphaTex);
-            SAMPLER(sampler_HairAlphaTex);
+            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
+            TEXTURE2D(_NormalTex);          SAMPLER(sampler_NormalTex);
+            TEXTURE2D(_HairShiftTex);       SAMPLER(sampler_HairShiftTex);
+            TEXTURE2D(_HairAlphaTex);       SAMPLER(sampler_HairAlphaTex);
+            TEXTURE2D(_HairSpeckMaskTex);   SAMPLER(sampler_HairSpeckMaskTex);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
-                float4 _HairShiftTex_ST;
-                float4 _HairAlphaTex_ST;
-                half _Ks;
-                half _Kd;
-                half _SpecularPow;
+
+                half _PrimaryShift;
+                half _SecondaryShift;
+                half _S1Strength;
+                half _S1Exponent;
+                half _S2Strength;
+                half _S2Exponent;
             CBUFFER_END
 
             struct Attributes
@@ -90,7 +99,9 @@
 
             Varyings  vert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
+
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
@@ -100,40 +111,60 @@
                 return OUT;
             }
 
+            // --------------------
+            inline half3 ShiftTangent(half3 T, half3 N, half shiftAmount)
+            {
+                return normalize(T + shiftAmount * N);
+            }
+
+            half SpecularStrand(half dotTH, half strength, half exponent)
+            {
+                // Strand : ∞°¥⁄
+                half sinTH = sqrt(1.0 - dotTH * dotTH);
+                half dirAtten = smoothstep(-1.0, 0.0, dotTH);
+                return dirAtten * strength * pow(sinTH, exponent);
+            }
+                
             half4 frag(Varyings  IN) : SV_Target
             {
+                half normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));
+
                 Light light = GetMainLight();
 
                 // Sphere
-                // T | r | Ïò§Î•∏Ï™Ω
-                // B | g | ÏúÑÏ™Ω
-                // N | b | ÏßÅÍ∞Å
+                // T | r | ø¿∏•¬ 
+                // B | g | ¿ß¬ 
+                // N | b | ¡˜∞¢
 
-                // ÎÖºÎ¨∏ÏóêÏÑú T. Î∞©Ìñ•ÏùÄ Î®∏Î¶¨Î•ºÌñ•Ìïú ÏúÑÏ™Ω Î∞©Ìñ•.
+                // ≥ÌπÆø°º≠ T. πÊ«‚¿∫ ∏”∏Æ∏¶«‚«— ¿ß¬  πÊ«‚.
                 // half3 T = normalize(IN.T);
 
-                // SphereÏóêÏÑúÎäî BÍ∞Ä ÏúÑÏ™ΩÏù¥ÎØÄÎ°ú BÎ°úÌï¥Ïïº ÏõêÌïòÎäî Î∞©Ìñ•Ïù¥ ÎÇòÏò®Îã§.
+                // Sphereø°º≠¥¬ B∞° ¿ß¬ ¿Ãπ«∑Œ B∑Œ«ÿæﬂ ø¯«œ¥¬ πÊ«‚¿Ã ≥™ø¬¥Ÿ.
                 half3 T = normalize(IN.B);
+                //half3 N = CombineTBN(normalTex, IN.T, IN.B, IN.N);
                 half3 N = normalize(IN.N);
                 half3 L = normalize(light.direction);
                 half3 V = TransformWorldToViewDir(IN.positionWS);
                 half3 H = normalize(L + V);
 
                 half NdotL = max(0.0, dot(N, L));
-                half TdotL = dot(T, L);
-                half TdotV = dot(T, V);
 
-                half sinTL = sqrt(1 - TdotL * TdotL);
-                half sinTV = sqrt(1 - TdotV * TdotV);
+                half shiftTexVal = SAMPLE_TEXTURE2D(_HairShiftTex, sampler_HairShiftTex, IN.uv).r - 0.5;
+                half3 T1 = ShiftTangent(T, N, _PrimaryShift + shiftTexVal);
+                half3 T2 = ShiftTangent(T, N, _SecondaryShift + shiftTexVal);
+
+                half3 specular = SpecularStrand(dot(T1, H), _S1Strength, _S1Exponent);
+                specular += SAMPLE_TEXTURE2D(_HairSpeckMaskTex, sampler_HairSpeckMaskTex, IN.uv) * SpecularStrand(dot(T2, H), _S2Strength, _S2Exponent);
+                
+                //half specularAttenuation = saturate(1.75 * NdotL + 0.25);
+                //specular *= specularAttenuation;
 
                 half3 mainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-
-                half3 diffuse = _Kd * sinTL;
-                half3 specular = _Ks * pow(max(0.0, TdotL * TdotV + sinTL * sinTV), _SpecularPow);
+                
+                //half3 diffuse = lerp(0.25, 1, NdotL);
+                half3 diffuse = saturate(0.75 * NdotL + 0.25);;
                 
                 half4 finalColor = half4(diffuse * mainColor + specular, 0);
-
-                finalColor.rgb *= SAMPLE_TEXTURE2D(_HairShiftTex, sampler_HairShiftTex, IN.uv).rgb;
                 finalColor.a = SAMPLE_TEXTURE2D(_HairAlphaTex, sampler_HairAlphaTex, IN.uv).r;
 
                 return finalColor;

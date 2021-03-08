@@ -7,6 +7,14 @@
 - https://ko.wikipedia.org/wiki/비등방성
 ```
 
+
+
+- Kajya-Kay 모델                -
+  - 짧은머리는 괜춘. 빛의 산란효과는 별로
+- Steve Marschner 모델                      - SIGGRAPH 2003
+  - 빛의 산란효과 개선(반사/내부산란/투과)
+- Scheuermann - Hair Rendering and Shading - GDC 2004
+
 ![ephere-kajiya](./res/ephere-kajiya.jpg)
 
 ![ephere-marschner](./res/ephere-marschner.jpg)
@@ -17,6 +25,8 @@
 ## Kajiya-Kay
 
 - [blog - Hair Rendering Lighting Model - (Kajiya-Kay)](https://blog.naver.com/sorkelf/40185948507)
+
+![./res/NTBFromUVs.png](./res/NTBFromUVs.png)
 
 ``` hlsl
 // Sphere
@@ -30,8 +40,8 @@
 // Sphere에서는 B가 위쪽이므로 B로해야 원하는 방향이 나온다.
 half3 T = normalize(IN.B);
 
-sinTH    = sin(T, H) == sqrt(1 - dot(T, H) * dot(T, H))
-specular = pow(sinTH, specularPower)
+half sinTH    = sqrt(1 - dot(T, H) * dot(T, H));
+half specular = pow(sinTH, specularPower);
 ```
 
 ## Marschner

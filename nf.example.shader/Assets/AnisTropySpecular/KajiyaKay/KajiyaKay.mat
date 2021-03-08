@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: KajyaKay
+  m_Name: KajiyaKay
   m_Shader: {fileID: 4800000, guid: 908d4f71b84a7064b9ae06b9bcf106a2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -52,7 +52,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 902565fc97a5e8a4da37713c2d4bec2f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 91a306c941c8edf43ac04e26b2a27214, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -103,7 +103,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Kd: 1
-    - _Ks: 1
+    - _Ks: 0.5
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -111,6 +111,7 @@ Material:
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _SpecularExponent: 50
     - _SpecularHighlights: 1
     - _SpecularPow: 50
     - _SrcBlend: 1
