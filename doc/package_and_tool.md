@@ -6,3 +6,4 @@
 
 - https://catlikecoding.com/sdf-toolkit/docs/texture-generator/
 - [FlowMap Painter](http://teckartist.com/?page_id=107)
+- [EasyChannelPacking](https://gumroad.com/l/EasyChannelPacking)

@@ -15,7 +15,8 @@
   - Swizzling
 - Coordinate
 - UV
-- [Normal Map(Bump Map)](./doc/NormalMap.md)
+- [Normal Mapping](./doc/NormalMap.md)
+- [Parallax Mapping](./doc/ParallaxMapping.md)
 - Blend
 - Cull
 - Stencil
@@ -61,9 +62,9 @@
 ## optimize
 
 - Mesh Combine
-- Texture Combine
+- [Texture Combine](OptimizeCombineTexture.md)
 - ramp
-- BRDF Map
 - [better pow](./doc/SpecularPowApproximation.md)
+- BRDF Map
 
 ## package and tool

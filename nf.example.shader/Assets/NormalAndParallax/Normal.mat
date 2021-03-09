@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Bump
+  m_Name: Normal
   m_Shader: {fileID: 4800000, guid: fa05e631ccc376d47a677e3c35d293ec, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4

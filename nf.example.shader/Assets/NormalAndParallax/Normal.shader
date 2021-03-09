@@ -1,23 +1,19 @@
-Shader "example/Parallax"
+﻿Shader "example/Normal"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
 		_BumpMap("Normal Map", 2D) = "bump" {}
-		_Parallax("Parallax", Float) = 0.03
 	}
 
-		SubShader
+	SubShader
 	{
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
-				"LightMode" = "UniversalForward"
 				"RenderType" = "Opaque"
-				"Queue" = "Geometry"
-				"IgnoreProjector" = "True"
+				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
@@ -36,7 +32,6 @@ Shader "example/Parallax"
 			CBUFFER_START(UnityPerMaterial)
 				float4 _MainTex_ST;
 				float4 _BumpMap_ST;
-				float _Parallax;
 			CBUFFER_END
 
 			struct Attributes
@@ -84,18 +79,13 @@ Shader "example/Parallax"
 
 			half4 frag(Varyings  IN) : SV_Target
 			{
-				float height = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv).a;
-				float3 V = normalize(GetWorldSpaceViewDir(IN.positionWS));
-				float2 E = -(V.xy / V.z); // eye
-				float2 offset = _Parallax * height * E;
-				float2 uv = IN.uv + offset;
-					
-				float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-
-				float3 tangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv));
+				float4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+				float3 tangentNormal = UnpackNormal(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv));
 				Light light = GetMainLight();
 
+				//float3 N = normalize(IN.T); //CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
 				float3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
+				float3 V = normalize(GetWorldSpaceViewDir(IN.positionWS));
 				float3 L = normalize(light.direction);
 				float3 H = normalize(L + V);
 

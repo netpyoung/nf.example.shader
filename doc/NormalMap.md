@@ -161,24 +161,6 @@ real3 UnpackNormalAG(real4 packedNormal, real scale = 1.0)
 - `normal.xy = packednormal.wy * 2 - 1;` (0 ~ 1 => -1 ~ 1)
 - `Z`는 쉐이더에서 계산. 단위 벡터의 크기는 1인것을 이용.(sqrt(x^2 + y^2 + z^2) = 1) `sqrt(1 - saturate(dot(normal.xy, normal.xy)))`
 
-## 최적화
-
-TODO 나중에 문서 따로 옮길것.
-
-BC5 (x, y, 0, 1)을 보면, `RGBA`채널중에서 `RG`채널만 사용하고 있다. 이를 이용하여, `BA`채널에 마스킹이나 다른 데이터값을 체워 넣을 수 있다.
-
-`B`채널은 공짜로 사용할 수 있으나, `A`채널까지 사용하려면  유니티의 `UnpackNormal`함수는 다음과 같이 채널을 바꾸는 기능이 있어, 따로 함수를 작성해 주어야 한다.
-
-``` hlsl
-// Unpack normal as DXT5nm (1, y, 0, x) or BC5 (x, y, 0, 1)
-real3 UnpackNormalmapRGorAG(real4 packedNormal, real scale = 1.0)
-{
-    // Convert to (?, y, 0, x)
-    packedNormal.a *= packedNormal.r;
-    return UnpackNormalAG(packedNormal, scale);
-}
-```
-
 ## Normal Scale Problem
 
 - [Normal Transformation](https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html)
