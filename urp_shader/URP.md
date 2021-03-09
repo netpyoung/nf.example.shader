@@ -1,14 +1,21 @@
 # URP (Universal Render Pipeline)
 
+- 기존 Built-in(Legacy) 쉐이더의 include 경로 및 함수명등 바뀜
+- SBR Batcher 사용가능하게 바뀜.
+- 1패스 1라이트방식 => 1패스 16개 라이트 지원
+
 ## sample
 
 ``` hlsl
+Varyings OUT;
+ZERO_INITIALIZE(Varyings, OUT);
+
 OUT.positionCS    = TransformObjectToHClip(IN.positionOS.xyz);
 OUT.positionWS    = TransformObjectToWorld(IN.positionOS.xyz);
 OUT.N             = TransformObjectToWorldNormal(IN.normal);
 OUT.uv            = TRANSFORM_TEX(IN.uv, _MainTex);
-OUT.fogCoord      = ComputeFogFactor(IN.positionOS.xyz);
-OUT.shadowCoord   = TransformWorldToShadowCoord(OUT.positionWS);
+OUT.fogCoord      = ComputeFogFactor(IN.positionOS.z);          // float
+OUT.shadowCoord   = TransformWorldToShadowCoord(OUT.positionWS);// float4
 ```
 
 ``` hlsl
@@ -16,16 +23,51 @@ VertexPositionInputs vertexInput = GetVertexPositionInputs(v.vertex.xyz);
 OUT.shadowCoord = GetShadowCoord(vertexInput);
 ```
 
+``` hlsl
+Light mainLight = GetMainLight();
+Light mainLight = GetMainLight(shadowCoord);
+
+half3 ambient = SampleSH(IN.normal);
+
+half3 cameraWS = GetCameraPositionWS();
+```
+
+``` hlsl
+// GPU instancing
+#pragma multi_compile_instancing
+
+// Fog
+#pragma multi_compile_fog
+
+// Light & Shadow
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+#pragma multi_compile _ _ADDITIONAL_LIGHTS
+#pragma multi_compile _ _ADDITIONAL_LIGHTS_CASCADE
+#pragma multi_compile _ _SHADOWS_SOFT
+
+// LightMap
+#pragma multi_compile _ DIRLIGHTMAP_COMBINED
+#pragma multi_compile _ LIGHTMAP_ON
+```
+
 ## SBR Batcher / GPU인스턴싱
+
+SRP Batcher가 추가됨으로써, 동적오브젝트가 많아져도 좋은 퍼포먼스 유지하는게
 
 - <https://docs.unity3d.com/Manual/GPUInstancing.html>
 
 ``` hlsl
+// For SRP Batcher
+
 CBUFFER_START(UnityPerMaterial)
+...
 CBUFFER_END
 ```
 
 ``` hlsl
+// for GPU instancing
+
 struct Attributes
 {
     UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -34,6 +76,7 @@ struct Attributes
 struct Varyings
 {
     UNITY_VERTEX_INPUT_INSTANCE_ID
+    UNITY_VERTEX_OUTPUT_STEREO // for VR
 };
 
 Varyings vert(Attributes IN)
@@ -49,10 +92,10 @@ half4 frag(Varyings IN) : SV_Target
 }
 ```
 
-| SBR Batcher                   | GPU Instancing                                               |
-|-------------------------------|--------------------------------------------------------------|
-| 동일한 오브젝트 아니여도 가능 | 동일한 오브젝트 상태                                         |
-| CBUFFER_START // CBUFFER_END  | UNITY_INSTANCING_BUFFER_START // UNITY_INSTANCING_BUFFER_END |
+| SBR Batcher                  | GPU Instancing                                               |
+|------------------------------|--------------------------------------------------------------|
+| 동일한 메쉬 아니여도 가능    | 동일한 메쉬 상태                                             |
+| CBUFFER_START // CBUFFER_END | UNITY_INSTANCING_BUFFER_START // UNITY_INSTANCING_BUFFER_END |
 
 ## hlsl
 

@@ -1,15 +1,32 @@
+# Shadow
 
-- [실시간 그림자를 싸게 그리자! 평면상의 그림자 ( Planar Shadow for Skinned Mesh)](http://ozlael.egloos.com/4070775)
+``` hlsl
+// Light & Shadow
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+#pragma multi_compile _ _ADDITIONAL_LIGHTS
+#pragma multi_compile _ _ADDITIONAL_LIGHTS_CASCADE
+#pragma multi_compile _ _SHADOWS_SOFT
 
+UnityEngine.Rendering.Universal.ShaderKeywordStrings
+```
 
-- 원형(circle) 평면 그림자
-- 그림자용 카메라(렌더타겟텍스쳐) + 쉐도우용 모델(폴리곤 적은)
-- 쉐이더볼륨
-- 쉐이더맵
+``` hlsl
+OUT.shadowCoord   = TransformWorldToShadowCoord(OUT.positionWS);// float4
+```
 
-### Shadow
+``` hlsl
+VertexPositionInputs vertexInput = GetVertexPositionInputs(v.vertex.xyz);
+OUT.shadowCoord = GetShadowCoord(vertexInput);
+```
+
+``` hlsl
+Light mainLight = GetMainLight(inputData.shadowCoord);
+half shadow = mainLight.shadowAttenuation;
+finalColor.rgb *= shadow;
+```
+
 아 유니티 병신같은 문서어딧
-
 
 [URP 셰이더 코딩 튜토리얼 : 제 1편 - Unlit Soft Shadow](https://blog.naver.com/mnpshino/221844164319)
 
@@ -22,31 +39,15 @@
 [[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(3/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-frame-debugger%EB%A1%9C-%EC%9B%90%EC%9D%B8-%EC%B0%BE%EA%B8%B0-3-3-bae7825480d3)
 [Reading a depth value from Unity's shadow map?](https://forum.unity.com/threads/reading-a-depth-value-from-unitys-shadow-map.243092/)
 
-
+``` hlsl
 // Toggle the alpha test
 #define _ALPHATEST_ON
 
 // Toggle fog on transparent
 #define _ENABLE_FOG_ON_TRANSPARENT
+```
 
 ``` hlsl
-UnityEngine.Rendering.Universal.ShaderKeywordStrings
-
-// Light & Shadow
-#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-#pragma multi_compile _ _ADDITIONAL_LIGHTS
-#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-#pragma multi_compile _ _SHADOWS_SOFT
-
-
-o.shadowCoord = GetShadowCoord(vertexInput);
-
-float4 shadowCoord = TransformWorldToShadowCoord(positionWorldSpace);
-Light mainLight = GetMainLight(inputData.shadowCoord);
-half shadow = mainLight.shadowAttenuation;
-finalColor.rgb *= shadow;
-
 UsePass "Universal Render Pipeline/Lit/ShadowCaster"
 
 com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl
@@ -63,21 +64,6 @@ _ADDITIONAL_LIGHT_SHADOWS => ADDITIONAL_LIGHT_CALCULATE_SHADOWS
 PipelineAsset> Shadows > Cascades> No Cascades
 ```
 
-``` hlsl
-// 그림자 그려주는놈
-
-Name "ShadowCaster"
-Tags{"LightMode" = "ShadowCaster"}
-ZWrite On
-Cull Back
-
-vert()
-{
-    1 : lit
-    0 : shadow
-    return 1 or 0;
-}
-```
 ![./urp_shader_res/cascade.jpg](./urp_shader_res/cascade.jpg)
 
 ``` hlsl
@@ -168,8 +154,23 @@ half shadowAttenuation = MainLightRealtimeShadow(shadowCoord);
 // half shadowAttenuation = mainLight.shadowAttenuation;
 ```
 
-
 ## ShadowCaster
+
+``` hlsl
+// 그림자 그려주는놈
+Name "ShadowCaster"
+Tags{"LightMode" = "ShadowCaster"}
+ZWrite On
+Cull Back
+
+vert()
+{
+    1 : lit
+    0 : shadow
+
+    return 1 or 0;
+}
+```
 
 ``` hlsl
 Pass
@@ -249,8 +250,6 @@ real SampleShadowmap(TEXTURE2D_SHADOW_PARAM(ShadowMap, sampler_ShadowMap), float
 real LerpWhiteTo(real b, real t)
 ```
 
-
-
 ## 쉐도우맵
 
 1. Z-depth구하기
@@ -280,6 +279,7 @@ real LerpWhiteTo(real b, real t)
 
 
 ##
+
 - SSSM(Screen Space Shadow Map)
 
 
@@ -287,3 +287,45 @@ real LerpWhiteTo(real b, real t)
 - [OpenGL - 阴影映射 - Tutorial 16 : Shadow mapping](https://blog.csdn.net/linjf520/article/details/105380551)
 
 ### Shadow Acne
+
+## DepthOnly
+
+``` hlsl
+Pass
+{
+    Tags
+    {
+        "LightMode" = "DepthOnly"
+    }
+
+    ZWrite On
+    ColorMask 0
+
+    HLSLPROGRAM
+    
+    ...
+
+    half4 shadowFrag(Varyings IN) : SV_Target
+    {
+        return 0;
+    }
+    ENDHLSL
+}
+```
+
+## Meta
+
+- 라이트맵 구울때 사용.
+- 디버깅용 내부툴 만들때 유용.
+
+``` hlsl
+Pass
+{
+    Tags
+    {
+        "LightMode" = "DepthOnly"
+    }
+
+    ...
+}
+```
