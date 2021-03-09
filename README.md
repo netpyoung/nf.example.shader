@@ -62,7 +62,7 @@
 ## optimize
 
 - Mesh Combine
-- [Texture Combine](OptimizeCombineTexture.md)
+- [Texture Combine](./doc/OptimizeCombineTexture.md)
 - ramp
 - [better pow](./doc/SpecularPowApproximation.md)
 - BRDF Map
