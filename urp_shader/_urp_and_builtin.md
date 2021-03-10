@@ -15,30 +15,7 @@ URP
 | Shadows         | AutoLight.cginc | com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl  |
 | Surface shaders | Lighting.cginc  | None, but you can find a side project for this here              |
 
-
-
-``` hlsl
-o.vertex = UnityObjectToClipPos(v.vertex);
-=>
-o.vertex = TransformObjectToHClip(v.vertex.xyz);
-
-half4 c = tex2D(_MainTex, i.texcoord);
-=>
-float4 c = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
-
-texCUBElod(Cubemap Object, float4(Reflection Vector, mipLevel))
-=>
-SAMPLE_TEXCUBE_LOD(Cubemap Object, Sample Reflection Vector, mipLevel)
-
-
-half3 worldSpaceLightDir = normalize(_WorldSpaceLightPos0);
-=>
-Light mainLight = GetMainLight(i.shadowCoord);
-```
-
 ## Variant Keyword
-
-???
 
 - https://blogs.unity3d.com/2018/05/14/stripping-scriptable-shader-variants/
 
@@ -53,6 +30,7 @@ Light mainLight = GetMainLight(i.shadowCoord);
 | _MIXED_LIGHTING_SUBTRACTIVE |  |
 
 ## Macro
+
 | built-in                            | URP                          |
 |-------------------------------------|------------------------------|
 | UNITY_PROJ_COORD (a)                | 없음, 대신 a.xy / aw 사용    |
@@ -70,19 +48,19 @@ Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl
 | TRANSFER_SHADOW                   | TransformWorldToShadowCoord                                            |
 | UNITY_SHADOW_COORDS(x)            | x                                                                      |
 | SHADOWS_SCREEN                    | x                                                                      |
-
-
-urp - GetShadowCoords - shadow
+|                                   | GetShadowCoords                                                        |
 
 ## Fog
-com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl”.
+
+com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
+
 | Built-in                      | URP                                                 |
 |-------------------------------|-----------------------------------------------------|
 | UNITY_TRANSFER_FOG(o, outpos) | o.fogCoord = ComputeFogFactor(clipSpacePosition.z); |
 | UNITY_APPLY_FOG(coord, col)   | color = MixFog(color, i.fogCoord);                  |
 | UNITY_FOG_COORDS(x)           | x                                                   |
 
-## Texture/Sampler Declaration Macros 
+## Texture/Sampler Declaration Macros
 
 | Built-in                                          | URP                                                                      |
 |---------------------------------------------------|--------------------------------------------------------------------------|
@@ -96,7 +74,7 @@ com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
 
 Important to note that SCREENSPACE_TEXTURE has become TEXTURE2D_X. If you are working on some screen space effect for VR in Single Pass Instanced or Multi-view modes, you must declare the textures used with TEXTURE2D_X. This macro will handle for you the correct texture (array or not) declaration. You also have to sample the textures using SAMPLE_TEXTURE2D_X and use UnityStereoTransformScreenSpaceTex for the uv.
 
-## Helper 
+## Helper
 
 | Built-in                                    | URP            |                                                                   |
 |---------------------------------------------|----------------|-------------------------------------------------------------------|
@@ -136,16 +114,20 @@ unity_WorldToShadow	float4x4 _MainLightWorldToShadow[MAX_SHADOW_CASCADES + 1] or
 | LIGHTING_COORDS| x| |
 
 
-## Vertex-lit Helper Functions ↑
-Built-in	URP	 
-float3 ShadeVertexLights (float4 vertex, float3 normal)	Gone. You can try to use UNITY_LIGHTMODEL_AMBIENT.xyz + VertexLighting(...)	For VertexLighting(...) include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl”
+## Vertex-lit Helper Functions
+
+| Built-in                                                | URP                                                                                                                                                                                    |
+|---------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| float3 ShadeVertexLights (float4 vertex, float3 normal) | Gone. You can try to use UNITY_LIGHTMODEL_AMBIENT.xyz + VertexLighting(...)	For VertexLighting(...) include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl” |
 
 A bunch of utilities can be found in “Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl”.
 
-## Screen-space Helper Functions ↑
-Built-in	URP	 
-float4 ComputeScreenPos (float4 clipPos)	float4 ComputeScreenPos(float4 positionCS)	Include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl”
-float4 ComputeGrabScreenPos (float4 clipPos)	Gone.
+## Screen-space Helper Functions
+
+| Built-in                                     | URP                                                                                                                                            |
+|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| float4 ComputeScreenPos (float4 clipPos)     | float4 ComputeScreenPos(float4 positionCS) Include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl” |
+| float4 ComputeGrabScreenPos (float4 clipPos) | Gone.                                                                                                                                          |
 
 
 ComputeScreenPos deprecated - https://github.com/Unity-Technologies/Graphics/pull/2529
@@ -178,15 +160,9 @@ Linear01Depth(sceneZ)	Linear01Depth(sceneZ, _ZBufferParams)	Include “Packages/
 To use the camera depth texture, include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl” and the _CameraDepthTexture will be declared for you as well as helper the functions SampleSceneDepth(...) and LoadSceneDepth(...).
 
 ## etc
+
 ShadeSH9(normal)	SampleSH(normal)	Include “Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl”
 unity_ColorSpaceLuminance	Gone. Use Luminance()	Include “Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl”
-
-
------------------------------------------------------------------------
-
-
-그림자를 처리하기 위해서 그냥 float4 하나 넘기면 되는 거고, GetShadowCoord()로 좌표를 구하고, MainLightRealtimeShadow() 함수를 통해서 실제 attenuation을 구할 수 있다. 커스텀 라이팅 모델을 구현할 때는 이렇게 하면 되고, 만약 내장된 PBR 라이팅을 쓸거라면 InputData 구조체에 좌표를 넣어서 UniversalFragmentPBR()을 호출하면 된다.
-- https://codingdad.me/2020/02/12/urp-porting-3/
 
 
 | Built-in                                |   |                     |
@@ -198,6 +174,7 @@ unity_ColorSpaceLuminance	Gone. Use Luminance()	Include “Packages/com.unity.re
 | DotClamped                              | x |                     |
 | unity_LightGammaCorrectionConsts_PIDiv4 | x |                     |
 | UnityGlobalIllumiation                  | x |                     |
+
 ---------------------------------------------------------------------
 여깃는건 쓰지말것
 https://leegoonz.blog/
