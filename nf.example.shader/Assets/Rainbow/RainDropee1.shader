@@ -11,7 +11,7 @@ Shader "RainDropee1"
     // | b | streak gradient | 
     // | a | -               | 
 
-    // TODO : droplet -> ripple°ü·ÃµÈ°ÍÀº ripple·Î ¹Ù²Ü°Í.
+    // TODO : droplet -> rippleê´€ë ¨ëœê²ƒì€ rippleë¡œ ë°”ê¿€ê²ƒ.
     Properties
     {
         _MainTex("Main Texture", 2D) = "white" {}
@@ -139,14 +139,14 @@ Shader "RainDropee1"
 
             inline half EdgeMask(half droplet, half edgeWidth)
             {
-                // ³»ºÎ¿¡ ÀÛÀº °ËÀº ¸¶½ºÅ©¸¦ ¸¸µé¾î °á°úÀûÀ¸·Î Èò»ö Å×µÎ¸® È¿°ú.
+                // ë‚´ë¶€ì— ì‘ì€ ê²€ì€ ë§ˆìŠ¤í¬ë¥¼ ë§Œë“¤ì–´ ê²°ê³¼ì ìœ¼ë¡œ í°ìƒ‰ í…Œë‘ë¦¬ íš¨ê³¼.
 
                 // 0  0.05        0.95 1
                 // |--|--------------|-|
-                // °Ë        È¸        Èò
+                // ê²€        íšŒ        í°
 
                 // smoothstep(min, max, x);
-                // - [min, max]»çÀÌÀÇ Hermite º¸°£
+                // - [min, max]ì‚¬ì´ì˜ Hermite ë³´ê°„
 
                 // 0.04 ~ 0 | 0 ~ 0.05 ~ 0.9 | 0.9 ~ 0.95 // distance 0.05
                 // 0        | 0 ~ 1    ~ 18  | 18  ~ 19   // divide   0.05
@@ -157,9 +157,9 @@ Shader "RainDropee1"
 
             inline half RippleFade(half dropletTime)
             {                
-                // ripple: ÀÜ¹°°á
-                // ½Ã°£¿¡µû¸¥ Fade in / out È¿°ú
-                // sin PI°ªÀ» »ç¿ë.
+                // ripple: ì”ë¬¼ê²°
+                // ì‹œê°„ì—ë”°ë¥¸ Fade in / out íš¨ê³¼
+                // sin PIê°’ì„ ì‚¬ìš©.
                 return abs(sin(dropletTime * PI));
             }
 
@@ -182,7 +182,7 @@ Shader "RainDropee1"
                 
                 // streak A - droplet
                 half dropletTime1 = time * _RainSpeed;
-                // frac: ¼Ò¼öÁ¡ÀÌÇÏ ¸®ÅÏ.
+                // frac: ì†Œìˆ˜ì ì´í•˜ ë¦¬í„´.
                 half emissive1 = (1 - frac(dropletTime1)); // 0.99 ~ 0
                 half droplet1 = SAMPLE_TEXTURE2D(_DropletPatternPackTex, sampler_DropletPatternPackTex, IN.uv).r - emissive1;
                 half edgeMask1 = EdgeMask(droplet1, _EdgeWidth);

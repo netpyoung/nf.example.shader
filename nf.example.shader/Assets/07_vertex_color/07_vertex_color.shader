@@ -1,4 +1,4 @@
-Shader "VertexColor"
+Shader "07_vertex_color"
 {
 	Properties
 	{
@@ -8,15 +8,22 @@ Shader "VertexColor"
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
+			#pragma 3.5
 			#pragma vertex vert
 			#pragma fragment frag
 

@@ -81,7 +81,7 @@ Shader "example/Parallax_packed"
 			half2 ParallaxMapping(half2 uv, half3 V_TS)
 			{
 				half height = SAMPLE_TEXTURE2D(_NormalDepthPackedTex, sampler_NormalDepthPackedTex, uv).b;
-				half2 E = -(V_TS.xy / V_TS.z); // ½Ã¼­Àº ¹İ´ë¹æÇâÀÓÀ¸·Î ¸¶ÀÌ³Ê½º(-).
+				half2 E = -(V_TS.xy / V_TS.z); // ì‹œì„œì€ ë°˜ëŒ€ë°©í–¥ì„ìœ¼ë¡œ ë§ˆì´ë„ˆìŠ¤(-).
 				return uv + E * (height * _HeightStrength);
 			}
 

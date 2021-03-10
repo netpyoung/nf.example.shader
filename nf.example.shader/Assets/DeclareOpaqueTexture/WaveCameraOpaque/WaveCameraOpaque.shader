@@ -1,8 +1,8 @@
 Shader "WaveCameraOpaque"
 {
-    // ref: [LWRP(URP) ¿¡¼­ ±¼Àı(Refraction) ¸¸µé±â](https://chulin28ho.tistory.com/555)
-    // Queue / RenderType È®ÀÎ.
-    // PipelineAsset> General> Opaque Texture> Ã¼Å©.
+    // ref: [LWRP(URP) ì—ì„œ êµ´ì ˆ(Refraction) ë§Œë“¤ê¸°](https://chulin28ho.tistory.com/555)
+    // Queue / RenderType í™•ì¸.
+    // PipelineAsset> General> Opaque Texture> ì²´í¬.
 
     Properties
     {

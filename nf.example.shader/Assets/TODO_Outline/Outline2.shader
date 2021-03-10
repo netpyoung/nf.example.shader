@@ -11,7 +11,6 @@
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
-			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -21,6 +20,8 @@
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
+				"Queue" = "Geometry"
+				"RenderType" = "Opaque"
 			}
 
 			Cull Front
@@ -91,6 +92,8 @@
 			Tags
 			{
 				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
+				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

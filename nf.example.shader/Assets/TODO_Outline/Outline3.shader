@@ -11,7 +11,6 @@
 	{
 		Tags
 		{
-			"RenderType" = "Opaque"
 			"RenderPipeline" = "UniversalRenderPipeline"
 		}
 
@@ -22,6 +21,8 @@
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
+				"Queue" = "Geometry"
+				"RenderType" = "Opaque"
 			}
 
 			Cull Front
@@ -94,6 +95,8 @@
 			Tags
 			{
 				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
+				"RenderType" = "Opaque"
 			}
 
 			Cull Back

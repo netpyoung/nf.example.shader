@@ -12,21 +12,38 @@ Shader "example/04_dissolve_ramp"
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
 				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM
 			#pragma target 3.5
+
 			#pragma vertex vert
 			#pragma fragment frag
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+			TEXTURE2D(_DissolveTex);	SAMPLER(sampler_DissolveTex);
+			TEXTURE2D(_RampTex);		SAMPLER(sampler_RampTex);
+
+			CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+
+				half _Amount;
+				half _EdgeWidth;
+			CBUFFER_END
 
 			struct Attributes
 			{
@@ -39,17 +56,6 @@ Shader "example/04_dissolve_ramp"
 				float4 positionHCS : SV_POSITION;
 				float2 uv : TEXCOORD0;
 			};
-
-			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
-			TEXTURE2D(_DissolveTex);	SAMPLER(sampler_DissolveTex);
-			TEXTURE2D(_RampTex);		SAMPLER(sampler_RampTex);
-
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
-
-				half _Amount;
-				half _EdgeWidth;
-			CBUFFER_END
 
 			Varyings vert(Attributes IN)
 			{

@@ -6,20 +6,27 @@
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-
+			#pragma target 3.5
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
 			struct Attributes
 			{
@@ -34,8 +41,7 @@
 				float3 directionWS : TEXCOORD1;
 			};
 
-			TEXTURE2D(_Texture);
-			SAMPLER(sampler_Texture);
+			TEXTURE2D(_Texture);	SAMPLER(sampler_Texture);
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _Texture_ST;

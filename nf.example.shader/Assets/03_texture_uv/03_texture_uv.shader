@@ -2,17 +2,23 @@
 {
 	Properties
 	{
-		_Texture("texture", 2D) = "white"
+		_MainTex("texture", 2D) = "white"
 	}
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
@@ -20,6 +26,12 @@
 			#pragma fragment frag
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+
+			CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+			CBUFFER_END
 
 			struct Attributes
 			{
@@ -33,20 +45,13 @@
 				float4 positionHCS : SV_POSITION;
 				float2 uv : TEXCOORD0;
 			};
-
-			TEXTURE2D(_Texture);		SAMPLER(sampler_Texture);
-
-			CBUFFER_START(UnityPerMaterial)
-				float4 _Texture_ST;
-			CBUFFER_END
-
 			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.uv = TRANSFORM_TEX(IN.uv, _Texture);
+				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
 				// Time : https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 				OUT.uv += frac(float2(0, 1) * _Time.x);
@@ -56,7 +61,7 @@
 
 			half4 frag(Varyings IN) : SV_Target
 			{
-				return SAMPLE_TEXTURE2D(_Texture, sampler_Texture, IN.uv);
+				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 			}
 			ENDHLSL
 		}

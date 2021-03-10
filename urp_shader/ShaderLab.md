@@ -120,12 +120,20 @@ Cube            | float4 | "", "white", "black", "gray", "bump"
 Tags
 {
     "RenderPipeline" = "UniversalRenderPipeline"
+}
+
+Tags
+{
     "LightMode" = "UniversalForward"
     "RenderType" = "Opaque"
     "Queue" = "Geometry"
     "IgnoreProjector" = "True"
 }
 ```
+
+### RenderPipeline
+
+- <https://docs.unity3d.com/2021.1/Documentation/ScriptReference/Shader-globalRenderPipeline.html>
 
 ### Queue
 
@@ -140,6 +148,19 @@ Tags
 | 2400 | 2450    | 2699 | AlphaTest   |                     |
 | 2700 | 3000    | 3599 | Transparent |                     |
 | 3600 | 4000    | 5000 | Overlay     | render last / front |
+
+### RenderType
+
+- <https://docs.unity3d.com/2021.1/Documentation/Manual/SL-ShaderReplacement.html>
+- <https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.shadergraph/Editor/Generation/Enumerations/RenderType.cs>
+
+| RenderType        |                                            |
+|-------------------|--------------------------------------------|
+| Opaque            | 대부분의 쉐이더                            |
+| Transparent       | 투명한 쉐이더                              |
+| TransparentCutout | 마스킹 된 투명 쉐이더(2pass 식물쉐이더 등) |
+| Background        | Skybox 쉐이더                              |
+| Overlay           | 후광(Halo), 플레어(Flare)                  |
 
 ### IgnoreProjector
 

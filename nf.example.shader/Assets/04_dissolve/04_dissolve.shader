@@ -13,12 +13,17 @@
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
-				"LightMode" = "SRPDefaultUnlit"
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
 			}
 
@@ -28,17 +33,6 @@
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			struct Attributes
-			{
-				float4 positionOS : POSITION;
-				float2 uv : TEXCOORD0;
-			};
-
-			struct Varyings
-			{
-				float4 positionHCS : SV_POSITION;
-				float2 uv : TEXCOORD0;
-			};
 
 			TEXTURE2D(_Texture);		SAMPLER(sampler_Texture);
 			TEXTURE2D(_TexDissolve);	SAMPLER(sampler_TexDissolve);
@@ -53,6 +47,18 @@
 				half4 _EdgeColor1;
 				half4 _EdgeColor2;
 			CBUFFER_END
+
+			struct Attributes
+			{
+				float4 positionOS : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+
+			struct Varyings
+			{
+				float4 positionHCS : SV_POSITION;
+				float2 uv : TEXCOORD0;
+			};
 
 			Varyings vert(Attributes IN)
 			{

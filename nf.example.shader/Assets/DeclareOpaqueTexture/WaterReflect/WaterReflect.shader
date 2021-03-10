@@ -1,14 +1,14 @@
 Shader "WaterReflect"
 {
-    // Queue / RenderType Ȯ��.
-    // PipelineAsset> General> Opaque Texture> üũ.
+    // Queue / RenderType 확인.
+    // PipelineAsset> General> Opaque Texture> 체크.
 
     Properties
     {
         _Height("Height", Float) = 1
     }
 
-        SubShader
+    SubShader
     {
         Tags
         {

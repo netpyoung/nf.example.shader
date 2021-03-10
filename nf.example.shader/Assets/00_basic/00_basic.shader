@@ -2,19 +2,27 @@ Shader "example/00_basic"
 {
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
 			Tags
 			{
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#pragma 3.5
 
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			struct Attributes
 			{
@@ -29,12 +37,12 @@ Shader "example/00_basic"
 			Varyings  vert(Attributes IN)
 			{
 				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
+
 				// o.positionCS = mul(UNITY_MATRIX_MVP, v.positionOS);
 				// Use of UNITY_MATRIX_MVP is detected. To transform a vertex into clip space, consider using UnityObjectToClipPos for better performance and to avoid z-fighting issues with the default depth pass and shadow caster pass.
-
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				// HClip: Homogeneous Clip
-
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				return OUT;
 			}
 

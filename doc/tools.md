@@ -11,3 +11,7 @@
 
 - https://github.com/unity3d-jp/MeshSync
 - https://github.com/unity3d-jp/NormalPainter
+
+================================
+- for dummy model
+  - https://assetstore.unity.com/publishers/1/?orderBy=3&page=1&pageSize=24&plusPro=false&price=0-4000&rating=0&released=0
