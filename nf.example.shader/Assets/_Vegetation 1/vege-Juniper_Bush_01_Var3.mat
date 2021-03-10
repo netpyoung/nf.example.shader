@@ -141,7 +141,7 @@ Material:
     - _amapstrength: 1
     - _metalValue: 1
     - _smoothness: 1
-    - _strengthValue: 13
+    - _strengthValue: 22
     - _turbulenceValue: 2
     - _usenormalmap: 1
     m_Colors:
@@ -151,7 +151,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _albedocolor: {r: 0.19464216, g: 0.509434, b: 0.20418486, a: 0}
-    - _directionValue: {r: 2, g: 2, b: 0, a: 0}
+    - _directionValue: {r: 1, g: 1, b: 0, a: 0}
     - _offset: {r: 0, g: 0, b: 0, a: 0}
     - _tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []

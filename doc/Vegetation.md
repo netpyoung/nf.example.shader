@@ -4,6 +4,10 @@ Vegetation
 - https://docs.unity3d.com/Packages/com.unity.polybrush@1.0/manual/modes_color.html
   - [u: Polybrush Intro and Tutorial](https://youtu.be/JQyntL-Z5bM?t=448)
 
+
+- https://blogs.unity3d.com/kr/2018/06/29/book-of-the-dead-quixel-wind-scene-building-and-content-optimization-tricks/
+- https://blogs.unity3d.com/2018/08/07/shader-graph-updates-and-sample-project/
+
 |||
 |-|-|
 |r| the stiffness of leaves' edges|
