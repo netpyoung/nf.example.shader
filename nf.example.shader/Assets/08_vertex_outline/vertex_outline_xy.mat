@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Outline2
-  m_Shader: {fileID: 4800000, guid: c9af75cc14fd4014ab30d3508895c895, type: 3}
+  m_Name: vertex_outline_xy
+  m_Shader: {fileID: 4800000, guid: 06c02691aa7f2c849900ce901680376c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -70,8 +70,8 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OutlineThickness: 0.02
-    - _OutlineWidth: 0.09
+    - _OutlineThickness: 0.01
+    - _OutlineWidth: 0.02
     - _Parallax: 0.02
     - _Scale: 0.1
     - _SmoothnessTextureChannel: 0
@@ -82,7 +82,6 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _OutlineColor: {r: 1, g: 0, b: 0, a: 1}
-    - _OutlineScale: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _OutlineColor: {r: 1, g: 0.029599255, b: 0, a: 1}
     - _Scale: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

@@ -1,9 +1,9 @@
-﻿Shader "NFShader/Outline/Outline3"
+﻿Shader "NFShader/Outline/vertex_outline_xy"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_OutlineThickness("_OutlineThickness", float) = 0.02
+		_OutlineThickness("_OutlineThickness", Float) = 0.02
 		_OutlineColor("_OutlineColor", Color) = (1,1,1,1)
 	}
 
@@ -39,19 +39,17 @@
 				float4 _OutlineColor;
 			CBUFFER_END
 
-			struct appdata
+			struct Attributes
 			{
-				float4 vertex : POSITION;
-				float2 uv : TEXCOORD0;
-				float3 normal : NORMAL;
-
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
+				float3 normal		: NORMAL;
 			};
 
-			struct v2f
+			struct Varyings
 			{
-				float4 vertex : SV_POSITION;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionHCS	: SV_POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
 			inline float2 TransformViewToProjection(float2 v)
@@ -59,30 +57,28 @@
 				return mul((float2x2)UNITY_MATRIX_P, v);
 			}
 
-			v2f vert(appdata v)
+			Varyings vert(Attributes IN)
 			{
-				v2f o;
-				UNITY_SETUP_INSTANCE_ID(v);
-				UNITY_TRANSFER_INSTANCE_ID(v, o);
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
+
 
 				/*float3 worldNormalLength = length(TransformObjectToWorldNormal(v.normal));
 				float3 outlineOffset = _OutlineThickness * worldNormalLength * v.normal;
 				v.vertex.xyz += outlineOffset;
 				o.vertex = TransformObjectToHClip(v.vertex.xyz);*/
 
-				o.vertex = TransformObjectToHClip(v.vertex.xyz);
-				float3 normalVS = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-				float2 offsetPS = TransformViewToProjection(normalVS.xy);
-				o.vertex.xy += offsetPS * _OutlineThickness;
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 
+				half3 normalVS = mul((float3x3)UNITY_MATRIX_IT_MV, IN.normal);
+				half2 offsetPS = TransformViewToProjection(normalVS.xy);
+				OUT.positionHCS.xy += offsetPS * _OutlineThickness;
 
-				return o;
+				return OUT;
 			}
 
-			half4 frag(v2f Input) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				UNITY_SETUP_INSTANCE_ID(Input);
-
 				return _OutlineColor;
 			}
 			ENDHLSL
@@ -102,10 +98,12 @@
 			Cull Back
 
 			HLSLPROGRAM
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#pragma target 3.5
 
 			#pragma vertex vert
 			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
 
@@ -113,36 +111,31 @@
 				float4 _MainTex_ST;
 			CBUFFER_END
 
-			struct appdata
+			struct Attributes
 			{
-				float4 vertex : POSITION;
-				float2 texcoord : TEXCOORD0;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
-			struct v2f
+			struct Varyings
 			{
-				float4 vertex : SV_POSITION;
-				float2 texcoord : TEXCOORD0;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionHCS	: SV_POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
-			v2f vert(appdata v)
+			Varyings vert(Attributes IN)
 			{
-				v2f o;
-				UNITY_SETUP_INSTANCE_ID(v);
-				UNITY_TRANSFER_INSTANCE_ID(v, o);
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
-				o.vertex = TransformObjectToHClip(v.vertex.xyz);
-				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-				return o;
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+				return OUT;
 			}
 
-			half4 frag(v2f Input) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				UNITY_SETUP_INSTANCE_ID(Input);
-
-				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, Input.texcoord);
+				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 			}
 			ENDHLSL
 		}

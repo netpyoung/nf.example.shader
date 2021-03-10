@@ -34,7 +34,7 @@ Shader "example/00_basic"
 				float4 positionHCS : SV_POSITION;
 			};
 
-			Varyings  vert(Attributes IN)
+			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
@@ -46,7 +46,7 @@ Shader "example/00_basic"
 				return OUT;
 			}
 
-			half4 frag(Varyings  IN) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
 				return half4(1, 0, 0, 1);
 			}

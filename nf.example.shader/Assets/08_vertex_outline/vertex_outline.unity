@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.1273165, g: 0.13414678, b: 0.12107946, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -579,7 +579,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: fc71f595597f8364d90267e2804daa5e, type: 2}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_Name
-      value: Outline2
+      value: vertex_outline_scale
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_IsActive
@@ -743,7 +743,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 4fb222475759de24ba14ee37ef6dc002, type: 2}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_Name
-      value: Outline3
+      value: vertex_outline_xy
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_IsActive

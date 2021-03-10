@@ -1,9 +1,9 @@
-﻿Shader "NFShader/Outline/Outline2"
+﻿Shader "NFShader/Outline/vertex_outline_scale"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_OutlineThickness("_OutlineThickness", float) = 0.02
+		_OutlineThickness("_OutlineThickness", Float) = 0.02
 		_OutlineColor("_OutlineColor", Color) = (1,1,1,1)
 	}
 	SubShader
@@ -25,10 +25,10 @@
 			}
 
 			Cull Front
-
 			Blend SrcAlpha OneMinusSrcAlpha
 
 			HLSLPROGRAM
+			#pragma target 3.5
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -39,17 +39,15 @@
 				float4 _OutlineColor;
 			CBUFFER_END
 
-			struct appdata
+			struct Attributes
 			{
-				float4 vertex : POSITION;
-				float2 uv : TEXCOORD0;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
-			struct v2f
+			struct Varyings
 			{
-				float4 vertex : SV_POSITION;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
+				float4 positionHCS : SV_POSITION;
 			};
 
 			float4 Scale(float4 vertexPosition, float3 s)
@@ -62,20 +60,19 @@
 				return mul(m, vertexPosition);
 			}
 
-			v2f vert(appdata v)
+			Varyings  vert(Attributes IN)
 			{
-				v2f o;
-				UNITY_SETUP_INSTANCE_ID(v);
-				UNITY_TRANSFER_INSTANCE_ID(v, o);
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
-				o.vertex = TransformObjectToHClip(Scale(v.vertex, _OutlineThickness).xyz);
-				return o;
+				IN.positionOS = Scale(IN.positionOS, _OutlineThickness);
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+
+				return OUT;
 			}
 
-			float4 frag(v2f Input) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				UNITY_SETUP_INSTANCE_ID(Input);
-
 				return _OutlineColor;
 			}
 			ENDHLSL
@@ -84,10 +81,6 @@
 		Pass
 		{
 			Name "Front"
-			Cull Back
-			Blend SrcAlpha OneMinusSrcAlpha
-			ZWrite On
-			ZTest LEqual
 
 			Tags
 			{
@@ -95,6 +88,11 @@
 				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
 			}
+
+			Cull Back
+			Blend SrcAlpha OneMinusSrcAlpha
+			ZWrite On
+			ZTest LEqual
 
 			HLSLPROGRAM
 			#pragma target 3.5
@@ -109,34 +107,31 @@
 				float4 _MainTex_ST;
 			CBUFFER_END
 
-			struct appdata
+			struct Attributes
 			{
-				float4 vertex : POSITION;
-				float2 texcoord : TEXCOORD0;
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
-			struct v2f
+			struct Varyings
 			{
-				float4 vertex : SV_POSITION;
-				float2 texcoord : TEXCOORD0;
+				float4 positionHCS	: SV_POSITION;
+				float2 uv			: TEXCOORD0;
 			};
 
-			v2f vert(appdata v)
+			Varyings vert(Attributes IN)
 			{
-				v2f o;
-				UNITY_SETUP_INSTANCE_ID(v);
-				UNITY_TRANSFER_INSTANCE_ID(v, o);
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
-				o.vertex = TransformObjectToHClip(v.vertex.xyz);
-				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-				return o;
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+				return OUT;
 			}
 
-			float4 frag(v2f Input) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				UNITY_SETUP_INSTANCE_ID(Input);
-
-				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, Input.texcoord);
+				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 			}
 			ENDHLSL
 		}

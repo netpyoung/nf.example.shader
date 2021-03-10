@@ -15,6 +15,7 @@ Shader "ShadowCasterOnly"
         Pass
         {
             Name "ShadowCaster"
+
             Tags
             {
                 "LightMode" = "ShadowCaster"
@@ -50,9 +51,9 @@ Shader "ShadowCasterOnly"
                 Varyings OUT;
                 ZERO_INITIALIZE(Varyings, OUT);
 
-                float3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
-                float3 normalWS = TransformObjectToWorldNormal(IN.normal.xyz);
-                OUT.positionHCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _MainLightPosition.xyz));
+                half3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                half3 N = TransformObjectToWorldNormal(IN.normal.xyz);
+                OUT.positionHCS = TransformWorldToHClip(ApplyShadowBias(positionWS, N, _MainLightPosition.xyz));
 
                 return OUT;
             }
