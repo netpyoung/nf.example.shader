@@ -60,7 +60,8 @@
 
 			Varyings vert(Attributes IN)
 			{
-				Varyings OUT = (Varyings)0;
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
 
 				Light light = GetMainLight();
 				half3 L = light.direction;

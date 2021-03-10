@@ -29,7 +29,7 @@ Shader "dissolve_character"
 			}
 
 			HLSLPROGRAM
-			#pragma 3.5
+			#pragma target 3.5
 			#pragma shader_feature_local _ IS_NOISE
 
 			#pragma vertex vert

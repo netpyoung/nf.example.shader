@@ -126,7 +126,9 @@ Shader "RainDropee1"
 
             Varyings vert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
+
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 

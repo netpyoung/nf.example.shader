@@ -50,7 +50,8 @@ Shader "Unlit/NewUnlitShader"
 
             Varyings vert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
 
                 VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
 

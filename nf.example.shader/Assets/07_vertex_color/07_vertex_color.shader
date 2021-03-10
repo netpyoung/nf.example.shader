@@ -23,7 +23,7 @@ Shader "07_vertex_color"
 			}
 
 			HLSLPROGRAM
-			#pragma 3.5
+			#pragma target 3.5
 			#pragma vertex vert
 			#pragma fragment frag
 

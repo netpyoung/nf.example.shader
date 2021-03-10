@@ -80,14 +80,14 @@
 
                 Varyings vert(Attributes input)
                 {
-                    Varyings output = (Varyings)0;
-                    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+                    Varyings OUT;
+                    ZERO_INITIALIZE(Varyings, OUT);
 
                     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
-                    output.vertex = vertexInput.positionCS;
-                    output.uv = input.uv;
+                    OUT.vertex = vertexInput.positionCS;
+                    OUT.uv = input.uv;
 
-                    return output;
+                    return OUT;
                 }
 
                 half4 frag(Varyings input) : SV_Target

@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: dissolve_character
   m_Shader: {fileID: 4800000, guid: 7ba2f056283e1c34295957c2cda66297, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: IS_NOISE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -94,9 +94,9 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _GlowWidth: 0.1
+    - _GlowWidth: 0.05
     - _Height: 2
-    - _IsNoise: 0
+    - _IsNoise: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -105,7 +105,7 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SplitValue: 1
+    - _SplitValue: 0.5
     - _SrcBlend: 1
     - _Surface: 0
     - _WorkflowMode: 1

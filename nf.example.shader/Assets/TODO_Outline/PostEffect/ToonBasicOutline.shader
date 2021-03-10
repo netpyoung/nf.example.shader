@@ -45,16 +45,17 @@ Shader "Toon/Basic Outline"
             
             Varyings vert(Attributes input) 
             {
-                Varyings output = (Varyings)0;
-                
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
+
                 input.positionOS.xyz += input.normalOS.xyz * _Outline;
                 
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
-                output.positionCS = vertexInput.positionCS;
+                OUT.positionCS = vertexInput.positionCS;
                 
-                output.color = _OutlineColor;
-                output.fogCoord = ComputeFogFactor(output.positionCS.z);
-                return output;
+                OUT.color = _OutlineColor;
+                OUT.fogCoord = ComputeFogFactor(OUT.positionCS.z);
+                return OUT;
             }
 			
 			half4 frag(Varyings i) : SV_Target

@@ -47,7 +47,8 @@ Shader "ShadowCasterOnly"
 
             Varyings shadowVert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
 
                 float3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normal.xyz);

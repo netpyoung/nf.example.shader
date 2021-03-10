@@ -58,8 +58,8 @@
 
             Varyings vert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
-
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
 
                 half beamHeight = 20;
                 half pi = 3.141;

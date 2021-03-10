@@ -113,7 +113,8 @@
 
             Varyings vert(Attributes IN)
             {
-                Varyings OUT = (Varyings)0;
+                Varyings OUT;
+                ZERO_INITIALIZE(Varyings, OUT);
 
                 // 노이즈 빈도를 높이기위헤 uv값에 2를 곱했다.
                 half noiseTexVal = SAMPLE_TEXTURE2D_LOD(_NoiseTex, sampler_NoiseTex, IN.uv * 2, 0);

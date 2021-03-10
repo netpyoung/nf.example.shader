@@ -52,7 +52,9 @@ Shader "n18Approximation"
 
 			Varyings  vert(Attributes IN)
 			{
-				Varyings OUT = (Varyings)0;
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
+
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 
 				Light light = GetMainLight();
