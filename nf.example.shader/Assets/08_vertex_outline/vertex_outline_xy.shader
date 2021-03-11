@@ -37,6 +37,7 @@
 			CBUFFER_START(UnityPerMaterial)
 				float _OutlineThickness;
 				float4 _OutlineColor;
+				float4 _MainTex_ST;
 			CBUFFER_END
 
 			struct Attributes
@@ -108,6 +109,8 @@
 			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
 
 			CBUFFER_START(UnityPerMaterial)
+				float _OutlineThickness;
+				float4 _OutlineColor;
 				float4 _MainTex_ST;
 			CBUFFER_END
 

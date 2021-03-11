@@ -7,7 +7,8 @@
 	// 	Unity Shader - Planar Shadow - 平面阴影 （References 未看完）
 	//   - https://blog.csdn.net/linjf520/article/details/112979847
 
-	Properties {
+	Properties
+	{
 		_ShadowColor ("Shadow Color", Color) = (0, 0, 0, 1)
 		_PlaneHeight ("planeHeight", Float) = 0
 	}

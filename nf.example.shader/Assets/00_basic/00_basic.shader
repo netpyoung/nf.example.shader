@@ -9,6 +9,8 @@ Shader "example/00_basic"
 
 		Pass
 		{
+			Name "RED_CIRCLE"
+
 			Tags
 			{
 				"LightMode" = "UniversalForward"

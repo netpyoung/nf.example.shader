@@ -35,16 +35,17 @@
 
 			struct Attributes
 			{
-				float4 positionOS : POSITION;
-				float2 uv : TEXCOORD0;
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
 
 			};
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
-				float2 uv : TEXCOORD0;
+				float4 positionHCS	: SV_POSITION;
+				float2 uv			: TEXCOORD0;
 			};
+
 			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
