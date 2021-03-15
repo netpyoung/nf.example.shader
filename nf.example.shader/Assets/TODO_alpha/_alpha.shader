@@ -19,11 +19,12 @@ Shader "_alpha"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "AlphaTest"
-				"RenderType" = "TransparentCutout"
+				"Queue" = "Transparent"
+				"RenderType" = "Transparent"
 			}
 
-			Cull Off
+			ZWrite On // Default is On.
+			Blend SrcAlpha OneMinusSrcAlpha
 
 			HLSLPROGRAM
 			#pragma target 3.5
@@ -67,8 +68,68 @@ Shader "_alpha"
 				half3 L = light.direction;
 
 				half NdotL = dot(N, L);
-
+				if (_Alpha == 0)
+				{
+					discard;
+				}
 				return half4(NdotL, NdotL, NdotL, _Alpha);
+			}
+			ENDHLSL
+		}
+
+		Pass
+		{
+			// https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl
+
+			Name "DEPTHONLY"
+
+			Tags
+			{
+				"LightMode" = "DepthOnly"
+				"Queue" = "Transparent"
+				"RenderType" = "Transparent"
+			}
+
+			HLSLPROGRAM
+			#pragma target 3.5
+
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+			TEXTURE2D(_BaseMap);            SAMPLER(sampler_BaseMap);
+
+			CBUFFER_START(UnityPerMaterial)
+				float4 _BaseMap_ST;
+			CBUFFER_END
+
+			struct Attributes
+			{
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
+			};
+
+			struct Varyings
+			{
+				float4 positionHCS	: SV_POSITION;
+				float2 uv			: TEXCOORD0;
+			};
+
+			Varyings vert(Attributes IN)
+			{
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
+
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
+
+				return OUT;
+			}
+
+			half4 frag(Varyings IN) : SV_Target
+			{
+				return 0;
 			}
 			ENDHLSL
 		}

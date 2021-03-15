@@ -1,8 +1,7 @@
-Shader "_alpha1"
+Shader "_alpha"
 {
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
 		_Alpha("Alpha", Range(0, 1)) = 0.5
 	}
 
@@ -19,14 +18,13 @@ Shader "_alpha1"
 
 			Tags
 			{
-				"LightMode" = "UniversalForward"
+				"LightMode" = "SRPDefaultUnlit"
 				"Queue" = "Transparent"
 				"RenderType" = "Transparent"
 			}
 
-			Cull Off
-			ZWrite On // Default is On.
-			Blend SrcAlpha OneMinusSrcAlpha
+			ZWrite On
+			ColorMask 0
 
 			HLSLPROGRAM
 			#pragma target 3.5
@@ -37,10 +35,61 @@ Shader "_alpha1"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+			CBUFFER_START(UnityPerObject)
+				half _Alpha;
+			CBUFFER_END
 
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
+			struct Attributes
+			{
+				float4 positionOS	: POSITION;
+			};
+
+			struct Varyings
+			{
+				float4 positionHCS	: SV_POSITION;
+			};
+
+			Varyings vert(Attributes IN)
+			{
+				Varyings OUT;
+				ZERO_INITIALIZE(Varyings, OUT);
+
+				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				return OUT;
+			}
+
+			half4 frag(Varyings IN) : SV_Target
+			{
+				return 0;
+			}
+			ENDHLSL
+		}
+
+		Pass
+		{
+			Name "RED_CIRCLE2"
+
+			Tags
+			{
+				"LightMode" = "UniversalForward"
+				//"LightMode" = "SRPDefaultUnlit"
+				"Queue" = "Transparent"
+				"RenderType" = "Transparent"
+			}
+
+			ZWrite Off // Default is On.
+			//Blend SrcAlpha OneMinusSrcAlpha
+				Blend One One
+			HLSLPROGRAM
+			#pragma target 3.5
+
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+			CBUFFER_START(UnityPerObject)
 				half _Alpha;
 			CBUFFER_END
 
@@ -48,13 +97,11 @@ Shader "_alpha1"
 			{
 				float4 positionOS	: POSITION;
 				float4 normal		: NORMAL;
-				float2 uv			: TEXCOORD0;
 			};
 
 			struct Varyings
 			{
 				float4 positionHCS	: SV_POSITION;
-				float2 uv			: TEXCOORD0;
 				float3 N			: TEXCOORD1;
 			};
 
@@ -65,19 +112,21 @@ Shader "_alpha1"
 
 				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.N = TransformObjectToWorldDir(IN.normal.xyz);
-				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
-
 				return OUT;
 			}
 
 			half4 frag(Varyings IN) : SV_Target
 			{
-				half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv) * _Alpha;
-				if (mainTex.a == 0)
+				Light light = GetMainLight();
+				half3 N = normalize(IN.N);
+				half3 L = light.direction;
+
+				half NdotL = dot(N, L);
+				if (_Alpha == 0)
 				{
 					discard;
 				}
-				return mainTex;
+				return half4(NdotL, NdotL, NdotL, _Alpha);
 			}
 			ENDHLSL
 		}
@@ -104,7 +153,7 @@ Shader "_alpha1"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			TEXTURE2D(_BaseMap);            SAMPLER(sampler_BaseMap);
-			
+
 			CBUFFER_START(UnityPerMaterial)
 				float4 _BaseMap_ST;
 			CBUFFER_END

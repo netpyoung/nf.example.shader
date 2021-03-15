@@ -7,6 +7,7 @@
 - https://catlikecoding.com/sdf-toolkit/docs/texture-generator/
 - [FlowMap Painter](http://teckartist.com/?page_id=107)
 - [EasyChannelPacking](https://gumroad.com/l/EasyChannelPacking)
+- https://github.com/andydbc/unity-texture-packer
 
 
 - https://github.com/unity3d-jp/MeshSync
