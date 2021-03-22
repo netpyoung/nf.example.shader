@@ -12,13 +12,15 @@
 | 4.5   | 3.5 + compute + randomwrite                                    |
 | 4.6   | 4.0 + cubearray + tesshw + tessellation                        |
 
-| #pragma target | 설명            |
-|----------------|-----------------|
-| 2.5            | 기본값 / WebGL1 |
-| 3.0            | WebGL2          |
-| 3.5            | es3.0  / Vulkan |
-| 4.5            | es3.1           |
-
+| #pragma target | 설명            |                                  |
+|----------------|-----------------|----------------------------------|
+| 2.5            | 기본값 / WebGL1 |                                  |
+| 3.0            | WebGL2          |                                  |
+| 3.5            | es3.0  / Vulkan |                                  |
+| 4.0            |                 | Geometry                         |
+| 4.5            | es3.1           | Compute                          |
+| 4.6            |                 | Tessellation(* Metal은 지원안함) |
+| 5.0 | | RenderTexture.enableRandomWrite|
 ## 안드로이드와 그래픽 라이브러리
 
 | Graphic Library | Android API | version | 코드명     | Linear지원 |

@@ -1,8 +1,38 @@
 
 
  SubSurfaceScattering (피하산란)
+실시간 SSS 셰이더 구현하는 세가지 방법 (1) https://blog.naver.com/mnpshino/221442188568
+실시간 SSS 셰이더 구현하는 세가지 방법 (2) https://blog.naver.com/mnpshino/221442196618
+실시간 SSS 셰이더 구현하는 세가지 방법 (3) https://blog.naver.com/mnpshino/221442210257
+
+
 
 ## Fake SSS
+
+``` hlsl
+half halfLambert = NdotL * 0.5 + 0.5;
+half3 fakeSSS = halfLambert * _SSSColor;
+half3 color = halfLambert + fakeSSS;
+```
+
+// [SSS 쉐이더 만들었어요 뿌우](http://chulin28ho.egloos.com/5591833)
+``` hlsl
+half lambert = NdotL;
+half invLambert = 1 - lambert;
+half3 fakeSSS = pow(invLambert, _SSSPower) * _SSSMultiplier * _SSSColor;
+half3 color = lambert * fakeSSS;
+
+```
+
+// [SSS Shader for Unity](https://chulin28ho.tistory.com/515)
+
+thickness map 
+https://blender.stackexchange.com/questions/100724/how-to-bake-a-fake-sss-map-thickness-map
+https://colinbarrebrisebois.com/2011/04/04/approximating-translucency-part-ii-addendum-to-gdc-2011-talk-gpu-pro-2-article/
+
+## gpggem 16
+
+
 
 [Chapter 16. Real-Time Approximations to Subsurface Scattering](https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch16.html)
 16.2 Simple Scattering Approximations

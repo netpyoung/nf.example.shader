@@ -11,7 +11,9 @@
 - [2019 - Unity SRP와 LWRP에 대한 모든 것!](https://www.youtube.com/watch?v=MuzLdCXoJ9I)
 - [2020 - Universal RenderPipeline의 Custom RenderPass를 활용하여 렌더링 기능을 구현해보자 Track1-2](https://www.youtube.com/watch?v=vtfe3UgDs0w)
 - [2020 - Dev Weeks: URP 기본 구성과 흐름](https://www.youtube.com/watch?v=QRlz4-pAtpY)
+  - [Dev Weeks 2020.5. 세션자료](http://www.unitysquare.co.kr/growwith/resource/form?id=83)
 - [2020 - Dev Weeks: URP 셰이더 뜯어보기](https://www.youtube.com/watch?v=9K1uOihvNyg)
+  - [Dev Weeks 2020.6. 세션자료](http://www.unitysquare.co.kr/growwith/resource/form?id=87)
 
 ## Samples
 
