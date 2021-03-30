@@ -1,9 +1,16 @@
 # nf.example.shader
 
+- 셰이더 모음집
+- 자료가 파편화되어있고 기억력 부족이라 보존용으로 만듬.
+- Vertex / Fragment Shader 위주
+  - [ShaderArt 관련](https://github.com/netpyoung/unity.shader.sandbox)
+  - [ComputeShader 관련](https://github.com/netpyoung/nf.example.computeshader)
+- [스터디 자료](./doc/Lecture.md)
+
 ## URP
 
 - [Linear And Gamma](./urp_shader/linear_and_gamma.md)
-- #include
+- `#include`
 - URP Pass tags: LightMode
 - Property attributes
 - Custom Shader Editor
