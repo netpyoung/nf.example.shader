@@ -47,7 +47,7 @@ Shader "WaveCameraOpaque"
 
             struct Varyings
             {
-                float4 positionHCS      : SV_POSITION;
+                float4 positionCS      : SV_POSITION;
                 float2 uv               : TEXCOORD0;
                 float3 N                : TEXCOORD1;
                 float3 positionWS       : TEXCOORD2;
@@ -61,7 +61,7 @@ Shader "WaveCameraOpaque"
                 ZERO_INITIALIZE(Varyings, OUT);
 
                 VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-                OUT.positionHCS = vertexInputs.positionCS;
+                OUT.positionCS = vertexInputs.positionCS;
                 OUT.uv = IN.uv;
                 OUT.N = TransformObjectToWorldNormal(IN.normalOS);
                 OUT.positionWS = vertexInputs.positionWS;

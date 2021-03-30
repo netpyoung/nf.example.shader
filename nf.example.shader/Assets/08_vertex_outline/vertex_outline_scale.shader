@@ -1,4 +1,4 @@
-﻿Shader "NFShader/Outline/vertex_outline_scale"
+Shader "NFShader/Outline/vertex_outline_scale"
 {
 	Properties
 	{
@@ -48,7 +48,7 @@
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
+				float4 positionCS : SV_POSITION;
 			};
 
 			float4 Scale(float4 vertexPosition, float3 s)
@@ -67,7 +67,7 @@
 				ZERO_INITIALIZE(Varyings, OUT);
 
 				IN.positionOS = Scale(IN.positionOS, _OutlineThickness);
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
 				return OUT;
 			}
@@ -118,7 +118,7 @@
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
@@ -127,7 +127,7 @@
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				return OUT;
 			}

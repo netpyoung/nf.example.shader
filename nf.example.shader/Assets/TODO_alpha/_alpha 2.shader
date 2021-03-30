@@ -46,7 +46,7 @@ Shader "_alpha"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 			};
 
 			Varyings vert(Attributes IN)
@@ -54,7 +54,7 @@ Shader "_alpha"
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				return OUT;
 			}
 
@@ -101,7 +101,7 @@ Shader "_alpha"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float3 N			: TEXCOORD1;
 			};
 
@@ -110,7 +110,7 @@ Shader "_alpha"
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.N = TransformObjectToWorldDir(IN.normal.xyz);
 				return OUT;
 			}
@@ -166,7 +166,7 @@ Shader "_alpha"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
@@ -175,7 +175,7 @@ Shader "_alpha"
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
 
 				return OUT;

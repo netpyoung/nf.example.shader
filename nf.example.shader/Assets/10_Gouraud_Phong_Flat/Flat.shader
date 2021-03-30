@@ -1,4 +1,4 @@
-Shader "example/Phong"
+﻿Shader "example/Flat"
 {
 	Properties
 	{
@@ -12,17 +12,25 @@ Shader "example/Phong"
 	}
 
 	SubShader
-	{
+	{ 
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+		}
+
 		Pass
 		{
+
 			Tags
 			{
+				"LightMode" = "UniversalForward"
+				"Queue" = "Geometry"
 				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
 			}
 
 			HLSLPROGRAM
-			#pragma target 3.5
+			#pragma target 4.0
+
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -45,47 +53,52 @@ Shader "example/Phong"
 			struct Attributes
 			{
 				float4 positionOS	: POSITION;
-				float3 normalOS     : NORMAL;
 				float2 uv			: TEXCOORD0;
 			};
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv           : TEXCOORD0;
 
-				float3 N            : TEXCOORD1;
+				float3 positionWS	: TEXCOORD1;
 				float3 V            : TEXCOORD2;
 				float3 L            : TEXCOORD3;
 			};
 
-			Varyings  vert(Attributes IN)
+			Varyings vert(Attributes IN)
 			{
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				
 				Light light = GetMainLight();
-				OUT.N = TransformObjectToWorldNormal(IN.normalOS);
 				OUT.V = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(IN.positionOS.xyz)));
 				OUT.L = normalize(light.direction);
 				return OUT;
 			}
 
-			half4 frag(Varyings  IN) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				float3 N = normalize(IN.N);
-				float3 V = normalize(IN.V);
-				float3 L = normalize(IN.L);
+				half3 x = ddx(IN.positionWS);
+				half3 y = ddy(IN.positionWS);
 
-				float3 R = reflect(-L, N);
+				half3 N = normalize(-cross(x, y));
+				half3 V = normalize(IN.V);
+				half3 L = normalize(IN.L);
 
-				float3 diffuseColor = _Ambient * _Ka + _Diffuse * _Kd * max(0, dot(N, L));
-				float3 specularColor = _Specular * _Ks * pow(max(0, dot(R, V)), 20);
+				half3 R = reflect(-L, N);
 
-				float4 finalColor = float4((diffuseColor) * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb + specularColor, 1);
+				half NdotL = max(0, dot(N, L));
+				half RdotV = max(0, dot(R, V));
+
+				half3 diffuseColor = _Ambient * _Ka + _Diffuse * _Kd * NdotL;
+				half3 specularColor = _Specular * _Ks * pow(RdotV, 20);
+
+				half4 finalColor = half4(diffuseColor * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb + specularColor, 1);
 				return finalColor;
 			}
 			ENDHLSL

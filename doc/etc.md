@@ -1,15 +1,4 @@
-## lambert
-max(0, dot(N, L))
 
-## half lambert 
-
-## wrapped
-_wrapped =0 : lambert
-_wrapped =1 : half lambert
-
-```
-diffuse = max(0, (dot(N, L) + _wrapped) / (1 - _wrapped)));
-```
 
 ## Toon Ramp
 NPAR07_IllustrativeRenderingInTeamFortress2
@@ -19,8 +8,6 @@ NPAR07_IllustrativeRenderingInTeamFortress2
 ## Parallax Refraction  ??
 시차(視差: 관측 위치에 따른 물체의 위치나 방향의 차이)
 
-## phong
-## blinn phong
 ## SSS (Subsurface Scattering)
 
 ## AO(Ambient Occlusion) - https://gpgstudy.com/forum/viewtopic.php?t=22536
@@ -149,28 +136,6 @@ https://en.wikipedia.org/wiki/Global_illumination - 사진
 https://wiki.jmonkeyengine.org/jme3/advanced/pbr_part3.html
 
 
-======
-미네르트 모델
-``` shader
-float3 NdotL = max(0.0f, dot(N, L));
-float3 NdotV = max(0.0f, dot(N, V));
-float3 diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
-```
-
-오렌네이어
-``` shader
-float3 NdotL = max(0.0f, dot(N, L));
-float3 NdotV = max(0.0f, dot(N, V));
-float3 VdotL = max(0.0f, dot(V, L));
-
-float3 s = VdotL - NdotL * NdotV;
-float3 t = lerp(1.0f, max(NdotL, NdotV), step(0.0f, s));
-
-float3 A = 1.0 + _OrenNayarAlbedo * (_OrenNayarAlbedo / (_OrenNayarSigma + 0.13) + 0.5 / (_OrenNayarSigma + 0.33));
-float3 B = 0.45 * _OrenNayarSigma / (_OrenNayarSigma + 0.09);
-
-float3 diffuse = _OrenNayarAlbedo * max(0.0, NdotL) * (A + B * s / t) / 3.14159265;
-```
 
 Burley 조명 모델
 https://canny708.blog.me/221551549052
@@ -323,3 +288,97 @@ https://www.jordanstevenstechart.com/physically-based-rendering
 
 
 https://github.com/wdas/brdf - compiled - https://www.disneyanimation.com/technology/brdf.html
+
+
+
+----------------------------------------------------------
+## 색공간
+
+https://en.wikipedia.org/wiki/YUV - TODO 이미지
+|YUV| |
+|-|-|
+|Y | 밝기 |
+|U | 파랑 - 밝기 |
+|V | 빨강 - 밝기|
+YCbCr - digital
+YPbPr - analog
+
+https://en.wikipedia.org/wiki/YIQ - TODO 이미지
+YUV 33도 회전
+- NTSC(National Television System Committee)방식 -한국 미국 컬러텔레비전
+|YIQ| |
+|-|-|
+|Y | 밝기 |
+|I | 파랑 - 밝기 |
+|Q | 빨강 - 밝기|
+
+The CMY color model is a subtractive color model 
+ 
+| CMY ||
+|-|-|
+|C| Cyan|
+|M| Magenta|
+|Y | Yellow|
+
+| CMYK ||
+|-|-|
+|C| Cyan|
+|M| Magenta|
+|Y | Yellow|
+|K | Key(black)|
+
+HSV
+H 색상(Hue)
+S 채도(Saturation)
+V 명도(value)
+
+## GrayScale
+https://danielilett.com/2019-05-01-tut1-1-smo-greyscale/
+
+- grayscale : https://en.wikipedia.org/wiki/Grayscale
+https://blog.ggaman.com/965
+
+``` hlsl
+YPrPb
+Y = 0.299  * R + 0.587  * G + 0.114  * B
+Y = 0.3  * R + 0.6  * G + 0.11  * B
+
+YCrCb
+Y = 0.2126 * R + 0.7152 * G + 0.0722 * B
+```
+
+http://www.songho.ca/dsp/luminance/luminance.html
+
+fast approximation
+integer domain은 float보다 빠르다. shader는 float범위([0, 1])이므로 별 유용성은 없지만. 다른 곳에서는 유용할 수 도 있을듯
+
+2/8 = 0.25
+5/8 = 0.625
+1/8 = 0.125
+
+
+Luminance = (2 * Red + 5 * Green + 1 * Blue) / 8 
+Y = (R << 1)
+Y += (G << 2 + G)
+Y += B
+Y >>= 8
+ 
+
+## Sepia Tone Filter
+?? http://www.aforgenet.com/framework/docs/html/10a0f824-445b-dcae-02ef-349d4057da45.htm
+
+``` hlsl
+half3x3 sepiaVals = half3x3
+(
+    0.393, 0.349, 0.272,    // Red
+    0.769, 0.686, 0.534,    // Green
+    0.189, 0.168, 0.131     // Blue
+);
+
+half3 sepiaResult = mul(tex.rgb, sepiaVals);
+```
+
+    transform to YIQ color space;
+    modify it;
+    transform back to RGB.
+----------------------------------------------------------

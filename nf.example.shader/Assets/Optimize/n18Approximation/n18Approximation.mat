@@ -22,7 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: n18Approximation
   m_Shader: {fileID: 4800000, guid: 39d140216acf9804b853c5dd30ee6c30, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ENABLE_APPROXIMATION
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -101,7 +101,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EnableApproximation: 0
+    - _EnableApproximation: 1
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0

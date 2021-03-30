@@ -58,7 +58,7 @@ Shader "grass_1"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 
 				float3 N            : TEXCOORD1;
@@ -72,7 +72,7 @@ Shader "grass_1"
 				
 				half3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				positionWS.x += _WindSpeed * _Time.y;
-				OUT.positionHCS = TransformWorldToHClip(positionWS);
+				OUT.positionCS = TransformWorldToHClip(positionWS);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				OUT.N = TransformObjectToWorldDir(IN.normalOS);
 

@@ -43,7 +43,7 @@ Shader "Unlit/NewUnlitShader"
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
                 float2 uv           : TEXCOORD0;
                 float4 positionNDC  : TEXCOORD1;
             };
@@ -55,7 +55,7 @@ Shader "Unlit/NewUnlitShader"
 
                 VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
 
-                OUT.positionHCS = vertexInputs.positionCS;
+                OUT.positionCS = vertexInputs.positionCS;
                 OUT.positionNDC = vertexInputs.positionNDC;
 
                 return OUT;

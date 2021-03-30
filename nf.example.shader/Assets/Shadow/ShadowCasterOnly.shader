@@ -43,7 +43,7 @@ Shader "ShadowCasterOnly"
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
             };
 
             Varyings shadowVert(Attributes IN)
@@ -53,7 +53,7 @@ Shader "ShadowCasterOnly"
 
                 half3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
                 half3 N = TransformObjectToWorldNormal(IN.normal.xyz);
-                OUT.positionHCS = TransformWorldToHClip(ApplyShadowBias(positionWS, N, _MainLightPosition.xyz));
+                OUT.positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, N, _MainLightPosition.xyz));
 
                 return OUT;
             }

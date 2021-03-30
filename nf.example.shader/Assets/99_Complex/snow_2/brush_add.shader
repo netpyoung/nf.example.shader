@@ -52,7 +52,7 @@ Shader "brush_add"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
@@ -64,7 +64,7 @@ Shader "brush_add"
 				
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = IN.uv;
 
 				return OUT;

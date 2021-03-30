@@ -94,7 +94,7 @@
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
                 float2 uv           : TEXCOORD0;
                 float4 positionOS   : TEXCOORD1;
                 float3 positionWS   : TEXCOORD2;
@@ -107,7 +107,7 @@
 
                 VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
 
-                OUT.positionHCS = vertexInputs.positionCS;
+                OUT.positionCS = vertexInputs.positionCS;
                 OUT.uv = TRANSFORM_TEX(IN.uv, _CombinedTex);
                 OUT.positionOS = IN.positionOS;
                 OUT.positionWS = vertexInputs.positionWS;

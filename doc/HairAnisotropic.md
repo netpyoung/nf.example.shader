@@ -7,11 +7,11 @@
 - https://ko.wikipedia.org/wiki/비등방성
 ```
 
-- Kajya-Kay 모델
+- Kajya-Kay 모델                            - SIGGRAPH 1989
   - 짧은머리는 괜춘. 빛의 산란효과는 별로
 - Steve Marschner 모델                      - SIGGRAPH 2003
   - 빛의 산란효과 개선(반사/내부산란/투과)
-- Scheuermann - Hair Rendering and Shading - GDC 2004
+- Scheuermann - Hair Rendering and Shading  - GDC 2004
 
 ![ephere-kajiya](./res/ephere-kajiya.jpg)
 
@@ -21,6 +21,8 @@
 - <https://graphics.pixar.com/library/DataDrivenHairScattering/>
 
 ## Kajiya-Kay
+
+- SIGGRAPH 1989
 
 - [blog - Hair Rendering Lighting Model - (Kajiya-Kay)](https://blog.naver.com/sorkelf/40185948507)
 
@@ -44,6 +46,7 @@ half specular = pow(sinTH, specularPower);
 
 ## Marschner
 
+- SIGGRAPH 2003
 - [blog - Hair Rendering Lighting Model - (Marschner)](https://blog.naver.com/sorkelf/40186644136)
 - [pdf - Light Scattering from Human Hair Fibers - Stephen R. Marschner, Henrik Wann Jensen, Mike Cammarano](www.cs.cornell.edu/~srm/publications/SG03-hair.pdf)
 
@@ -59,3 +62,8 @@ half specular = pow(sinTH, specularPower);
   - Tangent를 이동 (+ TangentShiftTex)
   - 1번째 반사(RR)
   - 두번째반사(TRT) (+ SpecularMaskTex)
+
+## Scheuermann
+
+- GDC 2004 Hair Rendering and Shading
+- Kajiya-Kay랑 Marschner를 믹스함

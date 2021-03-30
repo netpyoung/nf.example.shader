@@ -62,7 +62,7 @@
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
                 float3 N            : TEXCOORD0;
 #if _DEBUGCOLOR_ON
                 float3 color        : TEXCOORD1;
@@ -139,7 +139,7 @@
                 // 넓이: uv의 y를 뒤짚어서 양옆으로 넓히기.
                 IN.positionOS.xy -= normalize(half2(IN.uv.x, 1 - IN.uv.y) - 0.5) * sequenceVal * noiseTexVal;
 
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.N = TransformObjectToWorldDir(IN.normal);
 
 #if _DEBUGCOLOR_ON

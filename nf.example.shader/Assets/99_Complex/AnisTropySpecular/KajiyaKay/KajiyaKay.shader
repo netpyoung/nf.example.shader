@@ -55,7 +55,7 @@
 
             struct Varyings
             {
-                float4 positionHCS      : SV_POSITION;
+                float4 positionCS      : SV_POSITION;
                 float2 uv               : TEXCOORD0;
 
                 float3 T                : TEXCOORD1;
@@ -92,7 +92,7 @@
                 Varyings OUT;
                 ZERO_INITIALIZE(Varyings, OUT);
 
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
                 ExtractTBN(IN.normalOS, IN.tangent, OUT.T, OUT.B, OUT.N);

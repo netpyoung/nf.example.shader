@@ -1,9 +1,38 @@
-https://roystan.net/articles/grass-shader.html
+# Gemoetry
 
-#pragma hull hull
-https://catlikecoding.com/unity/tutorials/advanced-rendering/tessellation/
+- VS > HS > TS > `GS` > FS
+- shader model 4.0
+- <https://roystan.net/articles/grass-shader.html>
+- <https://halisavakis.com/my-take-on-shaders-geometry-shaders/>
 
-// VS > HS > TS > GS > FS
+## Type
+
+- <https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-geometry-shader>
+
+``` hlsl
+[maxvertexcount(NumVerts)]
+void ShaderName ( PrimitiveType DataType Name [ NumElements ], inout StreamOutputObject )
+{
+}
+```
+
+| PrimitiveType | Num |                                                               |
+|---------------|-----|---------------------------------------------------------------|
+| point         | 1   | Point list                                                    |
+| line          | 2   | Line list or line strip                                       |
+| triangle      | 3   | Triangle list or triangle strip                               |
+| lineadj       | 4   | Line list with adjacency or line strip with adjacency         |
+| triangleadj   | 6   | Triangle list with adjacency or triangle strip with adjacency |
+
+- <https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-so-type>
+
+| StreamOutputObject |                                   |
+|--------------------|-----------------------------------|
+| PointStream\<T>    | A sequence of point primitives    |
+| LineStream\<T>     | A sequence of line primitives     |
+| TriangleStream\<T> | A sequence of triangle primitives |
+
+## Barebone
 
 ``` hlsl
 #pragma vertex vert
@@ -51,3 +80,9 @@ half4 frag(GStoFS IN) : SV_Target
 {
 }
 ```
+
+## Etc
+
+- <https://medium.com/@andresgomezjr89/rain-snow-with-geometry-shaders-in-unity-83a757b767c1>
+  - <https://github.com/tiredamage42/RainSnowGeometryShader>
+- <https://jayjingyuliu.wordpress.com/2018/01/24/unity3d-wireframe-shader/>

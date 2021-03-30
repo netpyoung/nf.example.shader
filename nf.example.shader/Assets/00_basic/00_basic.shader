@@ -33,7 +33,7 @@ Shader "example/00_basic"
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
+				float4 positionCS : SV_POSITION;
 			};
 
 			Varyings vert(Attributes IN)
@@ -44,7 +44,7 @@ Shader "example/00_basic"
 				// o.positionCS = mul(UNITY_MATRIX_MVP, v.positionOS);
 				// Use of UNITY_MATRIX_MVP is detected. To transform a vertex into clip space, consider using UnityObjectToClipPos for better performance and to avoid z-fighting issues with the default depth pass and shadow caster pass.
 				// HClip: Homogeneous Clip
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				return OUT;
 			}
 

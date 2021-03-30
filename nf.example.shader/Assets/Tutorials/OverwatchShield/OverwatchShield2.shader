@@ -59,7 +59,7 @@
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
                 float2 uv           : TEXCOORD0;
                 float4 positionOS   : TEXCOORD1;
             };
@@ -68,7 +68,7 @@
             {
                 Varyings OUT = (Varyings) 0;
 
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _HexEdgeTex);
                 OUT.positionOS = IN.positionOS;
 

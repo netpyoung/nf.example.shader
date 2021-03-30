@@ -52,7 +52,7 @@
 
             struct Varyings
             {
-                float4 positionHCS  : SV_POSITION;
+                float4 positionCS  : SV_POSITION;
                 float3 N            : TEXCOORD1;
             };
 
@@ -91,7 +91,7 @@
 				// 좌우 진폭조정.
                 IN.positionOS.xy += sin(_Time.y * _NoiseFrequency + IN.positionOS.z * _NoiseLength) * _NoiseIntensity * _Sequence;
 
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.N = TransformObjectToWorldDir(IN.normal);
 
                 return OUT;

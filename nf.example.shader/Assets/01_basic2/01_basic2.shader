@@ -43,7 +43,7 @@
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
+				float4 positionCS : SV_POSITION;
 			};
 
 			Varyings vert(Attributes IN)
@@ -51,7 +51,7 @@
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				return OUT;
 			}
 

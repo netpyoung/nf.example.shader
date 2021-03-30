@@ -54,7 +54,7 @@ Shader "dissolve_character"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 				float3 positionWS	: TEXCOORD1;
 			};
@@ -65,7 +65,7 @@ Shader "dissolve_character"
 				ZERO_INITIALIZE(Varyings, OUT);
 
 				
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				OUT.uv = IN.uv;
 				return OUT;

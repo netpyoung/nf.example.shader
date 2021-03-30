@@ -1,5 +1,7 @@
 # Transform
 
+## Vertex
+
 ![res/coordinate.png](./res/coordinate.png)
 
 | 줄인말 | 공간                                     | 다른말           | 타입   | 설명                             |
@@ -64,6 +66,11 @@ TransformObjectToWorld - UNITY_MATRIX_M
 TransformWorldToView   - UNITY_MATRIX_V
 TransformWorldToHClip  - UNITY_MATRIX_VP
 ```
+
+## Normal
+
+- [./NormalMap.md](./NormalMap.md)
+
 
 ## ref
 

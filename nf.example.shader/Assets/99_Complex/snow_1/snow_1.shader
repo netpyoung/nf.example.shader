@@ -50,7 +50,7 @@ Shader "snow_1"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 
 				float3 N            : TEXCOORD1;
@@ -67,7 +67,7 @@ Shader "snow_1"
 					IN.positionOS.xyz += IN.positionOS.xyz * _SnowHeight;
 				}
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				OUT.N = N;
 

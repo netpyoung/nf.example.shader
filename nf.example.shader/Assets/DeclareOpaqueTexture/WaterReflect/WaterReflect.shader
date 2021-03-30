@@ -40,7 +40,7 @@ Shader "WaterReflect"
 
             struct Varyings
             {
-                float4 positionHCS      : SV_POSITION;
+                float4 positionCS      : SV_POSITION;
                 float4 positionNDC      : TEXCOORD3;
             };
 
@@ -50,7 +50,7 @@ Shader "WaterReflect"
                 ZERO_INITIALIZE(Varyings, OUT);
 
                 VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-                OUT.positionHCS = vertexInputs.positionCS;
+                OUT.positionCS = vertexInputs.positionCS;
                 OUT.positionNDC = vertexInputs.positionNDC;
                 return OUT;
             }

@@ -41,7 +41,7 @@ Shader "BlackHole"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 				float3 positionWS	: TEXCOORD1;
 			};
@@ -76,7 +76,7 @@ Shader "BlackHole"
 				half value = saturate(_Control - normalizeDist);
 				IN.positionOS.xyz += toBlackHole * value;
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 

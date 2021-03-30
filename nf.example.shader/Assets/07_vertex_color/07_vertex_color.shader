@@ -39,7 +39,7 @@ Shader "07_vertex_color"
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
+				float4 positionCS : SV_POSITION;
 				float4 color	   : TEXCOORD1;
 			};
 
@@ -48,7 +48,7 @@ Shader "07_vertex_color"
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.color = IN.color;
 				return OUT;
 			}

@@ -58,7 +58,7 @@
 
 			struct Varyings
 			{
-				float4 positionHCS : SV_POSITION;
+				float4 positionCS : SV_POSITION;
 			};
 
 			Varyings vert(Attributes IN)
@@ -77,7 +77,7 @@
 				positionWS += (L * hypotenuse);
 				positionWS.y = _PlaneHeight;
 
-				OUT.positionHCS = TransformWorldToHClip(positionWS);
+				OUT.positionCS = TransformWorldToHClip(positionWS);
 				return OUT;
 			}
 

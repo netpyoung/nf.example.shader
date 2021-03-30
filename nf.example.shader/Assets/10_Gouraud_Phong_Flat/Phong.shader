@@ -1,4 +1,4 @@
-﻿Shader "example/Gouraud"
+Shader "example/Phong"
 {
 	Properties
 	{
@@ -23,7 +23,6 @@
 
 			HLSLPROGRAM
 			#pragma target 3.5
-
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -52,10 +51,12 @@
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv           : TEXCOORD0;
-				float3 Diff			: TEXCOORD1;
-				float3 Spec			: TEXCOORD2;
+
+				float3 N            : TEXCOORD1;
+				float3 V            : TEXCOORD2;
+				float3 L            : TEXCOORD3;
 			};
 
 			Varyings  vert(Attributes IN)
@@ -63,24 +64,29 @@
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				
 				Light light = GetMainLight();
-				float3 N = TransformObjectToWorldNormal(IN.normalOS);
-				float3 V = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(IN.positionOS.xyz)));
-				float3 L = normalize(light.direction);
-				float3 H = normalize(L + V);
-				float3 R = reflect(-L, N);
-
-				OUT.Diff = _Ambient* _Ka + _Diffuse * _Kd * max(0, dot(N, L));
-				OUT.Spec = _Specular * _Ks * pow(max(0, dot(R, V)), 20);
+				OUT.N = TransformObjectToWorldNormal(IN.normalOS);
+				OUT.V = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(IN.positionOS.xyz)));
+				OUT.L = normalize(light.direction);
 				return OUT;
 			}
 
-			half4 frag(Varyings  IN) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
-				return half4(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb * IN.Diff + IN.Spec, 1);
+				float3 N = normalize(IN.N);
+				float3 V = normalize(IN.V);
+				float3 L = normalize(IN.L);
+
+				float3 R = reflect(-L, N);
+
+				float3 diffuseColor = _Ambient * _Ka + _Diffuse * _Kd * max(0, dot(N, L));
+				float3 specularColor = _Specular * _Ks * pow(max(0, dot(R, V)), 20);
+
+				float4 finalColor = float4((diffuseColor) * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb + specularColor, 1);
+				return finalColor;
 			}
 			ENDHLSL
 		}

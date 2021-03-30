@@ -37,7 +37,7 @@ Shader "Squash"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
@@ -70,7 +70,7 @@ Shader "Squash"
 				half value = saturate(_Control - normalizeDist);
 				IN.positionOS.xyz += localNegativeY * value;
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
 				return OUT;

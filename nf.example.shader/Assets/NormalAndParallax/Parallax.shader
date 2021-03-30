@@ -50,7 +50,7 @@ Shader "example/Parallax"
 
 			struct Varyings
 			{
-				float4 positionHCS      : SV_POSITION;
+				float4 positionCS      : SV_POSITION;
 				float2 uv               : TEXCOORD0;
 
 				float3 L_TS                : TEXCOORD1;
@@ -63,7 +63,7 @@ Shader "example/Parallax"
 				ZERO_INITIALIZE(Varyings, OUT);
 
 				VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-				OUT.positionHCS = vertexInputs.positionCS;
+				OUT.positionCS = vertexInputs.positionCS;
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
 				Light mainLight = GetMainLight();

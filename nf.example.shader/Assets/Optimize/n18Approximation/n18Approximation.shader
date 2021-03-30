@@ -43,7 +43,7 @@ Shader "n18Approximation"
 
 			struct Varyings
 			{
-				float4 positionHCS	: SV_POSITION;
+				float4 positionCS	: SV_POSITION;
 
 				float3 N            : TEXCOORD1;
 				float3 V            : TEXCOORD2;
@@ -55,7 +55,7 @@ Shader "n18Approximation"
 				Varyings OUT;
 				ZERO_INITIALIZE(Varyings, OUT);
 
-				OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
 				Light light = GetMainLight();
 				OUT.N = TransformObjectToWorldNormal(IN.normalOS);
@@ -79,7 +79,7 @@ Shader "n18Approximation"
 				return pow(max(0, _A * x + _B), _m);
 			}
 
-			half4 frag(Varyings  IN) : SV_Target
+			half4 frag(Varyings IN) : SV_Target
 			{
 				half3 N = normalize(IN.N);
 				half3 V = normalize(IN.V);
