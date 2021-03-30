@@ -40,14 +40,14 @@ Shader "NFShader/Outline/vertex_outline_xy"
 				float4 _MainTex_ST;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float2 uv			: TEXCOORD0;
 				float3 normal		: NORMAL;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
@@ -58,10 +58,10 @@ Shader "NFShader/Outline/vertex_outline_xy"
 				return mul((float2x2)UNITY_MATRIX_P, v);
 			}
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 
 				half3 N = TransformObjectToWorldNormal(IN.normal);
@@ -77,13 +77,13 @@ Shader "NFShader/Outline/vertex_outline_xy"
 				// 버텍스 칼라를 곱해주면서 디테일 조정.
 				// offset *= IN.color.r;
 
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS);
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.positionCS.xy += offset;
 
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				return _OutlineColor;
 			}
@@ -119,29 +119,29 @@ Shader "NFShader/Outline/vertex_outline_xy"
 				float4 _MainTex_ST;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 			}

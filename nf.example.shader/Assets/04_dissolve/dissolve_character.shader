@@ -46,24 +46,23 @@ Shader "dissolve_character"
 				half3 _GlowColor;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
 				float3 positionWS	: TEXCOORD1;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
-
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 				
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
@@ -71,7 +70,7 @@ Shader "dissolve_character"
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 #if IS_NOISE
 				half split = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, IN.uv).r;

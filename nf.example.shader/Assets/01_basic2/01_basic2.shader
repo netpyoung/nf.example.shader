@@ -36,26 +36,26 @@
 				half4 _BaseColor;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS : POSITION;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS : SV_POSITION;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				return _BaseColor;
 			}

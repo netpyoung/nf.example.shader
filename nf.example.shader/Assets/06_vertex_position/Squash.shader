@@ -29,13 +29,13 @@ Shader "Squash"
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
@@ -58,10 +58,10 @@ Shader "Squash"
 				return saturate(distance / range);
 			}
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				half3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				half normalizeDist = GetNormalizeDist(positionWS.y);
@@ -76,7 +76,7 @@ Shader "Squash"
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				half3 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 				return half4(color, 1);

@@ -44,7 +44,7 @@ Shader "NormalMapYminus"
 				float _Parallax;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS   : POSITION;
 				float3 normalOS     : NORMAL;
@@ -52,7 +52,7 @@ Shader "NormalMapYminus"
 				float2 uv           : TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS      : SV_POSITION;
 				float2 uv               : TEXCOORD0;
@@ -76,10 +76,10 @@ Shader "NormalMapYminus"
 				return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
 			}
 
-			Varyings  vert(Attributes IN)
+			VStoFS  vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
@@ -91,7 +91,7 @@ Shader "NormalMapYminus"
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 				half3 normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));

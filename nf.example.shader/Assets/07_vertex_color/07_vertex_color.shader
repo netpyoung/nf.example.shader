@@ -31,29 +31,29 @@ Shader "07_vertex_color"
 
 			#pragma multi_compile_local _COLORMODE_RGBA _COLORMODE_R _COLORMODE_G _COLORMODE_B _COLORMODE_A
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS : POSITION;
 				float4 color	  : COLOR;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS : SV_POSITION;
 				float4 color	   : TEXCOORD1;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.color = IN.color;
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 #if _COLORMODE_RGBA
 				return IN.color;

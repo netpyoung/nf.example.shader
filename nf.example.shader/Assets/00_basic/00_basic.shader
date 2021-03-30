@@ -26,20 +26,20 @@ Shader "example/00_basic"
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS : POSITION;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS : SV_POSITION;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				// o.positionCS = mul(UNITY_MATRIX_MVP, v.positionOS);
 				// Use of UNITY_MATRIX_MVP is detected. To transform a vertex into clip space, consider using UnityObjectToClipPos for better performance and to avoid z-fighting issues with the default depth pass and shadow caster pass.
@@ -48,7 +48,7 @@ Shader "example/00_basic"
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				return half4(1, 0, 0, 1);
 			}

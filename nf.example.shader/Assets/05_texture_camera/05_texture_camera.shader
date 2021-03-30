@@ -28,20 +28,20 @@
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS : POSITION;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS : SV_POSITION;
 				float3 directionWS : TEXCOORD1;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
+				VStoFS OUT;
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
@@ -51,7 +51,7 @@
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				// https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@7.1/manual/universalrp-asset.html
 

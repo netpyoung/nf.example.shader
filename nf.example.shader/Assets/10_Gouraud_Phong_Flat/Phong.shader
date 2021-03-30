@@ -42,14 +42,14 @@ Shader "example/Phong"
 				float _Ka;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float3 normalOS     : NORMAL;
 				float2 uv			: TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv           : TEXCOORD0;
@@ -59,10 +59,10 @@ Shader "example/Phong"
 				float3 L            : TEXCOORD3;
 			};
 
-			Varyings  vert(Attributes IN)
+			VStoFS  vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
@@ -74,7 +74,7 @@ Shader "example/Phong"
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				float3 N = normalize(IN.N);
 				float3 V = normalize(IN.V);

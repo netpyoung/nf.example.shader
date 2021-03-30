@@ -29,7 +29,7 @@
 			}
 
 			HLSLPROGRAM
-			#pragma target 4.0
+			#pragma target 3.5
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -50,13 +50,13 @@
 				float _Ka;
 			CBUFFER_END
 
-			struct Attributes
+			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
 				float2 uv			: TEXCOORD0;
 			};
 
-			struct Varyings
+			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv           : TEXCOORD0;
@@ -66,22 +66,22 @@
 				float3 L            : TEXCOORD3;
 			};
 
-			Varyings vert(Attributes IN)
+			VStoFS vert(APPtoVS IN)
 			{
-				Varyings OUT;
-				ZERO_INITIALIZE(Varyings, OUT);
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				
 				Light light = GetMainLight();
-				OUT.V = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(IN.positionOS.xyz)));
-				OUT.L = normalize(light.direction);
+				OUT.V = GetWorldSpaceViewDir(OUT.positionWS);
+				OUT.L = light.direction;
 				return OUT;
 			}
 
-			half4 frag(Varyings IN) : SV_Target
+			half4 frag(VStoFS IN) : SV_Target
 			{
 				half3 x = ddx(IN.positionWS);
 				half3 y = ddy(IN.positionWS);
