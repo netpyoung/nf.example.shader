@@ -1,5 +1,32 @@
-https://alexanderameye.github.io/simple-toon.html
+# Toon Shader
 
-https://hns17.tistory.com/entry/ZeldaToon-Graph?category=716326
-https://hns17.tistory.com/entry/ToonGraph-2?category=716326
-https://hns17.tistory.com/entry/ToonGraph?category=716326
+- <https://alexanderameye.github.io/simple-toon.html>
+- <https://roystan.net/articles/toon-shader.html>
+  - <https://github.com/IronWarrior/UnityToonShader>
+
+- ceil / Ramp Texture / smoothstep
+
+``` hlsl
+// ===== 계단 음영 표시 - ver. ceil() ====
+// [0, 1]범위를 _ToonStep(int)을 곱해서 [0, _ToonStep]범위로 변경.
+// ceil함수를 이용하여 올림(디테일 제거 효과).
+// 다시 _ToonStep(int)으로 나눔으로써 [0, 1]범위로 변경.
+half toonDiffuse = halfLambert;
+toonDiffuse = ceil(toon * _ToonStep) / _ToonStep;
+
+// ===== 계단 음영 표시 - ver. Ramp Texture ====
+// 아니면 Ramp Texture 이용
+half3 toonColor = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, half2(halfLambert, 0)).rgb;
+
+// ===== 림라이트 ======================
+// smoothstep으로 경계를 부드럽게 혼합.
+half rim = 1 - NdotV;
+half rimIntensity = smoothstep(0.715, 0.717, rim);
+
+// 아니면, 빛방향으로 림
+half rimIntensity = rim * pow(NdotL, 0.1);
+
+// ===== 스펙큘러 ======================
+// smoothstep으로 경계를 부드럽게 혼합.
+half toonSpecular = smoothstep(0.005, 0.01, blinnphongSpecular);
+```

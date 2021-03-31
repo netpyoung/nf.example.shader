@@ -19,3 +19,10 @@ Dimitar Lazarov, Lead Graphics Engineer, Treyarch
  Sébastien Lagarde
 Moving Frostbite to PBR (Sébastien Lagarde & Charles de Rousiers) 
 https://blog.selfshadow.com/publications/s2014-shading-course/frostbite/s2014_pbs_frostbite_slides.pdf
+
+
+- Etc
+  - BSDF(Bidirectional Scattering Distribution Function)
+  - BTDF(Bidirectional Transmission Distribution Function)
+  - BSSRDF(Bidirectional Scattering Surface Reflectance Distribution Function)
+  - SPDF(Scattering Probability Density Function)

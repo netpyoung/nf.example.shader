@@ -12,13 +12,17 @@ Shader "WaveCameraOpaque"
     {
         Tags
         {
-            "Queue" = "Transparent" // ***
-            "RenderType" = "Transparent"
             "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "Transparent" // ***
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+                "RenderType" = "Transparent"
+            }
             Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
             ZWrite Off

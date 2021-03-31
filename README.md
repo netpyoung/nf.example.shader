@@ -27,34 +27,13 @@
 - Blend
 - Cull
 - Stencil
-- Diffuse
-  - Lambert
-  - Half-Lambert
-- Specular
-  - Phong
+- [Lighiting Model](./doc/LightingModel.md)
+- [AnisTropy Specular](./doc/HairAnisotropic.md)
 - IBL(Image-based Lighting)
   - CubeMap
   - Reflection
   - Refraction
-- PBR(Physically-based rendering) / PBS(Physically-based Shading)
-  - Macrosurface
-    - GGX
-    - Schlick Fresnel
 - Depth
-- [AnisTropy Specular](./doc/HairAnisotropic.md)
-  - KajyaKay
-  - Marschener
-- Etc
-  - BRDF(Bidirectional Reflectance Distribution Function)
-    - Ashikhmin Shirley
-  - Cook Torrance
-  - Oren Nayar
-  - Ward
-  - Disney
-  - BSDF(Bidirectional Scattering Distribution Function)
-  - BTDF(Bidirectional Transmission Distribution Function)
-  - BSSRDF(Bidirectional Scattering Surface Reflectance Distribution Function)
-  - SPDF(Scattering Probability Density Function)
 
 ## tech
 
@@ -75,3 +54,9 @@
 - BRDF Map
 
 ## package and tool
+
+## TODO
+
+- 런타임 메쉬 제작
+  - 궤적
+  - 검기

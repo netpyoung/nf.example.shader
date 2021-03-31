@@ -2,7 +2,7 @@
 {
 	Properties
 	{
-		_MainTex("texture", 2D) = "white"
+		_MainTex("texture", 2D) = "white" {}
 
 		[KeywordEnum(RGBA, R, G, B, A)]
 		_ColorMode("ColorMode", Float) = 0
