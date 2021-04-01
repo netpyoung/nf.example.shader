@@ -1,9 +1,5 @@
 # Toon Shader
 
-- <https://alexanderameye.github.io/simple-toon.html>
-- <https://roystan.net/articles/toon-shader.html>
-  - <https://github.com/IronWarrior/UnityToonShader>
-
 - ceil / Ramp Texture / smoothstep
 
 ``` hlsl
@@ -30,3 +26,9 @@ half rimIntensity = rim * pow(NdotL, 0.1);
 // smoothstep으로 경계를 부드럽게 혼합.
 half toonSpecular = smoothstep(0.005, 0.01, blinnphongSpecular);
 ```
+
+## Ref
+
+- <https://alexanderameye.github.io/simple-toon.html>
+- <https://roystan.net/articles/toon-shader.html>
+  - <https://github.com/IronWarrior/UnityToonShader>

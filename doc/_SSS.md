@@ -35,6 +35,8 @@ half3 color = halfLambert + fakeSSS;
 
 ``` hlsl
 half rim = 1 - NdotL;
+// 역광일때만 하려면 VdotL처리
+// rim *= VdotL;
 half3 fakeSSS = pow(rim, _SSSPower) * _SSSMultiplier * _SSSColor;
 half3 color = lambert * fakeSSS;
 ```

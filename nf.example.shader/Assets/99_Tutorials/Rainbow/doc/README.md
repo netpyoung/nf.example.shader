@@ -4,6 +4,7 @@
 
 - <https://deepspacebanana.github.io/blog/shader/art/unreal%20engine/Rainy-Surface-Shader-Part-1>
 - <https://deepspacebanana.github.io/blog/shader/art/unreal%20engine/Rainy-Surface-Shader-Part-2>
+- [The Technical Art of The Last of Us Part II by Waylon Brinck and Steven Tang || SIGGRAPH 2020 - Rain on Glass](https://youtu.be/tvBIqPHaExQ?t=2591)
 
 ## desc
 
