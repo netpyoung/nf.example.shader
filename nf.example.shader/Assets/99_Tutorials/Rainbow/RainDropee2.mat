@@ -40,11 +40,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DropletNormalTex:
-        m_Texture: {fileID: 2800000, guid: 3afbf9d69d9e968488eca4ed7c8817cb, type: 3}
+        m_Texture: {fileID: 2800000, guid: 28185c3463fd93e4e903c1dcfc85dde2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DropletPatternPackTex:
-        m_Texture: {fileID: 2800000, guid: ba52108ee4ad96a44a8907b3ec7eda66, type: 3}
+        m_Texture: {fileID: 2800000, guid: aa689b3168395bd41a9cbaa0a1f74f51, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -76,7 +76,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RainStreakNormalTex:
-        m_Texture: {fileID: 2800000, guid: f46594e68181b094f9033102caaa894e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5afe5456b71f8f74a917cda7247cd064, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
