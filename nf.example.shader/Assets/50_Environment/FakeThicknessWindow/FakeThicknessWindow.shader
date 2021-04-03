@@ -121,7 +121,7 @@ Shader "FakeThicknessWindow"
 				half3 B = normalize(IN.B);
 				half3 N = normalize(IN.N);
 				
-				half3x3 TBN = float3x3(normalize(T), normalize(B), normalize(N));
+				half3x3 TBN = float3x3(T, B, N);
 
 				half2 parallaxUV = ParallaxMappingUV(_IdMaskHeightTex, sampler_IdMaskHeightTex, IN.uv, mul(TBN, V), _ParallaxScale * 0.01);
 

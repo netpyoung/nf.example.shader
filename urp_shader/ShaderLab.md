@@ -88,6 +88,8 @@ Rect            | float4 | "", "white", "black", "gray", "bump" // for non-power
 
 Cube            | float4 | "", "white", "black", "gray", "bump"
 
+// 주의해야할게 2D/Rect/Cube는 linear설정 관계없이 sRGB로 된다.
+// ex) pow(gray, 2.2);
 ```
 
 | color string | RGBA            |
