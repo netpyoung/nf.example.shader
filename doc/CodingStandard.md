@@ -7,7 +7,9 @@ Shader "example/03_texture_uv"
 	Properties
 	{
 		// Texture변수는 뒤에 Tex를 붙이자.
-		_MainTex("texture", 2D) = "white"
+		// 위치맞추기.        `type) =`
+		_MainTex("_MainTex",     2D) = "white" {}
+		_HeightTex("_HeightTex", 2D) = "gray" {}
 	}
 
 	SubShader

@@ -29,23 +29,9 @@ shadow 같은 경우에는 "광원에서 나오는 빛이 얼마나 가렸느냐
 Microfacet Theory
 
 
-연기 + SSS
-x-ray
-빗방울 바닥 / 유리 
 블러드(투명)
 렌즈플레어 - 빛과 렌즈 빛의문향 - https://blog.naver.com/daehuck/220789048084
-강/바다
-폭포
-눈쌓이기
-스케치효과
-홀로그램
-- bloom
 
-## Rim light
-림라이트효과와 반사광효과를 흉내낼 수있다.
-
-## Dissolve
-녹다, 용해되다
 
 
 Oren-Nayar
@@ -79,12 +65,6 @@ infinite-3d-head-scan-released
 스펙큘러반사는 Kelemen / Szirmay - Kalos Model
 =====
 
-불 이글거리는 쉐이더
-
-===============
-head size
-height
-weight - 부피
 
 =========
 PBS

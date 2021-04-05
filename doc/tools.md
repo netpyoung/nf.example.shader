@@ -14,6 +14,7 @@
 - https://github.com/unity3d-jp/NormalPainter
 
 - https://github.com/M-Fatah/texture_maker
+- http://mebiusbox.github.io/contents/EffectTextureMaker/
 
 ================================
 - for dummy model
