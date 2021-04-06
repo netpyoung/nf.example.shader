@@ -12,8 +12,8 @@ Shader "FlowMap"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
-			"RenderType" = "Transparent"
-			"Queue" = "Transparent"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -24,10 +24,6 @@ Shader "FlowMap"
 			{
 				"LightMode" = "UniversalForward"
 			}
-
-			Blend SrcAlpha OneMinusSrcAlpha
-			ZWrite Off
-			Cull Back
 
 			HLSLPROGRAM
 			#pragma target 3.5
