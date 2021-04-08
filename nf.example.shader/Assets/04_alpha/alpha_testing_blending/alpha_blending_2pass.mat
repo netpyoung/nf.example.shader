@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: _alpha
-  m_Shader: {fileID: 4800000, guid: 573e55df221096348812d659cf978891, type: 3}
+  m_Name: alpha_blending_2pass
+  m_Shader: {fileID: 4800000, guid: 2acc493bcfe383f488e0d92b567d10a1, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -76,7 +76,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Alpha: 0.18
+    - _Alpha: 0.5
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1

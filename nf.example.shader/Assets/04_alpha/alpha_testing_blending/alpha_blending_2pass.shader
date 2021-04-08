@@ -1,8 +1,8 @@
-Shader "_alpha1"
+Shader "alpha_blending_2pass"
 {
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
+		_MainTex("Main Texture", 2D) = "white" {}
 		_Alpha("Alpha", Range(0, 1)) = 0.5
 	}
 
@@ -17,15 +17,68 @@ Shader "_alpha1"
 
 		Pass
 		{
-			Name "RED_CIRCLE"
+			Name "ALPHA_BLENDING_2PASS_BACK"
+
+			Tags
+			{
+				"LightMode" = "SRPDefaultUnlit"
+			}
+
+			Cull Front
+			ZWrite On
+			ColorMask 0
+
+			HLSLPROGRAM
+			#pragma target 3.5
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+			CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+			CBUFFER_END
+
+			struct APPtoVS
+			{
+				float4 positionOS	: POSITION;
+				float2 uv			: TEXCOORD0;
+			};
+
+			struct VStoFS
+			{
+				float4 positionCS : SV_POSITION;
+				float2 uv			: TEXCOORD0;
+			};
+			
+			VStoFS vert(APPtoVS IN)
+			{
+				VStoFS OUT;
+				ZERO_INITIALIZE(VStoFS, OUT);
+
+				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+
+				return OUT;
+			}
+
+			half4 frag(VStoFS IN) : SV_Target
+			{
+				return 0;
+			}
+			ENDHLSL
+		}
+
+		Pass
+		{
+			Name "ALPHA_BLENDING_2PASS_BACK"
 
 			Tags
 			{
 				"LightMode" = "UniversalForward"
 			}
 
-			Cull Off
-			ZWrite On // Default is On.
+			Cull Back
+			ZWrite Off
 			Blend SrcAlpha OneMinusSrcAlpha
 
 			HLSLPROGRAM
@@ -41,21 +94,19 @@ Shader "_alpha1"
 
 			CBUFFER_START(UnityPerMaterial)
 				float4 _MainTex_ST;
-				half _Alpha;
+			half _Alpha;
 			CBUFFER_END
 
 			struct APPtoVS
 			{
 				float4 positionOS	: POSITION;
-				float4 normal		: NORMAL;
-				float2 uv			: TEXCOORD0;
+				float4 uv			: TEXCOORD0;
 			};
 
 			struct VStoFS
 			{
 				float4 positionCS	: SV_POSITION;
 				float2 uv			: TEXCOORD0;
-				float3 N			: TEXCOORD1;
 			};
 
 			VStoFS vert(APPtoVS IN)
@@ -64,7 +115,6 @@ Shader "_alpha1"
 				ZERO_INITIALIZE(VStoFS, OUT);
 
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.N = TransformObjectToWorldDir(IN.normal.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
 				return OUT;
@@ -72,69 +122,8 @@ Shader "_alpha1"
 
 			half4 frag(VStoFS IN) : SV_Target
 			{
-				half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv) * _Alpha;
-				if (mainTex.a == 0)
-				{
-					discard;
-				}
-				return mainTex;
-			}
-			ENDHLSL
-		}
-
-		Pass
-		{
-			// https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl
-
-			Name "DEPTHONLY"
-
-			Tags
-			{
-				"LightMode" = "DepthOnly"
-				"Queue" = "Transparent"
-				"RenderType" = "Transparent"
-			}
-
-			HLSLPROGRAM
-			#pragma target 3.5
-
-			#pragma vertex vert
-			#pragma fragment frag
-
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-			TEXTURE2D(_BaseMap);            SAMPLER(sampler_BaseMap);
-			
-			CBUFFER_START(UnityPerMaterial)
-				float4 _BaseMap_ST;
-			CBUFFER_END
-
-			struct APPtoVS
-			{
-				float4 positionOS	: POSITION;
-				float2 uv			: TEXCOORD0;
-			};
-
-			struct VStoFS
-			{
-				float4 positionCS	: SV_POSITION;
-				float2 uv			: TEXCOORD0;
-			};
-
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
-
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
-
-				return OUT;
-			}
-
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				return 0;
+				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
+				return half4(mainTex, _Alpha);
 			}
 			ENDHLSL
 		}
