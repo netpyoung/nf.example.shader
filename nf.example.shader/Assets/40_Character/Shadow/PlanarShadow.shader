@@ -15,14 +15,20 @@
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Transparent"
+			"RenderType" = "Transparent"
+		}
+
 		Pass
-		{   
+		{
+			Name "PLANAR_SHADOW"
+
 			Tags
 			{
-				"Queue"="Transparent"
-				"IgnoreProjector"="True"
-				"RenderType"="Transparent"
-				"RenderPipeline" = "UniversalRenderPipeline"
+				"LightMode" = "UniversalForward"
 			}
 
 			ZWrite On

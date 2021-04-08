@@ -10,15 +10,20 @@ Shader "WaterReflect"
 
     SubShader
     {
-        Tags
+       Tags
         {
+            "RenderPipeline" = "UniversalRenderPipeline"
             "Queue" = "Transparent" // ***
             "RenderType" = "Transparent"
-            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
             ZWrite Off
@@ -31,7 +36,10 @@ Shader "WaterReflect"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl" // SampleSceneColor
 
-            half _Height;
+            CBUFFER_START(UnityPerMaterial)
+                half _Height;
+            CBUFFER_END
+
 
             struct APPtoVS
             {

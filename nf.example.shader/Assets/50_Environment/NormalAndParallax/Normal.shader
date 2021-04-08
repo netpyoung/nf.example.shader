@@ -8,12 +8,18 @@
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderType" = "Opaque"
-				"RenderPipeline" = "UniversalRenderPipeline"
+				"LightMode" = "UniversalForward"
 			}
 
 			HLSLPROGRAM
@@ -65,7 +71,7 @@
 				return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
 			}
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);

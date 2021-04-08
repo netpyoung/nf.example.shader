@@ -17,6 +17,8 @@ Shader "dissolve_character"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "AlphaTest"
+			"RenderType" = "TransparentCutout"
 		}
 
 		Pass
@@ -24,8 +26,6 @@ Shader "dissolve_character"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Transparent"
-				"Queue" = "Transparent"
 			}
 
 			HLSLPROGRAM

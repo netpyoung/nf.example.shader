@@ -13,6 +13,8 @@ Shader "snow_1"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -20,8 +22,6 @@ Shader "snow_1"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

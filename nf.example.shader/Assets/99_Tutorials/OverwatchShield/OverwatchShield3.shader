@@ -22,13 +22,16 @@
         {
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Transparent"
-
-            // RenderType is optional but used in https://docs.unity3d.com/Manual/SL-ShaderReplacement.html
             "RenderType" = "Transparent"
         }
-        
+
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             Cull Off
             Blend SrcAlpha One
 
@@ -86,7 +89,7 @@
             half4 frag(VStoFS IN) : SV_Target
             {
                 
-                half edgeTex = SAMPLE_TEXTURE2D(_EdgeTex, sampler_EdgeTex, IN.uv).a;
+                half edgeTex = max(0.0, SAMPLE_TEXTURE2D(_EdgeTex, sampler_EdgeTex, IN.uv).a);
                 half3 edgeTerm = pow(edgeTex, _EdgeExponent) * _Color.rgb * _EdgeIntensity;
 
                 half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
@@ -96,7 +99,7 @@
                 half depth = sceneZ - partZ;
 
                 half intersectGradient = 1 - min(depth, 1.0f);
-                half3 intersectTerm = _Color * pow(intersectGradient, _IntersectExponent) * _IntersectIntensity;
+                half3 intersectTerm = _Color.rgb * pow(intersectGradient, _IntersectExponent) * _IntersectIntensity;
 
                 half4 finalColor = half4(intersectTerm, _Color.a);
                 return finalColor;

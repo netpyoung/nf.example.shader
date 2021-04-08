@@ -2,13 +2,13 @@
 {
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
-		_Ambient("Ambient", Color) = (1, 1, 1, 1)
-		_Diffuse("Diffuse", Color) = (1, 1, 1, 1)
-		_Specular("Specular", Color) = (1, 1, 1, 1)
-		_Ks("Ks", Float) = 1
-		_Kd("Kd", Float) = 1
-		_Ka("Ka", Float) = 1
+		_MainTex("Texture", 2D)			= "white" {}
+		_Ambient("Ambient", Color)		= (1, 1, 1, 1)
+		_Diffuse("Diffuse", Color)		= (1, 1, 1, 1)
+		_Specular("Specular", Color)	= (1, 1, 1, 1)
+		_Ks("Ks", Float)				= 1
+		_Kd("Kd", Float)				= 1
+		_Ka("Ka", Float)				= 1
 	}
 
 	SubShader
@@ -16,6 +16,8 @@
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -24,8 +26,6 @@
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

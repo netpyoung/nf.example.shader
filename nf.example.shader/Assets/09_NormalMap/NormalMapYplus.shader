@@ -1,25 +1,29 @@
 Shader "NormalMapYplus"
 {
+	// Unity is YPlus (same as OpenGL)
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
-		[Normal][NoScaleOffset] _NormalTex("Normal Map", 2D) = "bump" {}
+		_MainTex("Texture", 2D)									= "white" {}
+		[Normal][NoScaleOffset] _NormalTex("Normal Map", 2D)	= "bump" {}
 
 		[Toggle(ENABLE_NORMALMAP)]
-		_EnableNormalMap("NormalMap?", Float) = 0
+		_EnableNormalMap("NormalMap?", Float)					= 0
 	}
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Opaque"
-				"Queue" = "Geometry"
-				"IgnoreProjector" = "True"
 			}
 
 			HLSLPROGRAM
@@ -72,7 +76,7 @@ Shader "NormalMapYplus"
 				return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
 			}
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);

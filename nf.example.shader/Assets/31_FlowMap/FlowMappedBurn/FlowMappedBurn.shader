@@ -25,8 +25,8 @@ Shader "FlowMappedBurn"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Geometry"
-			"RenderType" = "Opaque"
+			"Queue" = "AlphaTest"
+			"RenderType" = "TransparentCutout"
 		}
 
 		Pass

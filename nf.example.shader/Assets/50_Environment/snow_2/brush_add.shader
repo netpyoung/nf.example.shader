@@ -10,6 +10,8 @@ Shader "brush_add"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -17,8 +19,6 @@ Shader "brush_add"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			Blend One One

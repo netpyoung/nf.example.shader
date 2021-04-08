@@ -6,7 +6,6 @@ Shader "MotionVector"
 		[NoScaleOffset] _FlowTex("_FlowTex", 2D)			= "white" {}
 		_DistortionStrength("_DistortionStrength", Float)	= 0.0037
 
-		_CutOff("Alpha Cutoff", Range(0, 1))				= 0.15
 		_ColumnsX("Columns (X)", Int)						= 8
 		_RowsY("Rows (Y)", Int)								= 8
 
@@ -48,7 +47,6 @@ Shader "MotionVector"
 
 			CBUFFER_START(UnityPerMaterial)
 				half _DistortionStrength;
-				half _CutOff;
 				uint _ColumnsX;
 				uint _RowsY;
 				half _FramesPerSeconds;
@@ -112,7 +110,6 @@ Shader "MotionVector"
 				half4 mainTex1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, mainUV1);
 
 				half4 finalColor = lerp(mainTex0, mainTex1, interval);
-				clip(finalColor.a - _CutOff);
 				return finalColor;
 			}
 			ENDHLSL

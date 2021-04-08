@@ -11,6 +11,8 @@ Shader "07_vertex_color"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -18,8 +20,6 @@ Shader "07_vertex_color"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

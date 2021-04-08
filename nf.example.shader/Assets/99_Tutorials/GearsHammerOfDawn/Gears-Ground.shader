@@ -26,12 +26,20 @@
     {
         Tags
         {
-            "RenderPipeline" = "UniversalPipeline"
+            "RenderPipeline" = "UniversalRenderPipeline"
             "Queue" = "Geometry"
+            "RenderType" = "Opaque"
         }
 
         Pass
         {
+            Name "GEARS_GROUND"
+
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert

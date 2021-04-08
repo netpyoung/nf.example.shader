@@ -15,15 +15,18 @@ Shader "example/Parallax_packed"
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Opaque"
-				"Queue" = "Geometry"
-				"IgnoreProjector" = "True"
 			}
 
 			HLSLPROGRAM
@@ -60,7 +63,7 @@ Shader "example/Parallax_packed"
 				float3 V_TS                : TEXCOORD2;
 			};
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);

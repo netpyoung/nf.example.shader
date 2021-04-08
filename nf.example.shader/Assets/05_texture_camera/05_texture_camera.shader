@@ -1,14 +1,12 @@
 ﻿Shader "example/05_texture_camera"
 {
-	Properties
-	{
-	}
-
 	SubShader
 	{
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -16,8 +14,6 @@
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

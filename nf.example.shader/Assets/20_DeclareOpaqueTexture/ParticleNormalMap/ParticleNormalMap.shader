@@ -2,8 +2,8 @@ Shader "ParticleNormalMap"
 {
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
-		_NormalPower("_NormalPower", Range(1, 10)) = 1
+		_MainTex("texture", 2D)						= "white" {}
+		_NormalPower("_NormalPower", Range(1, 10))	= 1
 	}
 
 	SubShader
@@ -11,6 +11,8 @@ Shader "ParticleNormalMap"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -18,8 +20,6 @@ Shader "ParticleNormalMap"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

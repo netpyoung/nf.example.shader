@@ -4,16 +4,13 @@ Shader "WaveCameraOpaque"
     // Queue / RenderType 확인.
     // PipelineAsset> General> Opaque Texture> 체크.
 
-    Properties
-    {
-    }
-
     SubShader
     {
         Tags
         {
-            "RenderPipeline" = "UniversalPipeline"
+            "RenderPipeline" = "UniversalRenderPipeline"
             "Queue" = "Transparent" // ***
+            "RenderType" = "Transparent"
         }
 
         Pass
@@ -21,8 +18,8 @@ Shader "WaveCameraOpaque"
             Tags
             {
                 "LightMode" = "UniversalForward"
-                "RenderType" = "Transparent"
             }
+
             Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
             ZWrite Off

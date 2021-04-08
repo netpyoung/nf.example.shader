@@ -22,12 +22,18 @@ Shader "Marschener"
     {
         Tags
         {
-            "RenderType" = "Opaque"
             "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "AlphaTest"
+            "RenderType" = "TransparentCutout"
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert
@@ -97,7 +103,7 @@ Shader "Marschener"
                 return float3x3(T, B, N);
             }
 
-            VStoFS  vert(APPtoVS IN)
+            VStoFS vert(APPtoVS IN)
             {
                 VStoFS OUT;
                 ZERO_INITIALIZE(VStoFS, OUT);
@@ -131,7 +137,7 @@ Shader "Marschener"
 
                 Light light = GetMainLight();
 
-// Sphere
+                // Sphere
                 // T | r | 오른쪽
                 // B | g | 위쪽
                 // N | b | 직각
@@ -169,6 +175,7 @@ Shader "Marschener"
                 
                 half4 finalColor = half4(diffuse * mainColor + specular, 0);
                 finalColor.a = SAMPLE_TEXTURE2D(_HairAlphaTex, sampler_HairAlphaTex, IN.uv).r;
+                clip(finalColor.a - 0.5);
 
                 return finalColor;
             }

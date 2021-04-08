@@ -4,7 +4,6 @@ Shader "SpriteFlipBook"
 	{
 		[NoScaleOffset] _MainTex("_MainTex", 2D)		= "white" {}
 
-		_CutOff("Alpha Cutoff", Range(0, 1))			= 0.15
 		_ColumnsX("Columns (X)", Int)					= 8
 		_RowsY("Rows (Y)", Int)							= 8
 
@@ -44,7 +43,6 @@ Shader "SpriteFlipBook"
 			TEXTURE2D(_MainTex);	SAMPLER(sampler_MainTex);
 
 			CBUFFER_START(UnityPerMaterial)
-				half _CutOff;
 				uint _ColumnsX;
 				uint _RowsY;
 				half _FramesPerSeconds;
@@ -89,9 +87,7 @@ Shader "SpriteFlipBook"
 
 			half4 frag(VStoFS IN) : SV_Target
 			{
-				half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.subUV);
-				clip(mainTex.a - _CutOff);
-				return mainTex;
+				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.subUV);
 			}
 			ENDHLSL
 		}

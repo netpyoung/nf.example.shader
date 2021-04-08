@@ -1,20 +1,17 @@
 Shader "ShadowCasterOnly"
 {
-    Properties
-    {
-    }
-
     SubShader
     {
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "Geometry"
             "RenderType" = "Opaque"
         }
 
         Pass
         {
-            Name "ShadowCaster"
+            Name "SHADOW_CASTER_ONLY"
 
             Tags
             {

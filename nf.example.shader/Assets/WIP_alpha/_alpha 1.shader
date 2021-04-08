@@ -11,6 +11,8 @@ Shader "_alpha1"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Transparent"
+			"RenderType" = "Transparent"
 		}
 
 		Pass
@@ -20,8 +22,6 @@ Shader "_alpha1"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Transparent"
-				"RenderType" = "Transparent"
 			}
 
 			Cull Off

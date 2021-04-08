@@ -16,11 +16,12 @@ Shader <shader-name>
     }
 
     // http://docs.unity3d.com/Manual/SL-SubShader.html
-    Subshader
+    SubShader
     {
         // http://docs.unity3d.com/Manual/SL-SubshaderTags.html
         Tags
         {
+            // 주의. Pass의 Tag랑 다름
             <tag-name> = <tag-value>
         }
         
@@ -36,8 +37,11 @@ Shader <shader-name>
         {
             Name "PassName"
             
+            // https://docs.unity3d.com/Manual/SL-PassTags.html
             Tags
             {
+                // 주의. Subshader의 Tag랑 다름
+                <tag-name> = <tag-value>
             }
 
             // https://docs.unity3d.com/Manual/SL-Stencil.html
@@ -47,9 +51,9 @@ Shader <shader-name>
             
             // http://docs.unity3d.com/Manual/SL-CullAndDepth.html
             Cull <Back | Front | Off>
-            ZTest <(Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)>
+            ZTest <(Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)> // default: LEqual 
+            ZWrite <On | Off> // default: On 
             Offset <OffsetFactor>, <OffsetUnits>
-            ZWrite <On | Off>
 
             // http://docs.unity3d.com/Manual/SL-Blend.html
             Blend <SourceBlendMode> <DestBlendMode>
@@ -116,19 +120,29 @@ Cube            | float4 | "", "white", "black", "gray", "bump"
 [MainColor]
 ```
 
-## Tags
+## SubShader's Tags
 
 ``` hlsl
+SubShader
+{
+    // http://docs.unity3d.com/Manual/SL-SubshaderTags.html
+    Tags
+    {
+        // 주의. Pass의 Tag랑 다름
+        "RenderPipeline" = "UniversalRenderPipeline"
+        "RenderType" = "Opaque"
+        "Queue" = "Geometry"
+    }
+}
+```
+
+``` hlsl
+// ex) cutout() 셰이더
 Tags
 {
     "RenderPipeline" = "UniversalRenderPipeline"
-}
-
-Tags
-{
-    "LightMode" = "UniversalForward"
-    "RenderType" = "Opaque"
-    "Queue" = "Geometry"
+    "Queue" = "AlphaTest"
+    "RenderType" = "TransparentCutout"
     "IgnoreProjector" = "True"
 }
 ```
@@ -153,6 +167,8 @@ Tags
 
 ### RenderType
 
+- 그룹을 짓는것. 해당 그룹의 셰이더를 바꿔 랜더링 할 수 있음.
+  - 예를들어 Opaque의 노말버퍼를 만들고 싶을때 `RenderWithShader(Shader shader, "Opaque")` 이런 식으로.. 
 - <https://docs.unity3d.com/2021.1/Documentation/Manual/SL-ShaderReplacement.html>
 - <https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.shadergraph/Editor/Generation/Enumerations/RenderType.cs>
 
@@ -166,7 +182,24 @@ Tags
 
 ### IgnoreProjector
 
-TODO
+- <https://docs.unity3d.com/Manual/class-Projector.html>
+  - URP is not compatible with the Projector component. URP does not currently include an alternative solution.
+- <https://github.com/Anatta336/driven-decals>
+- <https://github.com/nyahoon-games/ProjectorForLWRP>
+
+### Pass's Tags
+
+``` hlsl
+Pass
+{
+    // http://docs.unity3d.com/Manual/SL-SubshaderTags.html
+    Tags
+    {
+        // 주의. SubShader의 Tag랑 다름
+        "LightMode" = "UniversalForward"
+    }
+}
+```
 
 ### LihgtMode
 

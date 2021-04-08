@@ -1,29 +1,33 @@
 Shader "NormalMapYminus"
 {
+	// DirectX is YMinus
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
+		_MainTex("Texture", 2D)							= "white" {}
 
 		// Texture Type> Default
 		// sRGB (Color Texture)> uncheck
-		[NoScaleOffset] _NormalTex("Normal Map", 2D) = "bump" {}
+		[NoScaleOffset] _NormalTex("Normal Map", 2D)	= "bump" {}
 		
 
 		[Toggle(ENABLE_NORMALMAP)]
-		_EnableNormalMap("NormalMap?", Float) = 0
+		_EnableNormalMap("NormalMap?", Float)			= 0
 	}
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
+		}
+
 		Pass
 		{
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Opaque"
-				"Queue" = "Geometry"
-				"IgnoreProjector" = "True"
 			}
 
 			HLSLPROGRAM
@@ -76,7 +80,7 @@ Shader "NormalMapYminus"
 				return mul(tangentNormal, float3x3(normalize(T), normalize(B), normalize(N)));
 			}
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);

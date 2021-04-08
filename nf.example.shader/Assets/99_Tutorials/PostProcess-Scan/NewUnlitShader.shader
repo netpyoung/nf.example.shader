@@ -10,16 +10,21 @@ Shader "Unlit/NewUnlitShader"
         _WaveColor("Color", Color) = (1,0,0,1)
     }
 
-        SubShader
+    SubShader
     {
         Tags
         {
-            "RenderPipeline" = "UniversalPipeline"
-            //"Queue" = "Transparent"
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"
+            "RenderType" = "Opaque"
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert

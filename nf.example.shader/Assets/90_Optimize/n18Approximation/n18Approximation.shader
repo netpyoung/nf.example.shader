@@ -14,11 +14,20 @@ Shader "n18Approximation"
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
+		}
+
 		Pass
 		{
+			Name "N18_APPROXIMATION"
+
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
+				"LightMode" = "UniversalForward"
 			}
 
 			HLSLPROGRAM
@@ -50,7 +59,7 @@ Shader "n18Approximation"
 				float3 L            : TEXCOORD3;
 			};
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);

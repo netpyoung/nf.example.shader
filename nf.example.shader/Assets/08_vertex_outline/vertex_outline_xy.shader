@@ -12,17 +12,17 @@ Shader "NFShader/Outline/vertex_outline_xy"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
 		{
-			Name "Outline"
+			Name "VERTEX_OUTLINE_XY_BACK"
 
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			Cull Front
@@ -35,9 +35,10 @@ Shader "NFShader/Outline/vertex_outline_xy"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 			CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+
 				float _OutlineWidth;
 				float4 _OutlineColor;
-				float4 _MainTex_ST;
 			CBUFFER_END
 
 			struct APPtoVS
@@ -92,13 +93,11 @@ Shader "NFShader/Outline/vertex_outline_xy"
 
 		Pass
 		{
-			Name "Front"
+			Name "VERTEX_OUTLINE_XY_FRONT"
 
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			Cull Back
@@ -114,9 +113,10 @@ Shader "NFShader/Outline/vertex_outline_xy"
 			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
 
 			CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+
 				float _OutlineThickness;
 				float4 _OutlineColor;
-				float4 _MainTex_ST;
 			CBUFFER_END
 
 			struct APPtoVS

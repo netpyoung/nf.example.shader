@@ -16,8 +16,8 @@ Shader "ParticleRainWindow"
 	//   - renderer > render mode > Streched Billboard
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
-		_NormalPower("_NormalPower", Range(1, 10)) = 1
+		_MainTex("texture", 2D)						= "white" {}
+		_NormalPower("_NormalPower", Range(1, 10))	= 1
 	}
 
 	SubShader
@@ -26,6 +26,7 @@ Shader "ParticleRainWindow"
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
 			"Queue" = "Transparent" // ***
+			"RenderType" = "Transparent"
 		}
 
 		Pass
@@ -33,7 +34,6 @@ Shader "ParticleRainWindow"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Transparent"
 			}
 
 			Blend SrcAlpha OneMinusSrcAlpha

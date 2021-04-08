@@ -15,6 +15,8 @@ Shader "BlackHole"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "AlphaTest"
+			"RenderType" = "TransparentCutout"
 		}
 
 		Pass
@@ -22,8 +24,6 @@ Shader "BlackHole"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

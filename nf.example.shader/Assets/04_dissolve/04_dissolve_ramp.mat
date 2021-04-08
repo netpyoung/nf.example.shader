@@ -69,7 +69,7 @@ Material:
     - _Blend: 0
     - _BumpScale: 1
     - _Cull: 2
-    - _Cutoff: 0.5
+    - _Cutoff: 0.25
     - _DissolveLevel: 1
     - _DstBlend: 0
     - _EdgeWidth: 0.1

@@ -21,13 +21,16 @@
         {
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Transparent"
-
-            // RenderType is optional but used in https://docs.unity3d.com/Manual/SL-ShaderReplacement.html
             "RenderType" = "Transparent"
         }
         
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             Cull Off
             Blend SrcAlpha One
 

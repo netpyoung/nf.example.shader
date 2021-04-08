@@ -2,12 +2,12 @@ Shader "example/04_dissolve_ramp"
 {
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
-		[NoScaleOffset]_DissolveTex("dissolve", 2D) = "white" {}
-		[NoScaleOffset]_RampTex("Ramp", 2D) = "white" {}
+		_MainTex("texture", 2D)						= "white" {}
+		[NoScaleOffset]_DissolveTex("dissolve", 2D)	= "white" {}
+		[NoScaleOffset]_RampTex("Ramp", 2D)			= "white" {}
 
-		_Amount("Amount", Range(0, 1)) = 0
-		_EdgeWidth("Edge width", Range(0, 1)) = 0.1
+		_Cutoff("Cutoff", Range(0, 1))				= 0.25
+		_EdgeWidth("Edge width", Range(0, 1))		= 0.1
 	}
 
 	SubShader
@@ -15,6 +15,8 @@ Shader "example/04_dissolve_ramp"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "AlphaTest"
+			"RenderType" = "TransparentCutout"
 		}
 
 		Pass
@@ -22,8 +24,6 @@ Shader "example/04_dissolve_ramp"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM
@@ -41,7 +41,7 @@ Shader "example/04_dissolve_ramp"
 			CBUFFER_START(UnityPerMaterial)
 				float4 _MainTex_ST;
 
-				half _Amount;
+				half _Cutoff;
 				half _EdgeWidth;
 			CBUFFER_END
 
@@ -71,9 +71,9 @@ Shader "example/04_dissolve_ramp"
 			half4 frag(VStoFS IN) : SV_Target
 			{
 				half cutout = SAMPLE_TEXTURE2D(_DissolveTex, sampler_DissolveTex, IN.uv).r;
-				clip(cutout - _Amount);
+				clip(cutout - _Cutoff);
 				
-				half degree = saturate((cutout - _Amount)/ _EdgeWidth);
+				half degree = saturate((cutout - _Cutoff)/ _EdgeWidth);
 				half4 edgeColor = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, half2(degree, 0));
 
 				half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);

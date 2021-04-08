@@ -5,6 +5,8 @@ Shader "example/00_basic"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"    // 기본값.
+			"RenderType" = "Opaque" // 기본값.
 		}
 
 		Pass
@@ -14,8 +16,6 @@ Shader "example/00_basic"
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			HLSLPROGRAM

@@ -6,7 +6,6 @@
 		[HDR] _HexColor("_HexColor", Color) = (0, 0.3, 1, 1)
 		_FresnelPower("_FresnelPower", Float) = 40
 
-		// Intersection Highlight
 		[HDR] _IntersectColor("_IntersectColor", Color) = (1, 0, 0, 1)
 		_IntersectIntensity("Intersection Intensity", Float) = 30
 		_IntersectExponent("Intersection Falloff Exponent", Float) = 5
@@ -20,7 +19,7 @@
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Transparent" // ***
+			"Queue" = "Transparent"
 			"RenderType" = "Transparent"
 		}
 

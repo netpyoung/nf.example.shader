@@ -7,12 +7,23 @@
 
     SubShader
     {
-        Cull Off
-        ZWrite Off
-        ZTest Always
+        Tags
+        {
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"
+            "RenderType" = "Opaque"
+        }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+            Cull Off
+            ZWrite Off
+            ZTest Always
+
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert

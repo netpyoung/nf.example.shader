@@ -3,23 +3,28 @@ Shader "Squash"
 	// ref: bzyzhang.github.io/2020/11/28/2020-11-28-（一）顶点动画/
 	Properties
 	{
-		_MainTex("texture", 2D) = "white" {}
-		_TopY("Top Y", Float) = 1
-		_BottomY("Bottom Y", Float) = 0
-		_Control("Control", Range(0, 1)) = 0
+		_MainTex("texture", 2D)				= "white" {}
+		_TopY("Top Y", Float)				= 1
+		_BottomY("Bottom Y", Float)			= 0
+		_Control("Control", Range(0, 1))	= 0
 	}
 
 	SubShader
 	{
+		Tags
+		{
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"RenderType" = "Opaque"
+			"Queue" = "Geometry"
+		}
+
 		Pass
 		{
+			Name "SQUASH"
+
 			Tags
 			{
-				"RenderPipeline" = "UniversalRenderPipeline"
 				"LightMode" = "UniversalForward"
-				"RenderType" = "Opaque"
-				"Queue" = "Geometry"
-				"IgnoreProjector" = "True"
 			}
 
 			HLSLPROGRAM

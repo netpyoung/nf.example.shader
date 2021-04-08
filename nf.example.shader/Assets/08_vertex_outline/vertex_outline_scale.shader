@@ -2,26 +2,27 @@ Shader "NFShader/Outline/vertex_outline_scale"
 {
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
-		_OutlineThickness("_OutlineThickness", Float) = 0.02
-		_OutlineColor("_OutlineColor", Color) = (1,1,1,1)
+		_MainTex("Texture", 2D)							= "white" {}
+		_OutlineThickness("_OutlineThickness", Float)	= 0.02
+		_OutlineColor("_OutlineColor", Color)			= (1, 1, 1, 1)
 	}
+
 	SubShader
 	{
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
 		{
-			Name "Outline"
+			Name "VERTEX_OUTLINE_SCALE_BACK"
 
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			Cull Front
@@ -61,7 +62,7 @@ Shader "NFShader/Outline/vertex_outline_scale"
 				return mul(m, vertexPosition);
 			}
 
-			VStoFS  vert(APPtoVS IN)
+			VStoFS vert(APPtoVS IN)
 			{
 				VStoFS OUT;
 				ZERO_INITIALIZE(VStoFS, OUT);
@@ -81,13 +82,11 @@ Shader "NFShader/Outline/vertex_outline_scale"
 
 		Pass
 		{
-			Name "Front"
+			Name "VERTEX_OUTLINE_SCALE_FRONT"
 
 			Tags
 			{
 				"LightMode" = "UniversalForward"
-				"Queue" = "Geometry"
-				"RenderType" = "Opaque"
 			}
 
 			Cull Back

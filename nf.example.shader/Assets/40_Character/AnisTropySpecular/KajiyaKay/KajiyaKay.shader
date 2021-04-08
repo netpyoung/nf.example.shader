@@ -15,12 +15,18 @@
     {
         Tags
         {
-            "RenderType" = "Opaque"
-            "RenderPipeline" = "UniversalPipeline"
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "AlphaTest"
+            "RenderType" = "TransparentCutout"
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert
@@ -137,6 +143,7 @@
 
                 finalColor.rgb *= SAMPLE_TEXTURE2D(_HairShiftTex, sampler_HairShiftTex, IN.uv).rgb;
                 finalColor.a = SAMPLE_TEXTURE2D(_HairAlphaTex, sampler_HairAlphaTex, IN.uv).r;
+                clip(finalColor.a - 0.5);
 
                 return finalColor;
             }

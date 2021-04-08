@@ -10,8 +10,6 @@ Shader "RainDropeeFinal"
     // | g | streaks         | 
     // | b | streak gradient | 
     // | a | -               | 
-
-    // TODO : droplet -> ripple관련된것은 ripple로 바꿀것.
     Properties
     {
         _MainTex("Main Texture", 2D) = "white" {}
@@ -38,12 +36,17 @@ Shader "RainDropeeFinal"
 
         Tags
         {
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"
             "RenderType" = "Opaque"
-            "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex vert

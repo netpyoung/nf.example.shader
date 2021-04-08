@@ -10,6 +10,9 @@ Shader "_alpha"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
+
+				"Queue" = "Transparent"
+				"RenderType" = "Transparent"
 		}
 
 		Pass
@@ -19,8 +22,6 @@ Shader "_alpha"
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
-				"Queue" = "Transparent"
-				"RenderType" = "Transparent"
 			}
 
 			ZWrite On

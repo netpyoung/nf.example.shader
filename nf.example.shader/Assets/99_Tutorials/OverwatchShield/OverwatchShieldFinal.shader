@@ -42,13 +42,15 @@
         {
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Transparent"
-
-            // RenderType is optional but used in https://docs.unity3d.com/Manual/SL-ShaderReplacement.html
             "RenderType" = "Transparent"
         }
-        
+
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
             Cull Off
             Blend SrcAlpha One
 
@@ -147,7 +149,7 @@
                 hexEdgeTerm *= (1 / (1 - _HexEdgeWidthModifier));
 
                 // Edge
-                half edgeTex = combinedTex.b;
+                half edgeTex = max(0.0, combinedTex.b);
                 half3 edgeTerm = pow(edgeTex, _EdgeExponent) * _EdgeColor.rgb * _EdgeIntensity;
 
                 // InterSection

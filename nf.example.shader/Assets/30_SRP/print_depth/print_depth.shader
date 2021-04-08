@@ -1,14 +1,12 @@
 Shader "srp/print_depth"
 {
-    Properties
-    {
-    }
-
     SubShader
     {
         Tags
         {
             "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"
+            "RenderType" = "Opaque"
         }
 
         Pass
@@ -16,10 +14,7 @@ Shader "srp/print_depth"
             Tags
             {
                 "LightMode" = "UniversalForward"
-                "Queue" = "Geometry"
-                "RenderType" = "Opaque"
             }
-
             
             Cull Off
             ZTest Always
