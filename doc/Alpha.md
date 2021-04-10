@@ -53,6 +53,7 @@ SubShader
 - 모바일에서는 Blend 보다 성능이 안나오는 경향이 있음.
 - 풀, 나무, 머리카락, 털 등...
 - clip하여 너무 각지는게 보기 싫어질 정도면 blend를 잘 쓰자
+- // if ZWrite is Off, clip() is fast enough on mobile, because it won't write the DepthBuffer, so no GPU pipeline stall(confirmed by ARM staff).
 
 ``` hlsl
 SubShader

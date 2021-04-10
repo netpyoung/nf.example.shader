@@ -1,28 +1,34 @@
-
-## 유니티 
+# Shadow
 
 TRANSFER_SHADOW
 TRANSFER_SHADOW_CASTER
 
-[[1023 박민수] 깊이_버퍼_그림자_1](https://www.slideshare.net/MoonLightMS/1023-1)
-
-
 ## 바닥그림자
 
-### 원형(circle) 평면 그림자
+| 이름         | 부하     | 형상 | 자기그림자 | 특징             |
+|--------------|----------|------|------------|------------------|
+| 원형         | 가장적음 | 평면 | X          | 원형텍스쳐       |
+| 평면 투영    | 적음     | 평면 | X          | 평면에만         |
+| 투영 텍스쳐  | 적당     | 지형 | X          | 물체 하나만      |
+| 우선순위버퍼 | 큼       | 지형 | X          | 자기 그림자 없음 |
+| 스텐실       | 큼       | 지형 | O          | 정점 수가 많음   |
+| 깊이버퍼     | 큼       | 지형 | O          | 부분적 깜빡임    |
 
+### 원형(circle) 그림자
 
-- 그냥 텍스쳐로
+- 그냥 원형 텍스쳐로
 
-### 바닥 그림자 - RenderTexture이용
+### 평면 투영 (Planar Projected) 그림자
+
+### RenderTexture이용
 
 - Shadow용 모델
   - LOD
 - RenderTexture
 
-### 메시 평면 그림자 - 스텐실
+### 스텐실
 
-``` shader
+``` hlsl
 float4 vPosWorld = mul( _Object2World, v.vertex);
 float4 lightDirection = -normalize(_WorldSpaceLightPos0); 
 float opposite = vPosWorld.y - _PlaneHeight;
@@ -34,13 +40,12 @@ o.pos = mul (UNITY_MATRIX_VP, float4(vPos.x, _PlaneHeight, vPos.z ,1));
 // 그림자 덧 방지
 Stencil
 {
-	Ref 0
-	Comp Equal
-	Pass IncrWrap
-	ZFail Keep
+    Ref 0
+    Comp Equal
+    Pass IncrWrap
+    ZFail Keep
 }
 ```
-
 
 ## 그림자맵 - 깊이버퍼
 
@@ -48,9 +53,12 @@ Stencil
 - <https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch10.md>
 
 ## PSM(Perspective Shadow Map)
+
 - <http://www-sop.inria.fr/reves/Marc.Stamminger/psm/>
 - <http://x66vx.egloos.com/3808794>
 
-## Ref.
+## Ref
 
 - [게임 개발 포에버: 실시간 그림자를 싸게 그리자! 평면상의 그림자 ( Planar Shadow)](https://gamedevforever.com/326)
+- [[1023 박민수] 깊이_버퍼_그림자_1](https://www.slideshare.net/MoonLightMS/1023-1)
+- [타카시 이마기레 - DirectX 9 셰이더 프로그래밍](https://www.hanbit.co.kr/store/books/look.php?p_code=B9447539340)

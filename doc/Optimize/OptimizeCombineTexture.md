@@ -19,7 +19,7 @@
 | NoiseTex     | R   |                |
 | ...          | R   |                |
 
-## ex) [NormalMap](./NormalMap.md)와 [ParallaxMapping](./ParallaxMapping.md)
+## ex) [NormalMap](../NormalMap.md)와 [ParallaxMapping](../ParallaxMapping.md)
 
 - NormalMap에선 R,G채널 2개의 채널을
 - ParallaxMapping에선 깊이에 대한 하나의 채널을 추가해서 사용한다

@@ -64,6 +64,12 @@ half diffuse = pow(NdotL * wrapValue + (1.0 - wrapValue), 2);
 half diffuse = max(0.0, (NdotL + _wrapped) / (1.0 - _wrapped));
 ```
 
+``` hlsl
+// ref: https://blog.naver.com/eryners/220144182154
+// Harf Lambert사용시 명암 차이가 너무 없어져서 무게감이 없어보인다.
+​Half Lambert + Pow : pow((dot(N, L) * 0.5) + 0.5, 4) 
+```
+
 ## 물리기반
 
 ## Cook Torrance - 쿡토렌스
@@ -112,6 +118,28 @@ half3 specular = norm * pow(VdotR, shininess);
 
 - 2000 - Michael Ashikhmin & Peter Shirley - An Anisotropic Phong BRDF Model
 - 퐁 스펙큘러
+
+## Fakey Oren-Nayar -  최적화 오렌네이어
+
+- 2011 - [pope - Rendering Tech of Space Marine](https://www.slideshare.net/blindrenderer/rendering-tech-of-space-marinekgc-2011)
+  - <https://kblog.popekim.com/2011/11/blog-post_16.html>
+
+``` hlsl
+half OrenNayar_Fakey(half3 N, half3 L, half3 V, half roughness)
+{
+    half LdotN = dot(L, N);
+    half VdotN = dot(V, N);
+	
+    half result = saturate(LdotN);
+    half soft_rim = saturate(1 - VdotN / 2);
+	
+    half fakey = pow(1 - result * soft_rim, 2);
+    half fakey_magic = 0.62;
+    fakey = fakey_magic - fakey * fakey_magic;
+    return lerp(result, fakey, roughness);
+}
+```
+
 
 ## Disney - 디즈니
 
