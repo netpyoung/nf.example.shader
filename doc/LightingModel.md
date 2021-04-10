@@ -76,6 +76,7 @@ half diffuse = max(0.0, (NdotL + _wrapped) / (1.0 - _wrapped));
 
 - 1982 - Robert L.Cook & Kenneth E. Torrance - A Reflectance Model For Computer Graphics
 - 미세면이론
+- 거친표면 specular 초점
 
 ## Ward - 알드
 
@@ -85,7 +86,7 @@ half diffuse = max(0.0, (NdotL + _wrapped) / (1.0 - _wrapped));
 ## Oren-Nayar - 오렌네이어
 
 - 1994 - Michael Oren & Shree K. Nayar - Generalization of Lambert’s Reflectance Model
-- 디퓨즈 전용
+- 거친포면 diffuse 초점
 
 ``` hlsl
 half NdotL = max(0.0, dot(N, L));

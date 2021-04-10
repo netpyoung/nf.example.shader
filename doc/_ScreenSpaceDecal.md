@@ -10,32 +10,6 @@
 
 ## ver. Pope
 
-``` hlsl
-// ver. Pope
-
-// ============== 1. 씬뎁스 구하기
-float2 screenPosition = clipPosition.xy / clipPosition.w;
-float2 depth_uv = screenPosition * float2(0.5f, -0.5f) + float2(0.5f, 0.5f);
-depth_uv += ScreenDimension.zw; // Half-pixel Offset Basically
-
-float sceneDepth = tex2D(DepthMap, depth_uv).r;
-
-// ============== 2. 뎁스로부터 3D위치를 구하기
-float4 scenePosView = float4((clipPosition.xy * sceneDepth) / (Deproject.xy * clipPosition.w), -depth, 1);
-
-// Deproject.X = ProjectionMatrix.M11;
-// Deproject.Y = ProjectionMatrix.M22;
-
-position = mul(scenePosView, InvWorldView);
-
-// ============== 3. SSD상자 밖이면 그리지않기
-clip(0.5 - abs(position.xyz));
-
-// ============== 4. 데칼 그리기
-float2 uv = position.xz;
-uv += 0.5f
-```
-
 1. 알파블렌딩
    - Blend Factor
 2. 움직이는 물체들
@@ -69,26 +43,42 @@ clip(dot(normal, orientation) - gNormalThreshold);
 ``` hlsl
 // ver. URP
 
-// ============== 1. 씬뎁스 구하기
-VertexPositionInputs vertexInputs = GetVertexPositionInputs(positionOS.xyz);
+// vert:
+// positionNDCw: [0, w]
+OUT.positionNDCw = vertexPositionInput.positionNDC;
 
-half4 positionNDC = vertexInputs.positionNDC;
-half2 uv_Screen = IN.positionNDC.xy / IN.positionNDC.w;
-half sceneDepth = SampleSceneDepth(uv_Screen);
+// frag:
+// ============== 1. 씬뎁스 구하기
+// positionNDCuv: [0, 1]
+half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
+half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
 // ============== 2. 뎁스로부터 3D위치를 구하기
-// for Perspective
-half sceneDepthVS = LinearEyeDepth(sceneDepth, _ZBufferParams);
+// positionNDC: [-0.5, 0.5]
+float2 positionNDC = positionNDCuv * 2.0 - 1.0;
+half4 positionVS_decal;
+positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
+positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
+positionVS_decal.z = -sceneEyeDepth;
+positionVS_decal.w = 1;
 
-half4 decalPositionVS;
-decalPositionVS.x = (positionCS.x * sceneDepth) / (UNITY_MATRIX_P._11 * positionCS.w);
-decalPositionVS.y = (positionCS.y * sceneDepth) / (UNITY_MATRIX_P._22 * positionCS.w);
-decalPositionVS.z = -sceneDepthVS;
-decalPositionVS.w = 1;
+half4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
+// positionOS_decal: [-0.5, 0.5]
+half4 positionOS_decal = mul(I_MV, positionVS_decal);
 
-// mul(decalPositionVS, invViewWorld);
-half4 decalPositionOS = mul(UNITY_MATRIX_IT_MV, decalPositionVS);
+// ============== 3. SSD상자 밖이면 그리지않기
+clip(0.5 - abs(positionOS_decal.xyz));
 
+// ============== 4. 데칼 그리기
+// uv_decal: [0, 1]
+half2 uv_decal = positionOS_decal.xy + 0.5;
+half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
+half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
+```
+
+``` hlsl
+// ver2
 
 // 희안하네
 half sceneDepthVS = LinearEyeDepth(sceneDepth, _ZBufferParams);
@@ -115,19 +105,9 @@ clip(0.5 - abs(decalPositionOS.xyz));
 
 
 // ============== 4. 데칼 그리기
-half2 uv_DecalSpace = decalPositionOS.xy + 0.5;
-half2 uv_MainTex = TRANSFORM_TEX(uv_DecalSpace, _MainTex);
+half2 uv_decal = decalPositionOS.xz + 0.5;
+half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
 half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
-
-|        |                                                              |
-|--------|--------------------------------------------------------------|
-| 근평면 | 카메라와 수직하며 제일 가까운 곳의 시야 범위를 나타내는 평면 |
-| 원평면 | 카메라와 수직하며 제일 먼 곳의 시야 범위를 나타내는 평면     |
-| 좌평면 | 카메라의 좌측 시야 범위를 나타내는 평면                      |
-| 우평면 | 카메라의 우측 시야 범위를 나타내는 평면                      |
-| 상평면 | 카메라의 상단 시야 범위를 나타내는 평면                      |
-| 하평면 | 카메라의 하단 시야 범위를 나타내는 평면                      |
-
 ```
 
 ## 종합

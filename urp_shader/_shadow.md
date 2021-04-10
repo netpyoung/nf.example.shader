@@ -28,17 +28,6 @@ finalColor.rgb *= shadow;
 
 아 유니티 병신같은 문서어딧
 
-[URP 셰이더 코딩 튜토리얼 : 제 1편 - Unlit Soft Shadow](https://blog.naver.com/mnpshino/221844164319)
-
-[URP Default Unlit Based to Custom Lighting](https://illu.tistory.com/1407)
-[urp管线的自学hlsl之路 第十篇 主光源阴影投射和接收](https://www.bilibili.com/read/cv6436088/)
-[builtin -  Rendering 7 Shadows](https://catlikecoding.com/unity/tutorials/rendering/part-7/)
-
-[[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(1/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-%EB%AC%B8%EC%A0%9C%ED%8E%B8-1-3-e8e7f74c192a)
-[[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(2/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-%EC%BD%94%EB%93%9C-%EB%94%B0%EB%9D%BC%EA%B0%80%EB%A9%B0-%EB%AC%B8%EC%A0%9C-%EC%9B%90%EC%9D%B8-%EC%B0%BE%EA%B8%B0-2-3-5831e340d8eb)
-[[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(3/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-frame-debugger%EB%A1%9C-%EC%9B%90%EC%9D%B8-%EC%B0%BE%EA%B8%B0-3-3-bae7825480d3)
-[Reading a depth value from Unity's shadow map?](https://forum.unity.com/threads/reading-a-depth-value-from-unitys-shadow-map.243092/)
-
 ``` hlsl
 // Toggle the alpha test
 #define _ALPHATEST_ON
@@ -329,3 +318,14 @@ Pass
     ...
 }
 ```
+
+## Ref
+
+- [URP 셰이더 코딩 튜토리얼 : 제 1편 - Unlit Soft Shadow](https://blog.naver.com/mnpshino/221844164319)
+- [URP Default Unlit Based to Custom Lighting](https://illu.tistory.com/1407)
+- [urp管线的自学hlsl之路 第十篇 主光源阴影投射和接收](https://www.bilibili.com/read/cv6436088/)
+- [builtin -  Rendering 7 Shadows](https://catlikecoding.com/unity/tutorials/rendering/part-7/)
+- [[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(1/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-%EB%AC%B8%EC%A0%9C%ED%8E%B8-1-3-e8e7f74c192a)
+  - [[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(2/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-%EC%BD%94%EB%93%9C-%EB%94%B0%EB%9D%BC%EA%B0%80%EB%A9%B0-%EB%AC%B8%EC%A0%9C-%EC%9B%90%EC%9D%B8-%EC%B0%BE%EA%B8%B0-2-3-5831e340d8eb)
+  - [[Unity] URP Custom Shadow Shader 도전하기 : Frame Debugger로 원인 찾기(3/3)](https://tmdcks2368.medium.com/unity-urp-custom-shadow-shader-%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0-frame-debugger%EB%A1%9C-%EC%9B%90%EC%9D%B8-%EC%B0%BE%EA%B8%B0-3-3-bae7825480d3)
+- [Reading a depth value from Unity's shadow map?](https://forum.unity.com/threads/reading-a-depth-value-from-unitys-shadow-map.243092/)

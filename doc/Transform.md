@@ -1,7 +1,5 @@
 # Transform
 
-## Vertex
-
 ![res/coordinate.png](./res/coordinate.png)
 
 | 줄인말 | 공간                                     | 다른말           | 타입   | 설명                             |
@@ -12,27 +10,49 @@
 | CS     | Homogeneous Clip Space                   |                  | float4 | 카메라 시야에서 안보인 것은 제외 |
 | NDC    | Homogeneous Normalized Device Coordinate | Screen Space     | float4 | 2D 화면                          |
 
+## NDC
+
+- 이거 잘못쓰면 햇갈린다.
+
+``` hlsl
+// [0, w]
+float4 positionNDCw = GetVertexPositionInputs(positionOS).positionNDC;
+
+// [0, 1]
+float2 positionNDCuv = positionNDCw.xy / positionNDC.w;
+
+// [-1, 1]
+float2 positionNDC = positionNDCuv * 2.0 - 1.0;
+```
+
+## UNITY_MATRIX
+
 ``` txt
 UNITY_MATRIX_M == renderer.localToWorldMatrix
   - 유니티 4까지는 GPU에 넘겨주기전에 스케일을 가공 - transform.localToWorldMatrix, renderer.localToWorldMatrix가 달랐으나 지금은 같음.
 UNITY_MATRIX_V == camera.worldToCameraMatrix
 UNITY_MATRIX_P == GL.GetGPUProjectionMatrix(camera.projectionMatrix, false);
+
+
+unity_CameraProjection    : float4x4 Camera’s projection matrix.
+  - 스크린 공간 그리기
+unity_CameraInvProjection : float4x4 Inverse of camera’s projection matrix.
 ```
 
 ``` txt
-OS
+OS ----------------------- Object Space
  | UNITY_MATRIX_M * OS
-WS
+WS ----------------------- World Space
  | UNITY_MATRIX_V * WS
-VS
+VS ----------------------- View Space
  | UNITY_MATRIX_P * VS
-CS
+CS ----------------------- Clip Space
  | NDC = CS * 0.5
  | NDC.x = NDC.x + NDC.w
  | NDC.y =  NDC.y + NDC.w // DirectX
  | NDC.y = -NDC.y + NDC.w // OpenGL
  | NDC.zw = CS.zw
-NDC
+NDCw --------------------- Normalized Device Coordinate
 ```
 
 ``` hlsl
@@ -44,7 +64,6 @@ struct VertexPositionInputs
     float4 positionCS; // Homogeneous clip space position
     float4 positionNDC;// Homogeneous normalized device coordinates
 };
-
 
 // com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
 VertexPositionInputs GetVertexPositionInputs(float3 positionOS)
@@ -71,6 +90,89 @@ TransformWorldToHClip  - UNITY_MATRIX_VP
 
 - [./NormalMap.md](./NormalMap.md)
 
+## Pserspective Camera
+
+- <https://chengkehan.github.io/ReconstructPositionFromDepth.html>
+
+![./res/projectionMatrix.jpg](./res/projectionMatrix.jpg)
+
+``` cs
+// Find our current location in the camera's projection space.
+Vector3 pt = Camera.main.projectionMatrix.MultiplyPoint(transform.position);
+
+// Matrix4x4.MultiplyPoint
+public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
+{
+    Vector3 result;
+    result.x = mat.m00 * v.x + mat.m01 * v.y + mat.m02 * v.z + mat.m03;
+    result.y = mat.m10 * v.x + mat.m11 * v.y + mat.m12 * v.z + mat.m13;
+    result.z = mat.m20 * v.x + mat.m21 * v.y + mat.m22 * v.z + mat.m23;
+    float num = mat.m30 * v.x + mat.m31 * v.y + mat.m32 * v.z + mat.m33;
+    num = 1 / num;
+    result.x *= num;
+    result.y *= num;
+    result.z *= num;
+    return result;
+}
+
+// z값 구하지 않으면
+public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
+{
+    Vector3 result;
+    result.x = mat.m00 * v.x + mat.m01 * v.y + mat.m02 * v.z + mat.m03;
+    result.y = mat.m10 * v.x + mat.m11 * v.y + mat.m12 * v.z + mat.m13;
+    float num = mat.m30 * v.x + mat.m31 * v.y + mat.m32 * v.z + mat.m33;
+    num = 1 / num;
+    result.x *= num;
+    result.y *= num;
+    return result;
+}
+
+// 값을 대입하면
+public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
+{
+    Vector3 result;
+    result.x = mat.m00 * v.x + 0 * v.y + 0 * v.z + 0;
+    result.y = 0 * v.x + mat.m11 * v.y + 0 * v.z + 0;
+    float num = 0 * v.x + 0 * v.y + -1 * v.z + 0;
+    num = 1 / num;
+    result.x *= num;
+    result.y *= num;
+    return result;
+}
+
+// 최종적으로
+public Vector3 MultiplyPoint(Matrix4x4 mat, Vector3 v)
+{
+    Vector3 result;
+    result.x = mat.m00 * v.x;
+    result.y = mat.m11 * v.y;
+    float num = -1 * v.z;
+    num = 1 / num;
+    result.x *= num;
+    result.y *= num;
+    return result;
+}
+
+(X, Y, linearEyeDepth)
+positionNDC // [-1, 1]
+X = positionNDC.x * linearEyeDepth / mat.m00
+Y = positionNDC.x * linearEyeDepth / mat.m11
+
+
+The zero-based row-column position:
+|  _m00, _m01, _m02, _m03 |
+|  _m10, _m11, _m12, _m13 |
+|  _m20, _m21, _m22, _m23 |
+|  _m30, _m31, _m32, _m33 |
+
+The one-based row-column position:
+|   _11,  _12,  _13,  _14 |
+|   _21,  _22,  _23,  _24 |
+|   _31,  _32,  _33,  _34 |
+|   _41,  _42,  _43,  _44 |
+
+```
 
 ## ref
 
