@@ -1,4 +1,4 @@
-Shader "ssd_v1"
+Shader "ScreenSpaceDecal_v2"
 {
 	Properties
 	{
@@ -9,19 +9,22 @@ Shader "ssd_v1"
 	{
 		Tags
 		{
-			"RenderPipeline" = "UniversalRenderPipeline"
+			"RenderPipeline" = "UniversalRenderPipeline" 
 			"Queue" = "AlphaTest"
 			"RenderType" = "TransparentCutout"
 		}
 
 		Pass
 		{
+			Name "SCREEN_SPACE_DECAL_V2"
+
 			Tags
 			{
 				"LightMode" = "UniversalForward"
 			}
 
 			Cull Back
+			ZWrite Off
 
 			HLSLPROGRAM
 			#pragma target 3.5
@@ -45,8 +48,10 @@ Shader "ssd_v1"
 
 			struct VStoFS
 			{
-				float4 positionCS	: SV_POSITION;
-				float4 positionNDCw : TEXCOORD0;
+				float4 positionCS			: SV_POSITION;
+				float4 positionNDCw			: TEXCOORD0;
+				float3 positionOS_camera	: TEXCOORD2;
+				float4 positionOSw_viewRay	: TEXCOORD1;
 			};
 			
 			VStoFS vert(APPtoVS IN)
@@ -57,9 +62,13 @@ Shader "ssd_v1"
 				VertexPositionInputs vertexPositionInput = GetVertexPositionInputs(IN.positionOS.xyz);
 
 				OUT.positionCS = vertexPositionInput.positionCS;
-				// positionNDCw: [0, w]
 				OUT.positionNDCw = vertexPositionInput.positionNDC;
 
+				float4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
+				OUT.positionOS_camera = mul(I_MV, float4(0, 0, 0, 1)).xyz;
+
+				OUT.positionOSw_viewRay.xyz = mul((float3x3)I_MV, -vertexPositionInput.positionVS);
+				OUT.positionOSw_viewRay.w = vertexPositionInput.positionVS.z;
 				return OUT;
 			}
 		
@@ -72,24 +81,15 @@ Shader "ssd_v1"
 				half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
 				// ============== 2. 뎁스로부터 3D위치를 구하기
-				// positionNDC: [-0.5, 0.5]
-				float2 positionNDC = positionNDCuv * 2.0 - 1.0;
-				half4 positionVS_decal;
-				positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
-				positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
-				positionVS_decal.z = -sceneEyeDepth;
-				positionVS_decal.w = 1;
-
-				half4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
-				// positionOS_decal: [-0.5, 0.5]
-				half4 positionOS_decal = mul(I_MV, positionVS_decal);
+				// positionOS_decal: [-0.5, 0.5] // clip 으로 잘려질것이기에
+				half3 positionOS_decal = IN.positionOS_camera + IN.positionOSw_viewRay.xyz / IN.positionOSw_viewRay.w * sceneEyeDepth;
 
 				// ============== 3. SSD상자 밖이면 그리지않기
 				clip(0.5 - abs(positionOS_decal.xyz));
 
 				// ============== 4. 데칼 그리기
 				// uv_decal: [0, 1]
-				half2 uv_decal = positionOS_decal.xy + 0.5;
+				half2 uv_decal = positionOS_decal.xz + 0.5;
 				half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
 				half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
 				return mainTex;

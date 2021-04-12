@@ -2,13 +2,14 @@
 
 ![res/coordinate.png](./res/coordinate.png)
 
-| 줄인말 | 공간                                     | 다른말           | 타입   | 설명                             |
-|--------|------------------------------------------|------------------|--------|----------------------------------|
-| OS     | Object Space                             | Local Space      | float3 |                                  |
-| WS     | World Space                              | Global Space     | float3 |                                  |
-| VS     | View Space                               | Eye/Camera Space | float3 | 카메라에서 바라볼때              |
-| CS     | Homogeneous Clip Space                   |                  | float4 | 카메라 시야에서 안보인 것은 제외 |
-| NDC    | Homogeneous Normalized Device Coordinate | Screen Space     | float4 | 2D 화면                          |
+| 줄인말 | 공간                         | 다른말           | 타입   | 설명                             |
+|--------|------------------------------|------------------|--------|----------------------------------|
+| OS     | Object Space                 | Local Space      | float3 |                                  |
+| WS     | World Space                  | Global Space     | float3 |                                  |
+| VS     | View Space                   | Eye/Camera Space | float3 | 카메라에서 바라볼때              |
+| CS     | Clip Space                   |                  | float4 | 카메라 시야에서 안보인 것은 제외 |
+| NDC    | Normalized Device Coordinate |                  | float4 |                                  |
+|        | Screen Space                 |                  |        | 2D 화면                          |
 
 ## NDC
 
@@ -23,6 +24,30 @@ float2 positionNDCuv = positionNDCw.xy / positionNDC.w;
 
 // [-1, 1]
 float2 positionNDC = positionNDCuv * 2.0 - 1.0;
+```
+
+``` hlsl
+float4 ndc = input.positionCS * 0.5f;
+input.positionNDC.xy = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+input.positionNDC.zw = input.positionCS.zw;
+
+// 음.. 아랫부분이 좀 이상한데..
+NDCw = float4(
+    (0.5 * CS.x                       ) + 0.5 * CS.w,
+    (0.5 * CS.y *  _ProjectionParams.x) + 0.5 * CS.w,
+    CS.z,
+    CS.w
+);
+
+NDCuv = float2(
+    (0.5 * CS.x                       ) / CS.w + 0.5,
+    (0.5 * CS.y *  _ProjectionParams.x) / CS.w + 0.5
+);
+
+NDC = float2(
+    CS.x                       / CS.w,
+    CS.y * _ProjectionParams.x / CS.w
+);
 ```
 
 ## UNITY_MATRIX

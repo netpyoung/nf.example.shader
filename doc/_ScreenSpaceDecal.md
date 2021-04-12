@@ -7,6 +7,75 @@
 3. SSD상자 밖이면 그리지않기
 4. 데칼 그리기
 
+## ver. URP
+
+``` hlsl
+// NDC에서 depth를 이용 역산하여 데칼 위치를 구하는법.
+
+// vert:
+// positionNDCw: [0, w]
+OUT.positionNDCw = vertexPositionInput.positionNDC;
+
+// frag:
+// ============== 1. 씬뎁스 구하기
+// positionNDCuv: [0, 1]
+half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
+half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
+
+// ============== 2. 뎁스로부터 3D위치를 구하기
+// positionNDC: [-1, 1]
+float2 positionNDC = positionNDCuv * 2.0 - 1.0;
+half4 positionVS_decal;
+positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
+positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
+positionVS_decal.z = -sceneEyeDepth;
+positionVS_decal.w = 1;
+
+half4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
+// positionOS_decal: [-0.5, 0.5] // clip 으로 잘려질것이기에 
+half4 positionOS_decal = mul(I_MV, positionVS_decal);
+
+// ============== 3. SSD상자 밖이면 그리지않기
+clip(0.5 - abs(positionOS_decal.xyz));
+
+// ============== 4. 데칼 그리기
+// uv_decal: [0, 1]
+half2 uv_decal = positionOS_decal.xz + 0.5;
+half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
+half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
+```
+
+``` hlsl
+// 오브젝트 공간의 viewRay를 구하고 depth에 맞추어 데칼 위치를 구하는법.
+
+// vert:
+float4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
+OUT.positionOS_camera = mul(I_MV, float4(0, 0, 0, 1)).xyz;
+
+OUT.positionOSw_viewRay.xyz = mul((float3x3)I_MV, -vertexPositionInput.positionVS);
+OUT.positionOSw_viewRay.w = vertexPositionInput.positionVS.z;
+
+// frag:
+// ============== 1. 씬뎁스 구하기
+// positionNDCuv: [0, 1]
+half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
+half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
+
+// ============== 2. 뎁스로부터 3D위치를 구하기
+// positionOS_decal: [-0.5, 0.5] // clip 으로 잘려질것이기에
+half3 positionOS_decal = IN.positionOS_camera + IN.positionOSw_viewRay.xyz / IN.positionOSw_viewRay.w * sceneEyeDepth;
+
+// ============== 3. SSD상자 밖이면 그리지않기
+clip(0.5 - abs(positionOS_decal.xyz));
+
+// ============== 4. 데칼 그리기
+// uv_decal: [0, 1]
+half2 uv_decal = positionOS_decal.xz + 0.5;
+half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
+half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
+```
 
 ## ver. Pope
 
@@ -37,246 +106,6 @@ gNormalThreashold == cos(각도)
 float3 normal = DecodeGbufferNormal(tex2D(GNormalMap, depth_uv));
 clip(dot(normal, orientation) - gNormalThreshold);
 ```
-
-## ver. URP
-
-``` hlsl
-// ver. URP
-
-// vert:
-// positionNDCw: [0, w]
-OUT.positionNDCw = vertexPositionInput.positionNDC;
-
-// frag:
-// ============== 1. 씬뎁스 구하기
-// positionNDCuv: [0, 1]
-half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
-half sceneRawDepth = SampleSceneDepth(positionNDCuv);
-half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
-
-// ============== 2. 뎁스로부터 3D위치를 구하기
-// positionNDC: [-0.5, 0.5]
-float2 positionNDC = positionNDCuv * 2.0 - 1.0;
-half4 positionVS_decal;
-positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
-positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
-positionVS_decal.z = -sceneEyeDepth;
-positionVS_decal.w = 1;
-
-half4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
-// positionOS_decal: [-0.5, 0.5]
-half4 positionOS_decal = mul(I_MV, positionVS_decal);
-
-// ============== 3. SSD상자 밖이면 그리지않기
-clip(0.5 - abs(positionOS_decal.xyz));
-
-// ============== 4. 데칼 그리기
-// uv_decal: [0, 1]
-half2 uv_decal = positionOS_decal.xy + 0.5;
-half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
-half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
-```
-
-``` hlsl
-// ver2
-
-// 희안하네
-half sceneDepthVS = LinearEyeDepth(sceneDepth, _ZBufferParams);
-{ // vert
-  float4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
-  OUT.viewRayOS.xyz = mul((float3x3)I_MV, -vertexPositionInput.positionVS);
-  OUT.viewRayOS.w = vertexPositionInput.positionVS.z;
-} // vert
-half3 decalPositionOS = viewRayOS.xyz / viewRayOS.w * sceneDepthVS;
-
-
-// for Orthographic
-float sceneDepthVS = lerp(_ProjectionParams.y, _ProjectionParams.z, sceneDepth); // lerp(near,far, [0,1] linear depth) 
-half4 decalPositionVS = half4(positionCS.xy * sceneDepth) / (Deproject.xy * positionCS.w), -sceneDepthVS, 1);
-
-// Deproject.X = ProjectionMatrix.M11;
-// Deproject.Y = ProjectionMatrix.M22;
-
-decalPositionOS = mul(decalPositionVS, I_MV);
-
-// ============== 3. SSD상자 밖이면 그리지않기
-
-clip(0.5 - abs(decalPositionOS.xyz));
-
-
-// ============== 4. 데칼 그리기
-half2 uv_decal = decalPositionOS.xz + 0.5;
-half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
-half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
-```
-
-## 종합
-
-``` hlsl
-Shader "ScreenSpaceDecal"
-{
-    Properties
-    {
-        [Header(Blending)] // https://docs.unity3d.com/ScriptReference/Rendering.BlendMode.html
-        [Enum(UnityEngine.Rendering.BlendMode)]
-        _SrcBlend("_SrcBlend (default = SrcAlpha)", Float)          = 5  // SrcAlpha         == 5
-        [Enum(UnityEngine.Rendering.BlendMode)]
-        _DstBlend("_DstBlend (default = OneMinusSrcAlpha)", Float)  = 10 // OneMinusSrcAlpha == 10
-
-
-        // TODO 잘 모르겠다 스텐실은..
-        [Header(Stencil Masking)] // https://docs.unity3d.com/ScriptReference/Rendering.CompareFunction.html
-        _StencilRef("_StencilRef", Float) = 0
-        [Enum(UnityEngine.Rendering.CompareFunction)]_StencilComp("_StencilComp (default = Disable) _____Set to NotEqual if you want to mask by specific _StencilRef value, else set to Disable", Float) = 0 //0 = disable
-    }
-
-    SubShader
-    {
-        // To avoid render order problems, Queue must >= 2501, which enters the transparent queue, 
-        // in transparent queue Unity will always draw from back to front
-        // https://github.com/ColinLeung-NiloCat/UnityURPUnlitScreenSpaceDecalShader/issues/6#issuecomment-615940985
-
-        // https://docs.unity3d.com/Manual/SL-SubShaderTags.html
-        // Queues up to 2500 (“Geometry+500”) are consided “opaque” and optimize the drawing order of the objects for best performance. 
-        // Higher rendering queues are considered for “transparent objects” and sort objects by distance, 
-        // starting rendering from the furthest ones and ending with the closest ones. 
-        // Skyboxes are drawn in between all opaque and all transparent objects.
-        // "Queue" = "Transparent-499" mean "Queue" = "2501", which is almost equals "draw right before any transparent objects"
-        Tags
-        {
-            "RenderPipeline" = "UniversalRenderPipeline"
-            "Queue" = "Transparent-499"
-            "RenderType" = "Overlay"
-            "DisableBatching" = "True"
-        }
-        Pass
-        {
-            Name "SCREEN_SPACE_DECAL"
-
-            Tags
-            {
-                "LightMode" = "UniversalForward"
-            }
-
-            Stencil
-            {
-                Ref  // TODO
-                Comp // TODO
-            }
-            Cull Back
-            ZWrite off
-            Blend[_SrcBlend][_DstBlend]
-            HLSLPROGRAM
-
-
-// PipelineAsset.asset > General > Depth Texture> Check
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-
-            
-#if _ProjectionAngleDiscardEnable
-// 직접계산
-float3 decalSpaceHardNormal = normalize(
-  cross(ddx(decalSpaceScenePos), ddy(decalSpaceScenePos))
-);
-// 혹은 노말맵으로 계산TODO
-clip(decalSpaceHardNormal.z - _ProjectionAngleDiscardThreshold);
-#else
-
-#endif
-
-            ENDHLSL
-        }
-    }
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-``` hlsl
-
-
-
-#if _ProjectionAngleDiscardEnable
-// also discard "scene normal not facing decal projector direction" pixels
-float3 decalSpaceHardNormal = normalize(cross(ddx(decalSpaceScenePos), ddy(decalSpaceScenePos)));//reconstruct scene hard normal using scene pos ddx&ddy
-
-// compare scene hard normal with decal projector's dir, decalSpaceHardNormal.z equals dot(decalForwardDir,sceneHardNormalDir)
-shouldClip = decalSpaceHardNormal.z > _ProjectionAngleDiscardThreshold ? 0 : 1;
-#endif
-```
-
-``` hlsl
-vert:
-    half3 viewPos = mul(MV, positionOS);
-    half3 rayVS = viewPos / viewPos.z;
-    rayWS = mul((half3x3)I_V, rayVS);
-    rayOS = mul((half3x3)I_M, rayVS);
-
-frag:
-    half3 positionVS = rayVS * depth;
-    half3 positionDecal = mul(half4(positionVS, 1.0), I_VP);
-
-    half3 positionWS = rayWS * depth + _WorldSpaceViewPos;
-    half3 positionDecal = mul(I_M, half4(positionWS, 1.0));
-
-    half3 positionDecal = rayOS * depth + _ObjectSpaceViewPos;
-```
-
-``` hlsl
-// ref: https://blog.naver.com/eryners/110176182240
-
-float4 screenPos = ComputeScreenPos(positionCS);
-float2 screenSpaceUV = screenPos.xy / screenPos.w;
-
-half2 depthUV;
-depthUV.x =  screenSpaceUV.x * 0.5 + 0.5;
-depthUV.y = -screenSpaceUV.y * 0.5 + 0.5;
-
-// TopRight
-// DirectX 기준
-// 근평면의 경우 -1, -1, 0
-// 원평면의 경우 1, 1, 1
-// OpenGL 기준
-// 근평면의 경우 -1, -1, -1
-// 원평면의 경우 1, 1, 1
-
-depthUV += ScreenDimension.zw; // half-pixel Offset basically.
-
-half sceneDepth = SampleSceneDepth(depthUV);
-half2 Deproject;
-Deproject.x = ProjectionMatrix.M11;
-Deproject.y = ProjectionMatrix.M22;
-half4 scenePositionVS = half4(positionCS.xy * sceneDepth / (Deproject.xy * positionCS.w) , -depth, 1);
-
-position = mul(scenePositionVS, I_MV);
-
-// 0.5보다 크면 상자 밖임. 클립!
-clip(0.5 - abs(position.xyz));
-
-// unity cube's [-0.5,0.5] vertex pos range to [0,1] uv
-half2 decalUV = position.xz + 0.5;
-
-
-clip(0.5 - abs(position.xyz) - shouldClip);
-```
-
-``` hlsl
-// com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl
-#define UNITY_MATRIX_I_VP  unity_MatrixInvVP
-```
-
 
 ## Ref
 
