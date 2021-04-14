@@ -150,7 +150,7 @@ Shader "Marschener"
                 //half3 N = CombineTBN(normalTex, IN.T, IN.B, IN.N);
                 half3 N = normalize(IN.N);
                 half3 L = normalize(light.direction);
-                half3 V = TransformWorldToViewDir(IN.positionWS);
+                half3 V = GetWorldSpaceNormalizeViewDir(IN.positionWS);
                 half3 H = normalize(L + V);
 
                 half NdotL = max(0.0, dot(N, L));

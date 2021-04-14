@@ -147,7 +147,7 @@ Shader "WaveCameraOpaque"
                 noise *= 0.08;
 
                 half3 N = normalize(IN.N);
-                half3 V = TransformWorldToViewDir(IN.positionWS.xyz);
+                half3 V = GetWorldSpaceNormalizeViewDir(IN.positionWS.xyz);
 
                 half fresnelEffect;
                 Unity_FresnelEffect_float(N, V, 0.27, fresnelEffect);

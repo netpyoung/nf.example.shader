@@ -99,7 +99,7 @@ Shader "example/Cubemap"
 
 				//float3 N = normalize(IN.T); //CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
 				float3 N = CombineTBN(tangentNormal, IN.T, IN.B, IN.N);
-				float3 V = normalize(GetWorldSpaceViewDir(IN.positionWS));
+				float3 V = GetWorldSpaceNormalizeViewDir(IN.positionWS);
 				float3 L = normalize(light.direction);
 				float3 H = normalize(L + V);
 
