@@ -42,6 +42,7 @@ half specular = pow(NdotH ,_SpecularGloss) * _SpecularPower;
 - 1954 - Marcel Minnaert
 
 - 달표면 반사를 표현하기 위해 고안됨. moon shader라 불리기도 함
+- <https://blog.naver.com/canny708/221551395976>
 
 ``` hlsl
 half NdotL = max(0.0, dot(N, L));
@@ -134,9 +135,9 @@ half OrenNayar_Fakey(half3 N, half3 L, half3 V, half roughness)
     half result = saturate(LdotN);
     half soft_rim = saturate(1 - VdotN / 2);
 	
+	const half FAKEY_MAGIC = 0.62;
     half fakey = pow(1 - result * soft_rim, 2);
-    half fakey_magic = 0.62;
-    fakey = fakey_magic - fakey * fakey_magic;
+	fakey = FAKEY_MAGIC - fakey * FAKEY_MAGIC;
     return lerp(result, fakey, roughness);
 }
 ```
