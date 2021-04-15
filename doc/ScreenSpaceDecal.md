@@ -1,6 +1,7 @@
 # Screen Space Decal / SSD
 
-큐브를 프로젝터처럼 이용, 화면에 데칼을 그린다.
+- 큐브를 프로젝터처럼 이용, 화면에 데칼을 그린다.
+- 뎁스로부터 포지션을 다시 구축하는 것이므로 `Reconstructing position from depth`라고도 한다.
 
 1. 씬뎁스 구하기
 2. 뎁스로부터 3D위치를 구하기

@@ -147,3 +147,7 @@ half OrenNayar_Fakey(half3 N, half3 L, half3 V, half roughness)
 
 - SIGGRAPH 2012 - Brent Burley - Physically Based Shading at Disney
 - 여러 파라미터
+
+## Ref
+
+- <https://www.cnblogs.com/timlly/p/10631718.html>

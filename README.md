@@ -34,6 +34,7 @@
   - Reflection
   - Refraction
 - Depth
+  - [Screen Space Decal](./doc/ScreenSpaceDecal.md)
 
 ## tech
 
