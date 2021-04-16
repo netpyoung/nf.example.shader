@@ -3,6 +3,7 @@
 - SEM(Spherical Environment Mapping)
   - MatCap(Material Capture) / Lit Sphere
 - 환경을 텍스쳐에 맵핑하고, `뷰스페이스 노말`로 색을 얻어온다.
+- 케릭터에 사용할때는 Diffuse용/Reflect용 맵캡을 이용하도록 하자
 
 ``` hlsl
 // vert
@@ -49,3 +50,4 @@ OUT.uv_Matcap = normalOS.xy * 0.5 + 0.5;
 - <https://en.wikipedia.org/wiki/Sphere_mapping>
 - http://wiki.polycount.com/wiki/Spherical_environment_map
 - <https://docs.microsoft.com/en-us/windows/win32/direct3d9/spherical-environment-mapping>
+- [[Unite Seoul 2019] 최재영 류재성 - 일곱개의 대죄 : "애니메이션의 감성을 그대로＂와 “개발 최적화"](https://youtu.be/0LwlNVS3FJo?t=530)
