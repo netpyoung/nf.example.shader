@@ -68,7 +68,11 @@ half diffuse = max(0.0, (NdotL + _wrapped) / (1.0 - _wrapped));
 ``` hlsl
 // ref: https://blog.naver.com/eryners/220144182154
 // Harf Lambert사용시 명암 차이가 너무 없어져서 무게감이 없어보인다.
-​Half Lambert + Pow : pow((dot(N, L) * 0.5) + 0.5, 4) 
+half diffuse = ​pow((dot(N, L) * 0.5) + 0.5, 4)  // Half Lambert + Pow
+```
+
+``` hlsl
+half diffuse = max(0, ((dot(L, N) + warp) / (1 + wrap + wrap^2)) ^ (1 + wrap));
 ```
 
 ## 물리기반
