@@ -48,7 +48,7 @@ Shader "Distortion_tv"
 				float4 _MainTex_ST;
 				float4 _Color;
 				float4 _BackgroundColor;
-				float4 _AdjustColor;
+				float3 _AdjustColor;
 				float _DistortionFrequency;
 				float _DistortionAmplitude;
 				float _DistortionAnmSpeed;

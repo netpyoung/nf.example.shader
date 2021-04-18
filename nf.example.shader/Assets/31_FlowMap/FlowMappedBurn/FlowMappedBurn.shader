@@ -60,8 +60,8 @@ Shader "FlowMappedBurn"
 				half _MaskHardness;
 				half _EmberSpread;
 				half _CharringSpread;
-				half4 _EmberColor;
-				half4 _BaseColor;
+				half3 _EmberColor;
+				half3 _BaseColor;
 				half3 _InteractPosition;
 				half _DistortionStrength;
 			CBUFFER_END

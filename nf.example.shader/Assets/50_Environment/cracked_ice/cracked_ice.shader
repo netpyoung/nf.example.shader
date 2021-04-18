@@ -96,11 +96,11 @@ Shader "cracked_ice"
 				half result = 1;
 				half2 parallaxUV;
 				half totalOffset = 0.0;
-				parallaxOffset = parallaxOffset * -0.001;
+				half pOffset = parallaxOffset * -0.001;
 
-				for (int i = 0; i < iterCount; ++i)
+				for (half i = 0; i < iterCount; ++i)
 				{
-					totalOffset += parallaxOffset;
+					totalOffset += pOffset;
 					parallaxUV = uv + half2(V_TS.x * totalOffset, V_TS.y * totalOffset);
 					parallaxedMask = SAMPLE_TEXTURE2D(maskTex, sampler_maskTex, parallaxUV).r;
 					result *= clamp(parallaxedMask + (i / iterCount), 0, 1);
@@ -134,7 +134,7 @@ Shader "cracked_ice"
 
 				half3 V_TS = mul(TBN, V);
 
-				half3 NdotL = dot(N, L);
+				half NdotL = dot(N, L);
 				half3 R = reflect(-L, N);
 
 				half diffuse = NdotL * 0.5 + 0.5;

@@ -125,7 +125,7 @@
                 ZERO_INITIALIZE(VStoFS, OUT);
 
                 // 노이즈 빈도를 높이기위헤 uv값에 2를 곱했다.
-                half noiseTexVal = SAMPLE_TEXTURE2D_LOD(_NoiseTex, sampler_NoiseTex, IN.uv * 2, 0);
+                half noiseTexVal = SAMPLE_TEXTURE2D_LOD(_NoiseTex, sampler_NoiseTex, IN.uv * 2, 0).r;
 
                 // 중심점 이동 [0, 1] => [-0.5, 0.5].
                 half2 uvDir = IN.uv - 0.5f;
@@ -133,7 +133,7 @@
                 half sequenceScale = _Sequence * 1.52 - 0.02; // 하드코딩으로(* 1.52 - 0.02) 범위조정.
 
                 // length(uvDir)을 이용하여, 중심에 가까울 수록 흰색(1), 멀어질수록 검정색(0)
-                half sequenceVal = pow(1 - (noiseTexVal + 1) * length(uvDir), _Exp) * sequenceScale;
+                half sequenceVal = pow(saturate(1 - (noiseTexVal + 1) * length(uvDir)), _Exp) * sequenceScale;
 
 #if _DEBUGROTATE_OFF
                 half3 center = half3(2.0f * uvDir, 0);                                  // [-0.5, 0.5] => [-1, 1]

@@ -102,7 +102,7 @@ Shader "FakeLiquid"
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				OUT.normalOS = IN.normalOS;
-				OUT.viewDirOS = TransformWorldToObject(GetCameraPositionWS()) - IN.positionOS;
+				OUT.viewDirOS = TransformWorldToObject(GetCameraPositionWS()) - IN.positionOS.xyz;
 
 				half3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 				half3 positionWS_X = RotateAroundYInDegrees(half4(positionWS, 0), 0).xyz;
