@@ -40,7 +40,7 @@ half3 normalVS = normalize(TransformWorldToView(normalWS));
   - [카메라 방향에 상관없는 Matcap 만들기](https://chulin28ho.tistory.com/351)
 
 ``` hlsl
-OUT.uv_Matcap = normalOS.xy * 0.5 + 0.5;
+OUT.uv_Matcap = normalVS.xy * 0.5 + 0.5;
 ```
 
 ## Ref
@@ -48,6 +48,7 @@ OUT.uv_Matcap = normalOS.xy * 0.5 + 0.5;
 - MaCrea(MatCap 생성 도구) <http://www.taron.de/>
   - 사용법: [MaCrea introduction](https://vimeo.com/14030320)
 - <https://en.wikipedia.org/wiki/Sphere_mapping>
-- http://wiki.polycount.com/wiki/Spherical_environment_map
+- <http://wiki.polycount.com/wiki/Spherical_environment_map>
 - <https://docs.microsoft.com/en-us/windows/win32/direct3d9/spherical-environment-mapping>
 - [[Unite Seoul 2019] 최재영 류재성 - 일곱개의 대죄 : "애니메이션의 감성을 그대로＂와 “개발 최적화"](https://youtu.be/0LwlNVS3FJo?t=530)
+- <https://github.com/nidorx/matcaps> : MatCap Textures
