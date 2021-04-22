@@ -59,9 +59,12 @@ Shader "Matcap_witout_bump"
 				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 				
+				// #define UNITY_MATRIX_IT_MV transpose(mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V))
+				half4x4 IT_MV = UNITY_MATRIX_IT_MV;
+
 				half2 normalVS;
-				normalVS.x = dot(UNITY_MATRIX_IT_MV[0].xyz, IN.normalOS);
-				normalVS.y = dot(UNITY_MATRIX_IT_MV[1].xyz, IN.normalOS);
+				normalVS.x = dot(IT_MV[0].xyz, IN.normalOS);
+				normalVS.y = dot(IT_MV[1].xyz, IN.normalOS);
 				OUT.uv_Matcap = normalVS * 0.5 + 0.5;
 
 				return OUT;

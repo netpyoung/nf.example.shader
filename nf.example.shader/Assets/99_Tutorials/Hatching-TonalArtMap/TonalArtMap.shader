@@ -1,4 +1,4 @@
-﻿Shader "TonalArtMap"
+Shader "TonalArtMap"
 {
 	Properties
 	{
@@ -71,9 +71,10 @@
 				// LdotN: [-1, 1] => factor: [0, 6]
 				float factor = (LdotN + 1.0) * 3.0;
 
+				// 총 6단계 영역으로 나눈다.
 				OUT.weight012 = float3(
 					1.0 - saturate(abs(factor - 5.0)),
-					1.0 - saturate(abs(factor - 3.0)),
+					1.0 - saturate(abs(factor - 4.0)),
 					1.0 - saturate(abs(factor - 3.0))
 				);
 				OUT.weight345 = float3(
@@ -86,6 +87,7 @@
 
 			half4 frag(VStoFS IN) : SV_Target
 			{
+				
 				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 				half3 hatch123Tex = SAMPLE_TEXTURE2D(_Hatch012Tex, sampler_Hatch012Tex, IN.uv).rgb;
 				half3 hatch456Tex = SAMPLE_TEXTURE2D(_Hatch345Tex, sampler_Hatch345Tex, IN.uv).rgb;
@@ -93,6 +95,10 @@
 				half3 color012 = saturate(dot((1 - hatch123Tex), IN.weight012));
 				half3 color345 = saturate(dot((1 - hatch456Tex), IN.weight345));
 
+				// return half4(IN.weight012, 1);
+				// return half4(IN.weight345, 1);
+				// return half4(color012, 1);
+				// return half4(color345, 1);
 				half3 hatchColor = 1 - (color012 + color345);
 				return half4(mainTex * hatchColor , 1);
 			}

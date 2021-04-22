@@ -1,6 +1,7 @@
-Shader "example/02_texture"
+Shader "MotionEffect"
 {
 	// ref: https://blog.csdn.net/linjf520/article/details/104602728
+	// ref: https://github.com/cjacobwade/HelpfulScripts/blob/master/SmearEffect/Smear.shader
 	Properties
 	{
 		_MainTex("texture", 2D) = "white" {}
@@ -21,8 +22,6 @@ Shader "example/02_texture"
 
 		Pass
 		{
-			Name ""
-
 			Tags
 			{
 				"LightMode" = "SRPDefaultUnlit"
