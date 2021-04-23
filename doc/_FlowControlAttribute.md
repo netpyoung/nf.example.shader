@@ -5,23 +5,23 @@ https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-swi
 https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-while
 
 if
-|||
-|-|-|
-|branch||
-|flatten||
+|         |  |
+|---------|--|
+| branch  |  |
+| flatten |  |
 
 switch
-|||
-|-|-|
-|flatten||
-|branch||
-|forcecase||
-|call||
+|           |  |
+|-----------|--|
+| flatten   |  |
+| branch    |  |
+| forcecase |  |
+| call      |  |
 
 for / while
-|||
-|-|-|
-|unroll(x)||
-|loop||
-|fastopt||
-|allow_uav_condition||
+|                     |  |
+|---------------------|--|
+| unroll(x)           |  |
+| loop                |  |
+| fastopt             |  |
+| allow_uav_condition |  |

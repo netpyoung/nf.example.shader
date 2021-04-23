@@ -6,7 +6,6 @@
 
 Parallax쓰면 조금 들어간것처럼 보임. - 이걸 겹겹히 쌓으면 더 깊이 들어간것처럼 보임
 
-
 ``` hlsl
 
 baseColor = blend(mainTex, parallax(heightMap), 0.5)
