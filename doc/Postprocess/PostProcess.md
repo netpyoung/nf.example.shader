@@ -1,14 +1,6 @@
+# PostProcess
 
-
-## 평균값 블러
-offset이용 여러방향 샘플 후 더한 평균값
-
-## 가우스 필터 블러
-- http://dev.theomader.com/gaussian-kernel-calculator/
-- https://www.sysnet.pe.kr/2/0/11623
-- https://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-
-2차원 가우스 분포 함수
+- Compute 셰이더가 좀 더 빠르지만, 여기선 일단 픽셀 셰이더로 구현하는 걸로.
 
 ## 크로스 필터 HDR
 

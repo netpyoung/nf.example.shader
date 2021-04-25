@@ -72,6 +72,16 @@ brdfUV.y = dot(N, H);
 half3 brdfTex = SAMPLE_TEXTURE2D(_BrdfTex, sampler_BrdfTex, brdfUV * 0.5 + 0.5).rgb;
 ```
 
+``` hlsl
+half LdotN = dot(L, N);
+half LdotV = dot(L, V);
+
+half2 rampUV;
+rampUV.x = LdotN * 0.3 + 0.5;
+rampUV.y = LdotV * 0.8;
+half3 rampTex = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, rampUV).rgb;
+```
+
 아니면 Albedo맵 / Normal맵 자체에 Blur(rgb에 가중치를 주어서)를 적용한다.
 
 ## Ref

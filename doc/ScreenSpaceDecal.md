@@ -120,3 +120,4 @@ clip(dot(normal, orientation) - gNormalThreshold);
 - <https://samdriver.xyz/article/decal-render-intro>
 - <http://www.ozone3d.net/tutorials/glsl_texturing_p08.php#part_8>
   - <https://diehard98.tistory.com/entry/Projective-Texture-Mapping-with-OpenGL-GLSL>
+- <https://blog.csdn.net/puppet_master/article/details/84310361>
