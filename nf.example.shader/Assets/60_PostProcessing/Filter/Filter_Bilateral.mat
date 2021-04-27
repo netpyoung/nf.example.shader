@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blur_Bilateral
+  m_Name: Filter_Bilateral
   m_Shader: {fileID: 4800000, guid: 41901bf2e653d49469803c7d09de41ed, type: 3}
   m_ShaderKeywords: IS_BLUR
   m_LightmapFlags: 4

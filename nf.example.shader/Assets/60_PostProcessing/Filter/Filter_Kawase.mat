@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blur_Kawase
+  m_Name: Filter_Kawase
   m_Shader: {fileID: 4800000, guid: 3e96b4cf310d1b342bccca85aa3a840d, type: 3}
   m_ShaderKeywords: IS_BLUR
   m_LightmapFlags: 4

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blur_Gaussian
+  m_Name: Filter_Gaussian
   m_Shader: {fileID: 4800000, guid: 9bc1368ba079a184bb545c1621df8aa9, type: 3}
   m_ShaderKeywords: IS_BLUR
   m_LightmapFlags: 4

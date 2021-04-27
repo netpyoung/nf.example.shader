@@ -83,8 +83,6 @@ if (_MainTex_TexelSize.y < 0)
 ## Radial / 방사형
 
 - 중심에서 원형으로 뻗혀나가는 방사형 블러.
+- 줌(Zoom)되는 효과
 - <https://forum.unity.com/threads/radial-blur.31970/#post-209514>
-
-## Zoom
-
 - <https://blog.naver.com/mnpshino/221478999495>
