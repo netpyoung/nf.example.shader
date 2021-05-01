@@ -63,12 +63,12 @@
 				return OUT;
 			}
 
-			half3 TonemapFilmic(half3 x)
+			half3 TonemapFilmic(half3 color_Linear)
 			{
 				// optimized formula by Jim Hejl and Richard Burgess-Dawson
-				half3 X = max(x - 0.004, 0.0);
-				half3 result = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
-				return pow(result, 2.2);
+				half3 X = max(color_Linear - 0.004, 0.0);
+				half3 result_Gamma = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
+				return pow(result_Gamma, 2.2); // convert Linear Color
 			}
 
 			half4 frag(VStoFS IN) : SV_Target

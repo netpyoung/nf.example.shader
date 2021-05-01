@@ -6,7 +6,7 @@
 	{
 		_MainTex("texture", 2D) = "white" {}
 
-		[Toggle(IS_ACES)]_IsAces("Use Aces?", Float) = 1
+		[KeywordEnum(None, Fitted, Slim)]_ACES("ACE Mode", Float) = 0
 		_Exposure("_Exposure", Range(0.01, 5.0)) = 1
 	}
 
@@ -31,7 +31,7 @@
 			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma shader_feature_local _ IS_ACES
+			#pragma shader_feature_local _ _ACES_FITTED _ACES_SLIM
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
@@ -89,7 +89,7 @@
 				return a / b;
 			}
 
-			float3 ACESFitted(float3 color)
+			float3 ACES_Fitted(float3 color)
 			{
 				color = mul(ACESInputMat, color);
 
@@ -104,11 +104,33 @@
 				return color;
 			}
 
+
+			float3 ACES_Slim(float3 x)
+			{
+				// ref: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+
+				x *= 0.6;
+				const float a = 2.51f;
+				const float b = 0.03f;
+				const float c = 2.43f;
+				const float d = 0.59f;
+				const float e = 0.14f;
+				return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+			}
+
+			float3 unreal(float3 x)
+			{
+				return x / (x + 0.155) * 1.019;
+			}
+
 			half4 frag(VStoFS IN) : SV_Target
 			{
 				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-#if IS_ACES
-				half3 color = ACESFitted(mainTex * _Exposure);
+#if _ACES_FITTED
+				half3 color = ACES_Fitted(mainTex * _Exposure);
+				return half4(color, 1);
+#elif _ACES_SLIM
+				half3 color = ACES_Slim(mainTex * _Exposure);
 				return half4(color, 1);
 #else
 				return half4(mainTex * _Exposure, 1);
