@@ -37,7 +37,10 @@ Shader "example/03_texture_uv"
             // CBUFFER 선언
             // 구조체선언
             // 함수선언(vert / frag)
-            
+
+            #pragma prefer_hlslcc gles // gles is not using HLSLcc by default
+            #pragma exclude_renderers d3d11_9x // DirectX 11 9.x는 더 이상 지원되지 않으므로 제외.
+
             #pragma target 3.5
             #pragma vertex vert
             #pragma fragment frag

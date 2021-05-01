@@ -236,6 +236,22 @@ Pass
 | DstColor | Zero             | Multiplicative                                |
 | DstColor | SrcColor         | 2x Multiplicative                             |
 
+## Offset
+
+``` hlsl
+Offset Factor, Units
+```
+
+Factor 및 units 파라미터 2개를 사용하여 뎁스 오프셋을 지정. Factor 는 폴리곤의 X 또는 Y를 기준으로 최대 Z 기울기를 스케일하고 units 는 최소 분석 가능 뎁스 버퍼 값을 스케일 하게된다.이를 통해 두개의 오브젝트가 겹칠경우 특정 오브젝트를 앞에 그리게 조절할 수 있다. 
+
+## AlphaToMask
+
+``` hlsl
+AlphaToMask On
+```
+
+포워드 렌더링을 사용하는 멀티샘플 안티앨리어싱(MSAA, QualitySettings 참조)을 사용하는 경우 알파 투 커버리지 기능을 사용해 알파채널 텍스쳐의 AA를 적용할 수 있다. MSAA 가 메시 외곽에만 AA를 적용하고 알파처럼 텍스쳐 안의 이미지에 대한 AA를 적용할수 없기 때문에 이와 같은 방식으로 AA를 적용한다
+
 ## HLSLPROGRAM
 
 ``` hlsl
