@@ -45,15 +45,19 @@ SubShader
 - ZTest
   - Z 값이 씌여져 있는 상태를 읽어서(ZRead), 그려져도 되는지를 결정.
 
-![unity_blend](./res/unity_blend.png)
+![unity_blend](../res/unity_blend.png)
 
 ## Alpha Cutout / Alpha Testing
 
 - 간편. sorting걱정 안해도 됨.
 - 모바일에서는 Blend 보다 성능이 안나오는 경향이 있음.
+  - 모바일(A11(ios), PowerVR 등)은 메모리와 대역폭을 줄이기위해 타일별 렌더링을 하는 TBDR(tile-based deferred rendering)을 이용함.
+  - 알파테스팅을 이용할시, 실제 보여지는지 여부를 알파테스팅이 끝날때까지 알 수 없으므로 Deffered 최적화를 방해함.
 - 풀, 나무, 머리카락, 털 등...
 - clip하여 너무 각지는게 보기 싫어질 정도면 blend를 잘 쓰자
 - // if ZWrite is Off, clip() is fast enough on mobile, because it won't write the DepthBuffer, so no GPU pipeline stall(confirmed by ARM staff).
+
+![TBDR.jpg](../res/TBDR.jpg)
 
 ``` hlsl
 SubShader
@@ -178,6 +182,7 @@ SubShader
 
 - [Jihoo Oh - 이펙트 쉐이더 2강 - 알파 / 블랜딩](https://www.slideshare.net/crjl5/2-205467251)
 - <https://www.gamedev.net/forums/topic/656826-why-the-alphablend-is-a-better-choice-than-alphatest-to-implement-transparent-on-mobile-device/5154785/>
+- [모바일 기기의 Tile Based Rendering(타일 기반 렌더링)과 유니티에서의 주의 사항 #2 : TBR 대응 리소스 제작시 주의점](https://ozlael.tistory.com/24)
 - <https://blog.naver.com/dasoong15/221356325748>
 - [PowerVR Performance Recommendations The Golden Rules](http://powervr-graphics.github.io/WebGL_SDK/WebGL_SDK/Documentation/Architecture%20Guides/PowerVR%20Performance%20Recommendations.The%20Golden%20Rules.pdf)
 - Z 버퍼의 Read / Write 개념 by 김윤정

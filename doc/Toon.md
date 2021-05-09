@@ -8,7 +8,7 @@
 // ceil함수를 이용하여 올림(디테일 제거 효과).
 // 다시 _ToonStep(int)으로 나눔으로써 [0, 1]범위로 변경.
 half toonDiffuse = halfLambert;
-toonDiffuse = ceil(toon * _ToonStep) / _ToonStep;
+toonDiffuse = ceil(toonDiffuse * _ToonStep) / _ToonStep;
 
 // ===== 계단 음영 표시 - ver. Ramp Texture ====
 // 아니면 Ramp Texture 이용
@@ -32,3 +32,5 @@ half toonSpecular = smoothstep(0.005, 0.01, blinnphongSpecular);
 - <https://alexanderameye.github.io/simple-toon.html>
 - <https://roystan.net/articles/toon-shader.html>
   - <https://github.com/IronWarrior/UnityToonShader>
+- [The Art Direction of Street Fighter V: The Role of Art in Fighting Games](https://www.youtube.com/watch?v=EDlbJdmo7KE)
+ - <https://www.gdcvault.com/play/1024506/Art-Direction-of-Street-Fighter>

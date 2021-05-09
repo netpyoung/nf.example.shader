@@ -86,3 +86,7 @@ if (_MainTex_TexelSize.y < 0)
 - 줌(Zoom)되는 효과
 - <https://forum.unity.com/threads/radial-blur.31970/#post-209514>
 - <https://blog.naver.com/mnpshino/221478999495>
+
+## Ref.
+
+- <https://github.com/QianMo/X-PostProcessing-Library>

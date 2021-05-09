@@ -26,3 +26,8 @@ https://blog.selfshadow.com/publications/s2014-shading-course/frostbite/s2014_pb
   - BTDF(Bidirectional Transmission Distribution Function)
   - BSSRDF(Bidirectional Scattering Surface Reflectance Distribution Function)
   - SPDF(Scattering Probability Density Function)
+  
+  
+## Ref
+
+- <https://www.slideshare.net/MRESC/pbr-vol2-131205432>
