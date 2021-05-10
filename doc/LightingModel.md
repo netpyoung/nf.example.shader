@@ -50,6 +50,28 @@ half NdotV = max(0.0, dot(N, V));
 half diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
 ```
 
+## Gooch - 구치
+
+- 1998 - Gooch
+- [SIGGRAPH1998 - A Non-Photorealistic Lighting Model For Automatic Technical Illustration](https://users.cs.northwestern.edu/~ago820/SIG98/abstract.html)
+- [GDC2008 - Stylization with a Purpose: The Illustrative World of TEAM FORTRESS 2](https://www.gdcvault.com/play/279/Stylization-with-a-Purpose-The)
+- 따뜻함과 차가움 영역을 나누어 표시
+
+
+## Lake
+
+- 2000 - Lake
+- [Stylized Rendering Techniques For Scalable Real-Time 3D Animation](http://www.markmark.net/npar/npar2000_lake_et_al.pdf)
+- 룩업텍스쳐 사용
+  - NdotL - LUT Texture(1D)
+
+## BARLA
+
+- BARLA, 2006
+- [X-Toon: An extended toon shader - Pascal Barla, Joëlle Thollot, Lee Markosian](https://maverick.inria.fr/Publications/2006/BTM06a/x-toon.pdf)
+- 룩업텍스쳐 사용
+  - NdotL, Detail - LUT Texture(2D)
+
 ## Half Lambert & Wrapped Lambert - 하프 람버트 & 와프드 람버트
 
 - 2004 Half-Life2 - Valve
