@@ -51,14 +51,14 @@ Shader "Marschener"
             TEXTURE2D(_HairSpeckMaskTex);   SAMPLER(sampler_HairSpeckMaskTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
+            float4 _MainTex_ST;
 
-                half _PrimaryShift;
-                half _SecondaryShift;
-                half _S1Strength;
-                half _S1Exponent;
-                half _S2Strength;
-                half _S2Exponent;
+            half _PrimaryShift;
+            half _SecondaryShift;
+            half _S1Strength;
+            half _S1Exponent;
+            half _S2Strength;
+            half _S2Exponent;
             CBUFFER_END
 
             struct APPtoVS
@@ -130,7 +130,7 @@ Shader "Marschener"
                 half dirAtten = smoothstep(-1.0, 0.0, dotTH);
                 return dirAtten * strength * pow(sinTH, exponent);
             }
-                
+            
             half4 frag(VStoFS IN) : SV_Target
             {
                 half3 normalTex = UnpackNormal(SAMPLE_TEXTURE2D(_NormalTex, sampler_NormalTex, IN.uv));

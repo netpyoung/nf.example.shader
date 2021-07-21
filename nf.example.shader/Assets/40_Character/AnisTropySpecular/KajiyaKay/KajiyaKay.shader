@@ -43,12 +43,12 @@
             TEXTURE2D(_HairAlphaTex);   SAMPLER(sampler_HairAlphaTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float4 _HairShiftTex_ST;
-                float4 _HairAlphaTex_ST;
-                half _Ks;
-                half _Kd;
-                half _SpecularExponent;
+            float4 _MainTex_ST;
+            float4 _HairShiftTex_ST;
+            float4 _HairAlphaTex_ST;
+            half _Ks;
+            half _Kd;
+            half _SpecularExponent;
             CBUFFER_END
 
             struct APPtoVS

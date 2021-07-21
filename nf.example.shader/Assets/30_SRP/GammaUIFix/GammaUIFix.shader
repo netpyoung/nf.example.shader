@@ -38,8 +38,8 @@
             SAMPLER(sampler_CameraColorTexture);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float4 _CameraColorTexture_ST;
+            float4 _MainTex_ST;
+            float4 _CameraColorTexture_ST;
             CBUFFER_END
 
             struct APPtoVS

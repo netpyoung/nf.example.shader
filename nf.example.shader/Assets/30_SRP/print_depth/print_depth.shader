@@ -51,15 +51,15 @@
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = IN.uv;
 
-#if UNITY_UV_STARTS_AT_TOP
-                // _MainTex_TexelSize.xy    : x= 1/°¡·Î, y= 1/¼¼·Î.
-                // UNITY_UV_STARTS_AT_TOP   : DirectX == 1, OpenGL == 0.
-                // _MainTex_TexelSize.y < 0 : antialiasing On.
-                if (_MainTex_TexelSize.y < 0)
-                {
-                    OUT.uv.y = 1 - OUT.uv.y;
-                }
-#endif
+                #if UNITY_UV_STARTS_AT_TOP
+                    // _MainTex_TexelSize.xy    : x= 1/°¡·Î, y= 1/¼¼·Î.
+                    // UNITY_UV_STARTS_AT_TOP   : DirectX == 1, OpenGL == 0.
+                    // _MainTex_TexelSize.y < 0 : antialiasing On.
+                    if (_MainTex_TexelSize.y < 0)
+                    {
+                        OUT.uv.y = 1 - OUT.uv.y;
+                    }
+                #endif
 
                 return OUT;
             }
