@@ -1,58 +1,58 @@
-Shader "example/00_basic"
+ï»¿Shader "example/00_basic"
 {
-	SubShader
-	{
-		Tags
-		{
-			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Geometry"    // ±âº»°ª.
-			"RenderType" = "Opaque" // ±âº»°ª.
-		}
+    SubShader
+    {
+        Tags
+        {
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"    // ê¸°ë³¸ê°’.
+            "RenderType" = "Opaque" // ê¸°ë³¸ê°’.
+        }
 
-		Pass
-		{
-			Name "RED_CIRCLE"
+        Pass
+        {
+            Name "RED_CIRCLE"
 
-			Tags
-			{
-				"LightMode" = "UniversalForward"
-			}
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
 
-			HLSLPROGRAM
-			#pragma target 3.5
+            HLSLPROGRAM
+            #pragma target 3.5
 
-			#pragma vertex vert
-			#pragma fragment frag
+            #pragma vertex vert
+            #pragma fragment frag
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			struct APPtoVS
-			{
-				float4 positionOS : POSITION;
-			};
+            struct APPtoVS
+            {
+                float4 positionOS : POSITION;
+            };
 
-			struct VStoFS
-			{
-				float4 positionCS : SV_POSITION;
-			};
+            struct VStoFS
+            {
+                float4 positionCS : SV_POSITION;
+            };
 
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
+            VStoFS vert(APPtoVS IN)
+            {
+                VStoFS OUT;
+                ZERO_INITIALIZE(VStoFS, OUT);
 
-				// o.positionCS = mul(UNITY_MATRIX_MVP, v.positionOS);
-				// Use of UNITY_MATRIX_MVP is detected. To transform a vertex into clip space, consider using UnityObjectToClipPos for better performance and to avoid z-fighting issues with the default depth pass and shadow caster pass.
-				// HClip: Homogeneous Clip
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				return OUT;
-			}
+                // o.positionCS = mul(UNITY_MATRIX_MVP, v.positionOS);
+                // Use of UNITY_MATRIX_MVP is detected. To transform a vertex into clip space, consider using UnityObjectToClipPos for better performance and to avoid z-fighting issues with the default depth pass and shadow caster pass.
+                // HClip: Homogeneous Clip
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                return OUT;
+            }
 
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				return half4(1, 0, 0, 1);
-			}
-			ENDHLSL
-		}
-	}
+            half4 frag(VStoFS IN) : SV_Target
+            {
+                return half4(1, 0, 0, 1);
+            }
+            ENDHLSL
+        }
+    }
 }

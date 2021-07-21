@@ -1,131 +1,131 @@
-Shader "alpha_blending_2pass"
+﻿Shader "alpha_blending_2pass"
 {
-	Properties
-	{
-		_MainTex("Main Texture", 2D) = "white" {}
-		_Alpha("Alpha", Range(0, 1)) = 0.5
-	}
+    Properties
+    {
+        _MainTex("Main Texture", 2D) = "white" {}
+        _Alpha("Alpha", Range(0, 1)) = 0.5
+    }
 
-	SubShader
-	{
-		Tags
-		{
-			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Transparent"
-			"RenderType" = "Transparent"
-		}
+    SubShader
+    {
+        Tags
+        {
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
+        }
 
-		Pass
-		{
-			Name "ALPHA_BLENDING_2PASS_BACK"
+        Pass
+        {
+            Name "ALPHA_BLENDING_2PASS_BACK"
 
-			Tags
-			{
-				"LightMode" = "SRPDefaultUnlit"
-			}
+            Tags
+            {
+                "LightMode" = "SRPDefaultUnlit"
+            }
 
-			Cull Front
-			ZWrite On
-			ColorMask 0
+            Cull Front
+            ZWrite On
+            ColorMask 0
 
-			HLSLPROGRAM
-			#pragma target 3.5
-			#pragma vertex vert
-			#pragma fragment frag
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex vert
+            #pragma fragment frag
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
-			CBUFFER_END
+            CBUFFER_START(UnityPerMaterial)
+            float4 _MainTex_ST;
+            CBUFFER_END
 
-			struct APPtoVS
-			{
-				float4 positionOS	: POSITION;
-				float2 uv			: TEXCOORD0;
-			};
+            struct APPtoVS
+            {
+                float4 positionOS	: POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-			struct VStoFS
-			{
-				float4 positionCS : SV_POSITION;
-				float2 uv			: TEXCOORD0;
-			};
-			
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
+            struct VStoFS
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+            VStoFS vert(APPtoVS IN)
+            {
+                VStoFS OUT;
+                ZERO_INITIALIZE(VStoFS, OUT);
 
-				return OUT;
-			}
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				return 0;
-			}
-			ENDHLSL
-		}
+                return OUT;
+            }
 
-		Pass
-		{
-			Name "ALPHA_BLENDING_2PASS_BACK"
+            half4 frag(VStoFS IN) : SV_Target
+            {
+                return 0;
+            }
+            ENDHLSL
+        }
 
-			Tags
-			{
-				"LightMode" = "UniversalForward"
-			}
+        Pass
+        {
+            Name "ALPHA_BLENDING_2PASS_BACK"
 
-			Cull Back
-			ZWrite Off
-			Blend SrcAlpha OneMinusSrcAlpha
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
 
-			HLSLPROGRAM
-			#pragma target 3.5
+            Cull Back
+            ZWrite Off
+            Blend SrcAlpha OneMinusSrcAlpha
 
-			#pragma vertex vert
-			#pragma fragment frag
+            HLSLPROGRAM
+            #pragma target 3.5
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #pragma vertex vert
+            #pragma fragment frag
 
-			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
-			half _Alpha;
-			CBUFFER_END
+            TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
 
-			struct APPtoVS
-			{
-				float4 positionOS	: POSITION;
-				float4 uv			: TEXCOORD0;
-			};
+            CBUFFER_START(UnityPerMaterial)
+            float4 _MainTex_ST;
+            half _Alpha;
+            CBUFFER_END
 
-			struct VStoFS
-			{
-				float4 positionCS	: SV_POSITION;
-				float2 uv			: TEXCOORD0;
-			};
+            struct APPtoVS
+            {
+                float4 positionOS	: POSITION;
+                float4 uv			: TEXCOORD0;
+            };
 
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
+            struct VStoFS
+            {
+                float4 positionCS	: SV_POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+            VStoFS vert(APPtoVS IN)
+            {
+                VStoFS OUT;
+                ZERO_INITIALIZE(VStoFS, OUT);
 
-				return OUT;
-			}
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-				return half4(mainTex, _Alpha);
-			}
-			ENDHLSL
-		}
-	}
+                return OUT;
+            }
+
+            half4 frag(VStoFS IN) : SV_Target
+            {
+                half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
+                return half4(mainTex, _Alpha);
+            }
+            ENDHLSL
+        }
+    }
 }
