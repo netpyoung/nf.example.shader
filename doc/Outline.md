@@ -83,20 +83,19 @@ OUT.positionCS = TransformObjectToHClip(Scale(IN.positionOS, _OutlineScale).xyz)
 - [마둠파 - 유니티 외곽선 셰이더 완벽정리편](https://blog.naver.com/mnpshino/221495979665)
 
 ``` hlsl
-half3 N = TransformObjectToWorldNormal(IN.normal);
-half4 normalCS = TransformWorldToHClip(N);
+OUT.positionCS = TransformObjectToHClip(IN.positionOS);
+
+half4 normalCS = TransformObjectToHClip(IN.normal);
 
 // 아웃라인은 2차원이므로. `normalCS.xy`에 대해서만 계산 및 `normalize`.
-// 카메라 거리에 따라 아웃라인의 크기가 변경되는것을 막기위해 `normalCS.w`를 곱해준다.
+// 카메라 거리에 따라 아웃라인의 크기가 변경되는것을 막기위해 `positionCS.w`를 곱해준다.
 // _ScreenParams.xy (x/y는 카메라 타겟텍스쳐 넓이/높이)로 나누어서 [-1, +1] 범위로 만듬.
 // 길이 2인 범위([-1, +1])와 비율을 맞추기 위해 OutlineWidth에 `*2`를 해준다.
 
-half2 offset = (normalize(normalCS.xy) * normalCS.w) / _ScreenParams.xy * (2 * _OutlineWidth);
+half2 offset = (normalize(normalCS.xy) * normalCS.w) / _ScreenParams.xy * (2 * _OutlineWidth) * OUT.positionCS.w;
 
 // 버텍스 칼라를 곱해주면서 디테일 조정.
 // offset *= IN.color.r;
-
-OUT.positionCS = TransformObjectToHClip(IN.positionOS);
 OUT.positionCS.xy += offset;
 ```
 

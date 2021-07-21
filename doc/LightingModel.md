@@ -15,6 +15,19 @@ half NdotL = max(0.0, dot(N, L));
 half diffuse = NdotL;
 ```
 
+## Minnaert - 미네르트
+
+- 1954 - Marcel Minnaert
+
+- 달표면 반사를 표현하기 위해 고안됨. moon shader라 불리기도 함
+- <https://blog.naver.com/canny708/221551395976>
+
+``` hlsl
+half NdotL = max(0.0, dot(N, L));
+half NdotV = max(0.0, dot(N, V));
+half diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
+```
+
 ## Phong - 퐁
 
 - 1973 - Bui Tuong Phong
@@ -35,19 +48,6 @@ half NdotL = max(0.0, dot(N, L));
 half NdotH = max(0.0, dot(N, H));
 
 half specular = pow(NdotH ,_SpecularGloss) * _SpecularPower;
-```
-
-## Minnaert - 미네르트
-
-- 1954 - Marcel Minnaert
-
-- 달표면 반사를 표현하기 위해 고안됨. moon shader라 불리기도 함
-- <https://blog.naver.com/canny708/221551395976>
-
-``` hlsl
-half NdotL = max(0.0, dot(N, L));
-half NdotV = max(0.0, dot(N, V));
-half diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
 ```
 
 ## Gooch - 구치

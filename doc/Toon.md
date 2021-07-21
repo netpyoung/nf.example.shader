@@ -34,3 +34,6 @@ half toonSpecular = smoothstep(0.005, 0.01, blinnphongSpecular);
   - <https://github.com/IronWarrior/UnityToonShader>
 - [The Art Direction of Street Fighter V: The Role of Art in Fighting Games](https://www.youtube.com/watch?v=EDlbJdmo7KE)
  - <https://www.gdcvault.com/play/1024506/Art-Direction-of-Street-Fighter>
+- [[마비노기] 마비노기 카툰렌더링 제작과정 영상 [Mabinogi] Cartoon rendering Production Process Video](https://www.youtube.com/watch?v=lYV_-x2aFX0)
+- [SIGGRAPH2006 - Shading In Valve's Source Engine](https://steamcdn-a.akamaihd.net/apps/valve/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
+- [Team Fortress 2 Shader for RenderMan RSL](https://vimeo.com/25953235)
