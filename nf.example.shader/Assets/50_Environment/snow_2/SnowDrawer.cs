@@ -22,7 +22,7 @@ public class SnowDrawer : MonoBehaviour
         );
 
         Texture2D clearTex = new Texture2D(1, 1);
-        clearTex.SetPixel(0, 0, new Color(0, 0, 0, 0));
+        clearTex.SetPixel(0, 0, new Color(0, 0, 0, 1));
         clearTex.Apply();
         Graphics.Blit(clearTex, _PaintTex);
     }
