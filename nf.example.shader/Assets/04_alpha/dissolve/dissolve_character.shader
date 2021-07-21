@@ -48,15 +48,15 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
-                float2 uv			: TEXCOORD0;
-                float3 positionWS	: TEXCOORD1;
+                float4 positionCS    : SV_POSITION;
+                float2 uv            : TEXCOORD0;
+                float3 positionWS    : TEXCOORD1;
             };
 
             VStoFS vert(APPtoVS IN)

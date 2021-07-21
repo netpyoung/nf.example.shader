@@ -34,13 +34,13 @@
             struct APPtoVS
             {
                 float4 positionOS : POSITION;
-                float4 color	  : COLOR;
+                float4 color      : COLOR;
             };
 
             struct VStoFS
             {
                 float4 positionCS : SV_POSITION;
-                float4 color	   : TEXCOORD1;
+                float4 color       : TEXCOORD1;
             };
 
             VStoFS vert(APPtoVS IN)

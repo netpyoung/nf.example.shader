@@ -34,8 +34,8 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 
-            TEXTURE2D(_Texture);		SAMPLER(sampler_Texture);
-            TEXTURE2D(_TexDissolve);	SAMPLER(sampler_TexDissolve);
+            TEXTURE2D(_Texture);        SAMPLER(sampler_Texture);
+            TEXTURE2D(_TexDissolve);    SAMPLER(sampler_TexDissolve);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _Texture_ST;

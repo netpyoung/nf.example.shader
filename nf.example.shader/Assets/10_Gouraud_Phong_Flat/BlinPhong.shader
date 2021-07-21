@@ -2,13 +2,13 @@
 {
     Properties
     {
-        _MainTex("Texture", 2D)			= "white" {}
-        _Ambient("Ambient", Color)		= (1, 1, 1, 1)
-        _Diffuse("Diffuse", Color)		= (1, 1, 1, 1)
-        _Specular("Specular", Color)	= (1, 1, 1, 1)
-        _Ks("Ks", Float)				= 1
-        _Kd("Kd", Float)				= 1
-        _Ka("Ka", Float)				= 1
+        _MainTex("Texture", 2D)            = "white" {}
+        _Ambient("Ambient", Color)        = (1, 1, 1, 1)
+        _Diffuse("Diffuse", Color)        = (1, 1, 1, 1)
+        _Specular("Specular", Color)    = (1, 1, 1, 1)
+        _Ks("Ks", Float)                = 1
+        _Kd("Kd", Float)                = 1
+        _Ka("Ka", Float)                = 1
     }
 
     SubShader
@@ -35,7 +35,7 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+            TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -49,14 +49,14 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
+                float4 positionOS    : POSITION;
                 float3 normalOS     : NORMAL;
-                float2 uv			: TEXCOORD0;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
+                float4 positionCS    : SV_POSITION;
                 float2 uv           : TEXCOORD0;
 
                 float3 N            : TEXCOORD1;

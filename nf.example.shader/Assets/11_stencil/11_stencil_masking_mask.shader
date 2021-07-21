@@ -41,12 +41,12 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
+                float4 positionOS    : POSITION;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
+                float4 positionCS    : SV_POSITION;
             };
 
             VStoFS vert(APPtoVS IN)
@@ -89,12 +89,12 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
+                float4 positionOS    : POSITION;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
+                float4 positionCS    : SV_POSITION;
             };
 
             VStoFS vert(APPtoVS IN)

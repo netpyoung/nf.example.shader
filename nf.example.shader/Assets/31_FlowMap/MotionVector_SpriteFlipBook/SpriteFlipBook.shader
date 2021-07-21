@@ -2,12 +2,12 @@
 {
     Properties
     {
-        [NoScaleOffset] _MainTex("_MainTex", 2D)		= "white" {}
+        [NoScaleOffset] _MainTex("_MainTex", 2D)        = "white" {}
 
-        _ColumnsX("Columns (X)", Int)					= 8
-        _RowsY("Rows (Y)", Int)							= 8
+        _ColumnsX("Columns (X)", Int)                    = 8
+        _RowsY("Rows (Y)", Int)                            = 8
 
-        _FramesPerSeconds("_FramesPerSeconds", Float)	= 3
+        _FramesPerSeconds("_FramesPerSeconds", Float)    = 3
     }
 
     SubShader
@@ -40,7 +40,7 @@
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            TEXTURE2D(_MainTex);	SAMPLER(sampler_MainTex);
+            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
             uint _ColumnsX;
@@ -50,14 +50,14 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
-                float2 subUV		: TEXCOORD0;
+                float4 positionCS    : SV_POSITION;
+                float2 subUV        : TEXCOORD0;
             };
 
             half2 GetSubUV(in half2 uv, in half frame, in int2 imageCount)

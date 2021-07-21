@@ -32,7 +32,7 @@
             struct VStoFS
             {
                 float4 positionCS : SV_POSITION;
-                float4 positionNDC	: TEXCOORD0;
+                float4 positionNDC    : TEXCOORD0;
                 float3 directionWS : TEXCOORD1;
             };
 

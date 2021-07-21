@@ -46,9 +46,9 @@
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            TEXTURE2D(_MainTex);	SAMPLER(sampler_MainTex);
-            TEXTURE2D(_FlowTex);	SAMPLER(sampler_FlowTex);
-            TEXTURE2D(_NoiseTex);	SAMPLER(sampler_NoiseTex);
+            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
+            TEXTURE2D(_FlowTex);    SAMPLER(sampler_FlowTex);
+            TEXTURE2D(_NoiseTex);    SAMPLER(sampler_NoiseTex);
             
 
             CBUFFER_START(UnityPerMaterial)
@@ -68,15 +68,15 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
-                float2 uv			: TEXCOORD0;
-                half3 positionWS	: TEXCOORD1;
+                float4 positionCS    : SV_POSITION;
+                float2 uv            : TEXCOORD0;
+                half3 positionWS    : TEXCOORD1;
             };
 
             VStoFS vert(in APPtoVS IN)

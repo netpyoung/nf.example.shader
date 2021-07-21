@@ -44,13 +44,13 @@
 
             Stencil
             {
-                Ref			[_StencilRef]
-                ReadMask	[_StencilReadMask]
-                WriteMask	[_StencilWriteMask]
-                Comp		[_StencilComp]
-                Pass		[_StencilPass]
-                Fail		[_StencilFail]
-                ZFail		[_StencilZFail]
+                Ref            [_StencilRef]
+                ReadMask    [_StencilReadMask]
+                WriteMask    [_StencilWriteMask]
+                Comp        [_StencilComp]
+                Pass        [_StencilPass]
+                Fail        [_StencilFail]
+                ZFail        [_StencilZFail]
             }
 
             HLSLPROGRAM
@@ -67,12 +67,12 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
+                float4 positionOS    : POSITION;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
+                float4 positionCS    : SV_POSITION;
             };
 
             VStoFS vert(APPtoVS IN)

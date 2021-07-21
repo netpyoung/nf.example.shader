@@ -2,16 +2,16 @@
 {
     Properties
     {
-        _MainTex("Texture", 2D)			= "white" {}
-        _Ambient("Ambient", Color)		= (1, 1, 1, 1)
-        _Diffuse("Diffuse", Color)		= (1, 1, 1, 1)
-        _Specular("Specular", Color)	= (1, 1, 1, 1)
-        _Ks("Ks", Float)				= 1
-        _Kd_A("Kd_A", Float)			= 0.2
-        _Kd_B("Kd_B", Float)			= 0.6
-        _Ka("Ka", Float)				= 1
+        _MainTex("Texture", 2D)            = "white" {}
+        _Ambient("Ambient", Color)        = (1, 1, 1, 1)
+        _Diffuse("Diffuse", Color)        = (1, 1, 1, 1)
+        _Specular("Specular", Color)    = (1, 1, 1, 1)
+        _Ks("Ks", Float)                = 1
+        _Kd_A("Kd_A", Float)            = 0.2
+        _Kd_B("Kd_B", Float)            = 0.6
+        _Ka("Ka", Float)                = 1
         _Yellow("_Yellow", Range(0, 1)) = 0.4
-        _Blue("_Blue", Range(0, 1))		= 0.4
+        _Blue("_Blue", Range(0, 1))        = 0.4
     }
 
     SubShader
@@ -56,14 +56,14 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
+                float4 positionOS    : POSITION;
                 float3 normalOS     : NORMAL;
-                float2 uv			: TEXCOORD0;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
+                float4 positionCS    : SV_POSITION;
                 float2 uv           : TEXCOORD0;
 
                 float3 N            : TEXCOORD1;

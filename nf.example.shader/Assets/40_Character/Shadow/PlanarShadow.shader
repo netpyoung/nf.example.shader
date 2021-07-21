@@ -4,7 +4,7 @@
     // 실시간 그림자를 싸게 그리자! 평면상의 그림자 ( Planar Shadow for Skinned Mesh) 
     //   - https://ozlael.tistory.com/10
     //   - https://github.com/ozlael/PlannarShadowForUnity
-    // 	Unity Shader - Planar Shadow - 平面阴影 （References 未看完）
+    //     Unity Shader - Planar Shadow - 平面阴影 （References 未看完）
     //   - https://blog.csdn.net/linjf520/article/details/112979847
 
     Properties

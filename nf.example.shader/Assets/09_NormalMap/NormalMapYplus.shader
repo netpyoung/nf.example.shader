@@ -3,11 +3,11 @@
     // Unity is YPlus (same as OpenGL)
     Properties
     {
-        _MainTex("Texture", 2D)									= "white" {}
-        [Normal][NoScaleOffset] _NormalTex("Normal Map", 2D)	= "bump" {}
+        _MainTex("Texture", 2D)                                 = "white" {}
+        [Normal][NoScaleOffset] _NormalTex("Normal Map", 2D)    = "bump" {}
 
         [Toggle(ENABLE_NORMALMAP)]
-        _EnableNormalMap("NormalMap?", Float)					= 0
+        _EnableNormalMap("NormalMap?", Float)                   = 0
     }
 
     SubShader
@@ -36,8 +36,8 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
-            TEXTURE2D(_NormalTex);		SAMPLER(sampler_NormalTex);
+            TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
+            TEXTURE2D(_NormalTex);      SAMPLER(sampler_NormalTex);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;

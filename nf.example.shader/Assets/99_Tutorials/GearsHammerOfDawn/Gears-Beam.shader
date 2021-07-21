@@ -43,13 +43,13 @@
 
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _Color;
+            half4 _Color;
 
-                half _Sequence;
-                half _Width;
-                half _NoiseFrequency;
-                half _NoiseLength;
-                half _NoiseIntensity;
+            half _Sequence;
+            half _Width;
+            half _NoiseFrequency;
+            half _NoiseLength;
+            half _NoiseIntensity;
             CBUFFER_END
 
             struct APPtoVS
@@ -93,10 +93,10 @@
                     smoothstep(scaledHeightMax, scaledHeightMax + 10.0f, IN.positionOS.z)
                 );
 
-				// 넓이 조정.
+                // 넓이 조정.
                 IN.positionOS.xy *= width * _Width;
-				
-				// 좌우 진폭조정.
+                
+                // 좌우 진폭조정.
                 IN.positionOS.xy += sin(_Time.y * _NoiseFrequency + IN.positionOS.z * _NoiseLength) * _NoiseIntensity * _Sequence;
 
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);

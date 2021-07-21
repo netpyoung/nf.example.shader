@@ -31,8 +31,8 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            TEXTURE2D(_MainTex);	SAMPLER(sampler_MainTex);
-            TEXTURE2D(_DiffuseTex);	SAMPLER(sampler_DiffuseTex);
+            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
+            TEXTURE2D(_DiffuseTex);    SAMPLER(sampler_DiffuseTex);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -40,17 +40,17 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
-                float4 normalOS		: NORMAL;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
+                float4 normalOS        : NORMAL;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
-                float2 uv			: TEXCOORD0;
-                float3 N			: TEXCOORD1;
-                float3 V			: TEXCOORD2;
+                float4 positionCS    : SV_POSITION;
+                float2 uv            : TEXCOORD0;
+                float3 N            : TEXCOORD1;
+                float3 V            : TEXCOORD2;
             };
             
             VStoFS vert(APPtoVS IN)

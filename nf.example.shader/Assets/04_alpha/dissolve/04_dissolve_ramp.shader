@@ -34,9 +34,9 @@
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
-            TEXTURE2D(_DissolveTex);	SAMPLER(sampler_DissolveTex);
-            TEXTURE2D(_RampTex);		SAMPLER(sampler_RampTex);
+            TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
+            TEXTURE2D(_DissolveTex);    SAMPLER(sampler_DissolveTex);
+            TEXTURE2D(_RampTex);        SAMPLER(sampler_RampTex);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;

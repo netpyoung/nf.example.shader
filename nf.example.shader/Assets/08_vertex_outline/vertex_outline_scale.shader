@@ -2,9 +2,9 @@
 {
     Properties
     {
-        _MainTex("Texture", 2D)							= "white" {}
-        _OutlineThickness("_OutlineThickness", Float)	= 0.02
-        _OutlineColor("_OutlineColor", Color)			= (1, 1, 1, 1)
+        _MainTex("Texture", 2D)                            = "white" {}
+        _OutlineThickness("_OutlineThickness", Float)    = 0.02
+        _OutlineColor("_OutlineColor", Color)            = (1, 1, 1, 1)
     }
 
     SubShader
@@ -43,8 +43,8 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
@@ -111,14 +111,14 @@
 
             struct APPtoVS
             {
-                float4 positionOS	: POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionOS    : POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             struct VStoFS
             {
-                float4 positionCS	: SV_POSITION;
-                float2 uv			: TEXCOORD0;
+                float4 positionCS    : SV_POSITION;
+                float2 uv            : TEXCOORD0;
             };
 
             VStoFS vert(APPtoVS IN)
