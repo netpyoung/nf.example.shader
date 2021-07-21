@@ -1,4 +1,4 @@
-Shader "grass_boom"
+﻿Shader "grass_boom"
 {
 	// ref: 유니티 - 폭발에 반응하는 grass 쉐이더 : https://blog.naver.com/daehuck/222413632188
 	// ref: Creating Interactive Grass in Unreal Engine 4: https://www.raywenderlich.com/6314-creating-interactive-grass-in-unreal-engine-4

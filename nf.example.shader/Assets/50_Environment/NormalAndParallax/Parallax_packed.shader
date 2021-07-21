@@ -1,4 +1,4 @@
-Shader "example/Parallax_packed"
+﻿Shader "example/Parallax_packed"
 {
 	// ref:
 	// - tool: https://gumroad.com/l/EasyChannelPacking

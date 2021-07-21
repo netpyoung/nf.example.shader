@@ -1,4 +1,4 @@
-Shader "FakeThicknessWindow"
+﻿Shader "FakeThicknessWindow"
 {
 	Properties
 	{

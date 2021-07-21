@@ -1,4 +1,4 @@
-Shader "InteriorMapping"
+﻿Shader "InteriorMapping"
 {
 	// ref: https://forum.unity.com/threads/interior-mapping.424676/#post-2751518
 	// 유니티 기본 Cube의 UV가 InteriorMapping에는 적절치 않으므로, 큐브의 다른 면에서 봤을때 방의 위아래가 뒤집히게 나온다.
