@@ -1,4 +1,4 @@
-Shader "ScreenSpaceDecal_v2"
+ï»¿Shader "ScreenSpaceDecal_v2"
 {
 	Properties
 	{
@@ -74,20 +74,20 @@ Shader "ScreenSpaceDecal_v2"
 		
 			half4 frag(VStoFS IN) : SV_Target
 			{
-				// ============== 1. ¾Àµª½º ±¸ÇÏ±â
+				// ============== 1. ì”¬ëìŠ¤ êµ¬í•˜ê¸°
 				// positionNDCuv: [0, 1]
 				half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
 				half sceneRawDepth = SampleSceneDepth(positionNDCuv);
 				half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
-				// ============== 2. µª½º·ÎºÎÅÍ 3DÀ§Ä¡¸¦ ±¸ÇÏ±â
-				// positionOS_decal: [-0.5, 0.5] // clip À¸·Î Àß·ÁÁú°ÍÀÌ±â¿¡
+				// ============== 2. ëìŠ¤ë¡œë¶€í„° 3Dìœ„ì¹˜ë¥¼ êµ¬í•˜ê¸°
+				// positionOS_decal: [-0.5, 0.5] // clip ìœ¼ë¡œ ì˜ë ¤ì§ˆê²ƒì´ê¸°ì—
 				half3 positionOS_decal = IN.positionOS_camera + IN.positionOSw_viewRay.xyz / IN.positionOSw_viewRay.w * sceneEyeDepth;
 
-				// ============== 3. SSD»óÀÚ ¹ÛÀÌ¸é ±×¸®Áö¾Ê±â
+				// ============== 3. SSDìƒì ë°–ì´ë©´ ê·¸ë¦¬ì§€ì•Šê¸°
 				clip(0.5 - abs(positionOS_decal.xyz));
 
-				// ============== 4. µ¥Ä® ±×¸®±â
+				// ============== 4. ë°ì¹¼ ê·¸ë¦¬ê¸°
 				// uv_decal: [0, 1]
 				half2 uv_decal = positionOS_decal.xz + 0.5;
 				half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);

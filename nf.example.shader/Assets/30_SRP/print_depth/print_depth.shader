@@ -1,4 +1,4 @@
-Shader "srp/print_depth"
+ï»¿Shader "srp/print_depth"
 {
     SubShader
     {
@@ -52,7 +52,7 @@ Shader "srp/print_depth"
                 OUT.uv = IN.uv;
 
 #if UNITY_UV_STARTS_AT_TOP
-                // _MainTex_TexelSize.xy    : x= 1/°¡·Î, y= 1/¼¼·Î.
+                // _MainTex_TexelSize.xy    : x= 1/Â°Â¡Â·ÃŽ, y= 1/Â¼Â¼Â·ÃŽ.
                 // UNITY_UV_STARTS_AT_TOP   : DirectX == 1, OpenGL == 0.
                 // _MainTex_TexelSize.y < 0 : antialiasing On.
                 if (_MainTex_TexelSize.y < 0)

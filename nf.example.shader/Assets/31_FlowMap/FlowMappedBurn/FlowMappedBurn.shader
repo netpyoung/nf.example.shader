@@ -1,4 +1,4 @@
-Shader "FlowMappedBurn"
+﻿Shader "FlowMappedBurn"
 {
 	Properties
 	{

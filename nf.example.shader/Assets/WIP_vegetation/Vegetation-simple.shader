@@ -1,4 +1,4 @@
-Shader "Vegetation-simple"
+﻿Shader "Vegetation-simple"
 {
 	Properties
 	{

@@ -1,4 +1,4 @@
-Shader "example/Phong"
+﻿Shader "example/Phong"
 {
 	Properties
 	{

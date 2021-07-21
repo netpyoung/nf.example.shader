@@ -1,4 +1,4 @@
-Shader "brush_add"
+﻿Shader "brush_add"
 {
 	Properties
 	{

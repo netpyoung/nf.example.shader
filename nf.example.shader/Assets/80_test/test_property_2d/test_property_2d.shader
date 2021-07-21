@@ -1,4 +1,4 @@
-Shader "test_property_2d"
+﻿Shader "test_property_2d"
 {
 	Properties
 	{

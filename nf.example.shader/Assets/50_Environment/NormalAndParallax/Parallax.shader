@@ -1,4 +1,4 @@
-Shader "example/Parallax"
+﻿Shader "example/Parallax"
 {
 	// parallax mapping, offset mapping, photonic mapping, virtual displace mapping 
 	Properties

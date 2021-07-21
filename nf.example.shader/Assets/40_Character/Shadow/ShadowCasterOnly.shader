@@ -1,4 +1,4 @@
-Shader "ShadowCasterOnly"
+﻿Shader "ShadowCasterOnly"
 {
     SubShader
     {

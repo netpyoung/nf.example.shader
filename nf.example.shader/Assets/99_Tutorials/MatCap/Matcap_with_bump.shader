@@ -1,4 +1,4 @@
-Shader "MatCap"
+﻿Shader "MatCap"
 {
 	Properties
 	{

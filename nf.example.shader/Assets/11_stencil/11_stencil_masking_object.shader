@@ -1,4 +1,4 @@
-Shader "Stencil"
+﻿Shader "Stencil"
 {
 	Properties
 	{
@@ -13,7 +13,7 @@ Shader "Stencil"
 			"Queue" = "Transparent"
 			"RenderType" = "Transparent"
 		}
-	
+		
 		Pass
 		{
 			Tags
@@ -37,7 +37,7 @@ Shader "Stencil"
 
 
 			CBUFFER_START(UnityPerMaterial)
-				float4 _OutlineColor;
+			float4 _OutlineColor;
 			CBUFFER_END
 
 			struct APPtoVS

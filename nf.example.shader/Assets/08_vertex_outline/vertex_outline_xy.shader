@@ -1,151 +1,148 @@
-Shader "NFShader/Outline/vertex_outline_xy"
+ï»¿Shader "NFShader/Outline/vertex_outline_xy"
 {
-	Properties
-	{
-		_MainTex("Texture", 2D) = "white" {}
-		_OutlineWidth("_OutlineWidth", Float) = 0.02
-		_OutlineColor("_OutlineColor", Color) = (1, 1, 1, 1)
-	}
+    Properties
+    {
+        _MainTex("Texture", 2D) = "white" {}
+        _OutlineWidth("_OutlineWidth", Float) = 0.02
+        _OutlineColor("_OutlineColor", Color) = (1, 1, 1, 1)
+    }
 
-	SubShader
-	{
-		Tags
-		{
-			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Geometry"
-			"RenderType" = "Opaque"
-		}
+    SubShader
+    {
+        Tags
+        {
+            "RenderPipeline" = "UniversalRenderPipeline"
+            "Queue" = "Geometry"
+            "RenderType" = "Opaque"
+        }
 
-		Pass
-		{
-			Name "VERTEX_OUTLINE_XY_BACK"
+        Pass
+        {
+            Name "VERTEX_OUTLINE_XY_BACK"
 
-			Tags
-			{
-				"LightMode" = "SRPDefaultUnlit"
-			}
+            Tags
+            {
+                "LightMode" = "SRPDefaultUnlit"
+            }
 
-			Cull Front
+            Cull Front
 
-			HLSLPROGRAM
-			#pragma target 3.5
-			#pragma vertex vert
-			#pragma fragment frag
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex vert
+            #pragma fragment frag
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
+            CBUFFER_START(UnityPerMaterial)
+            float4 _MainTex_ST;
 
-				float _OutlineWidth;
-				float4 _OutlineColor;
-			CBUFFER_END
+            float _OutlineWidth;
+            float4 _OutlineColor;
+            CBUFFER_END
 
-			struct APPtoVS
-			{
-				float4 positionOS	: POSITION;
-				float2 uv			: TEXCOORD0;
-				float3 normal		: NORMAL;
-			};
+            struct APPtoVS
+            {
+                float4 positionOS	: POSITION;
+                float2 uv			: TEXCOORD0;
+                float3 normal		: NORMAL;
+            };
 
-			struct VStoFS
-			{
-				float4 positionCS	: SV_POSITION;
-				float2 uv			: TEXCOORD0;
-			};
+            struct VStoFS
+            {
+                float4 positionCS	: SV_POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-			inline float2 TransformViewToProjection(float2 v)
-			{
-				return mul((float2x2)UNITY_MATRIX_P, v);
-			}
+            inline float2 TransformViewToProjection(float2 v)
+            {
+                return mul((float2x2)UNITY_MATRIX_P, v);
+            }
 
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
+            VStoFS vert(APPtoVS IN)
+            {
+                VStoFS OUT;
+                ZERO_INITIALIZE(VStoFS, OUT);
 
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
-				half3 N = TransformObjectToWorldNormal(IN.normal);
-				half4 normalCS = TransformWorldToHClip(N);
+                // ì•„ì›ƒë¼ì¸ì€ 2ì°¨ì›ì´ë¯€ë¡œ. `normalCS.xy`ì— ëŒ€í•´ì„œë§Œ ê³„ì‚° ë° `normalize`.
+                // ì¹´ë©”ë¼ ê±°ë¦¬ì— ë”°ë¼ ì•„ì›ƒë¼ì¸ì˜ í¬ê¸°ê°€ ë³€ê²½ë˜ëŠ”ê²ƒì„ ë§‰ê¸°ìœ„í•´ `normalCS.w`ë¥¼ ê³±í•´ì¤€ë‹¤.
+                // _ScreenParams.xy (x/yëŠ” ì¹´ë©”ë¼ íƒ€ê²Ÿí…ìŠ¤ì³ ë„“ì´/ë†’ì´)ë¡œ ë‚˜ëˆ„ì–´ì„œ [-1, +1] ë²”ìœ„ë¡œ ë§Œë“¬.
+                // ê¸¸ì´ 2ì¸ ë²”ìœ„([-1, +1])ì™€ ë¹„ìœ¨ì„ ë§ì¶”ê¸° ìœ„í•´ OutlineWidthì— `*2`ë¥¼ í•´ì¤€ë‹¤.
+                half4 normalCS = TransformObjectToHClip(IN.normal);
+                half2 offset = normalize(normalCS.xy) / _ScreenParams.xy * (2 * _OutlineWidth) * OUT.positionCS.w;
 
-				// ¾Æ¿ô¶óÀÎÀº 2Â÷¿øÀÌ¹Ç·Î. `normalCS.xy`¿¡ ´ëÇØ¼­¸¸ °è»ê ¹× `normalize`.
-				// Ä«¸Ş¶ó °Å¸®¿¡ µû¶ó ¾Æ¿ô¶óÀÎÀÇ Å©±â°¡ º¯°æµÇ´Â°ÍÀ» ¸·±âÀ§ÇØ `normalCS.w`¸¦ °öÇØÁØ´Ù.
-				// _ScreenParams.xy (x/y´Â Ä«¸Ş¶ó Å¸°ÙÅØ½ºÃÄ ³ĞÀÌ/³ôÀÌ)·Î ³ª´©¾î¼­ [-1, +1] ¹üÀ§·Î ¸¸µë.
-				// ±æÀÌ 2ÀÎ ¹üÀ§([-1, +1])¿Í ºñÀ²À» ¸ÂÃß±â À§ÇØ OutlineWidth¿¡ `*2`¸¦ ÇØÁØ´Ù.
+                // ë²„í…ìŠ¤ ì¹¼ë¼ë¥¼ ê³±í•´ì£¼ë©´ì„œ ë””í…Œì¼ ì¡°ì •.
+                // offset *= IN.color.r;
 
-				half2 offset = (normalize(normalCS.xy) * normalCS.w) / _ScreenParams.xy * (2 * _OutlineWidth);
+                OUT.positionCS.xy += offset;
 
-				// ¹öÅØ½º Ä®¶ó¸¦ °öÇØÁÖ¸é¼­ µğÅ×ÀÏ Á¶Á¤.
-				// offset *= IN.color.r;
+                return OUT;
+            }
 
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.positionCS.xy += offset;
+            half4 frag(VStoFS IN) : SV_Target
+            {
+                return _OutlineColor;
+            }
+            ENDHLSL
+        }
 
-				return OUT;
-			}
+        Pass
+        {
+            Name "VERTEX_OUTLINE_XY_FRONT"
 
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				return _OutlineColor;
-			}
-			ENDHLSL
-		}
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
 
-		Pass
-		{
-			Name "VERTEX_OUTLINE_XY_FRONT"
+            Cull Back
 
-			Tags
-			{
-				"LightMode" = "UniversalForward"
-			}
+            HLSLPROGRAM
+            #pragma target 3.5
 
-			Cull Back
+            #pragma vertex vert
+            #pragma fragment frag
 
-			HLSLPROGRAM
-			#pragma target 3.5
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-			#pragma vertex vert
-			#pragma fragment frag
+            TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            CBUFFER_START(UnityPerMaterial)
+            float4 _MainTex_ST;
 
-			TEXTURE2D(_MainTex);		SAMPLER(sampler_MainTex);
+            float _OutlineThickness;
+            float4 _OutlineColor;
+            CBUFFER_END
 
-			CBUFFER_START(UnityPerMaterial)
-				float4 _MainTex_ST;
+            struct APPtoVS
+            {
+                float4 positionOS	: POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-				float _OutlineThickness;
-				float4 _OutlineColor;
-			CBUFFER_END
+            struct VStoFS
+            {
+                float4 positionCS	: SV_POSITION;
+                float2 uv			: TEXCOORD0;
+            };
 
-			struct APPtoVS
-			{
-				float4 positionOS	: POSITION;
-				float2 uv			: TEXCOORD0;
-			};
+            VStoFS vert(APPtoVS IN)
+            {
+                VStoFS OUT;
+                ZERO_INITIALIZE(VStoFS, OUT);
 
-			struct VStoFS
-			{
-				float4 positionCS	: SV_POSITION;
-				float2 uv			: TEXCOORD0;
-			};
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                return OUT;
+            }
 
-			VStoFS vert(APPtoVS IN)
-			{
-				VStoFS OUT;
-				ZERO_INITIALIZE(VStoFS, OUT);
-
-				OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-				OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
-				return OUT;
-			}
-
-			half4 frag(VStoFS IN) : SV_Target
-			{
-				return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-			}
-			ENDHLSL
-		}
-	}
+            half4 frag(VStoFS IN) : SV_Target
+            {
+                return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+            }
+            ENDHLSL
+        }
+    }
 }

@@ -1,4 +1,4 @@
-Shader "MotionEffect"
+﻿Shader "MotionEffect"
 {
 	// ref: https://blog.csdn.net/linjf520/article/details/104602728
 	// ref: https://github.com/cjacobwade/HelpfulScripts/blob/master/SmearEffect/Smear.shader

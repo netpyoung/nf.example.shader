@@ -1,4 +1,4 @@
-Shader "example/Cubemap"
+﻿Shader "example/Cubemap"
 {
 	Properties
 	{

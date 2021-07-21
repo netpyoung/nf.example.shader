@@ -93,8 +93,8 @@
             //   \|/
             // ---+---
             //     \
-			//      \
-			//       -L
+            //      \
+            //       -L
 
             //       Phong Reflection Model : max(0, dot(R, N)) ^ S
             // Blinn-Phong Reflection Model : max(0, dot(H, N)) ^ S

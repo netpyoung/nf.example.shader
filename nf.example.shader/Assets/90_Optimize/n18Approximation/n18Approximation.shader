@@ -1,4 +1,4 @@
-Shader "n18Approximation"
+﻿Shader "n18Approximation"
 {
 	// ref: https://www.gamasutra.com/view/feature/131381/a_noninteger_power_function_on_.php
 	Properties

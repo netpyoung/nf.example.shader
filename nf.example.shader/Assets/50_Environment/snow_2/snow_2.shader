@@ -1,4 +1,4 @@
-Shader "snow_2"
+﻿Shader "snow_2"
 {
 	Properties
 	{

@@ -1,4 +1,4 @@
-Shader "MotionVector"
+﻿Shader "MotionVector"
 {
 	Properties
 	{

@@ -1,6 +1,7 @@
 Shader "grass_boom"
 {
 	// ref: 유니티 - 폭발에 반응하는 grass 쉐이더 : https://blog.naver.com/daehuck/222413632188
+	// ref: Creating Interactive Grass in Unreal Engine 4: https://www.raywenderlich.com/6314-creating-interactive-grass-in-unreal-engine-4
 
 	// RenderTexture 카메라의 렌더러가 URP기본렌더러(Linear공간의 렌더러)를 이용하면, 후처리로 pow(x, 2.2)를 적용시킨다.
 	// 이 때문에 FlowTexture의 기본 색(0.5, 0.5, 0)을 표현하기 위해서는,
@@ -35,8 +36,8 @@ Shader "grass_boom"
 		Tags
 		{
 			"RenderPipeline" = "UniversalRenderPipeline"
-			"Queue" = "Transparent"
-			"RenderType" = "Transparent"
+			"Queue" = "Geometry"
+			"RenderType" = "Opaque"
 		}
 
 		Pass
@@ -98,11 +99,11 @@ Shader "grass_boom"
 				// Construct orthogonal axes in the plane of the rotation
 				float3 UAxis = Position - ClosestPointOnAxis;
 				float3 VAxis = cross(NormalizedRotationAxisAndAngle.xyz, UAxis);
-				float CosAngle;
-				float SinAngle;
-				sincos(NormalizedRotationAxisAndAngle.w, SinAngle, CosAngle);
+				float s;
+				float c;
+				sincos(NormalizedRotationAxisAndAngle.w, s, c);
 				// Rotate using the orthogonal axes
-				float3 R = UAxis * CosAngle + VAxis * SinAngle;
+				float3 R = UAxis * c + VAxis * s;
 				// Reconstruct the rotated world space position
 				RotatedPosition = (ClosestPointOnAxis + R);// -Position;
 				// Convert from position to a position offset
@@ -114,17 +115,20 @@ Shader "grass_boom"
 				ZERO_INITIALIZE(VStoFS, OUT);
 
 				float3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
-				float2 uv = positionWS.xz * 0.1 + 0.5;
 
+				// positionWS : [5, -5] => [0.5, -0.5] => [1, -1]
+				float2 uv_fxRenderTex = positionWS.xz * 0.1 + 0.5;
 				// 렌더카메라가 180도 회전 되어있다면 RotateDegree함수 이용하여 회전된 값을 얻어오자.
-				// uv = RotateDegrees(uv, 0.5, 180);
+				// uv_fxRenderTex = RotateDegrees(uv_fxRenderTex, 0.5, 180);
 
-				float2 fxRenderTex = SAMPLE_TEXTURE2D_LOD(_FxRenderTex, sampler_FxRenderTex, uv, 0).rg;
-				fxRenderTex = fxRenderTex * 2 - 1;
+				float2 fxRenderTex = SAMPLE_TEXTURE2D_LOD(_FxRenderTex, sampler_FxRenderTex, uv_fxRenderTex, 0).rg;
+				fxRenderTex = fxRenderTex * 2 - 1; // [0, 1] => [-1, 1]
 
-				float3 p = cross(normalize(float3(fxRenderTex.r, 0, fxRenderTex.g)), float3(0, -1, 0));
-				float angle = length(fxRenderTex) * radians(90);
+				float3 rotationAxis = cross(normalize(float3(fxRenderTex.r, 0, fxRenderTex.g)), float3(0, -1, 0));
+				float rotationAngleMax = radians(90);
+				float rotationAngle = length(fxRenderTex) * rotationAngleMax;
 
+				// TODO(pyoung)
 				// #define SHADERGRAPH_OBJECT_POSITION UNITY_MATRIX_M._m03_m13_m23
 				// _m00, _m01, _m02, _m03
 				// _m10, _m11, _m12, _m13
@@ -132,7 +136,7 @@ Shader "grass_boom"
 				// _m30, _m31, _m32, _m33
 				float3 objectPosition = UNITY_MATRIX_M._m03_m13_m23;
 				float3 RotatedPositionWS;
-				RotateAboutAxis_float(float4(p, angle), objectPosition, positionWS, RotatedPositionWS);
+				RotateAboutAxis_float(float4(rotationAxis, rotationAngle), objectPosition, positionWS, RotatedPositionWS);
 
 				OUT.positionCS = TransformWorldToHClip(RotatedPositionWS);
 				OUT.uv = IN.uv;

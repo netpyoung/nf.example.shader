@@ -1,4 +1,4 @@
-Shader "fx_grass_boom"
+﻿Shader "fx_grass_boom"
 {
 	Properties
 	{
@@ -45,7 +45,7 @@ Shader "fx_grass_boom"
 				float4 color		: TEXCOORD1;
 			};
 
-			half SphereMask(in half2 coords, in half2 center, in half radius, in half hardness)
+			inline half SphereMask(in half2 coords, in half2 center, in half radius, in half hardness)
 			{
 				return 1 - saturate((distance(coords, center) - radius) / (1 - hardness));
 			}
