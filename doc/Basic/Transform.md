@@ -33,21 +33,22 @@ unity_CameraInvProjection : float4x4 Inverse of camera’s projection matrix.
 ```
 
 ``` txt
-OS ----------------------- Object Space
+OS  ----------------------- Object Space
  | UNITY_MATRIX_M * OS
-WS ----------------------- World Space
+WS  ----------------------- World Space
  | UNITY_MATRIX_V * WS
-VS ----------------------- View Space
+VS  ----------------------- View Space
  | UNITY_MATRIX_P * VS
-CS ----------------------- Homogeneous Clip Space
+CS  ----------------------- Homogeneous Clip Space
  | NDC    = CS * 0.5
  | NDC.x  =  NDC.x + NDC.w
  | NDC.y  =  NDC.y + NDC.w // DirectX
  | NDC.y  = -NDC.y + NDC.w // OpenGL
  | NDC.zw = CS.zw
-NDC --------------------- Homogeneous Normalized Device Coordinate [0..w]
- | ndc = (NDC.xyz / NDC.w) * 2.0 - 1.0;
-ndc ---------------------- Normalized Device Coordinate [-1..1]
+NDC ---------------------- Homogeneous Normalized Device Coordinate [0..w]
+ | pd = (NDC.xyz / NDC.w); // [0, 1] : perspective divide
+ | ndc = pd * 2.0 - 1.0;   // [-1, 1]
+ndc ---------------------- Nonhomogeneous Normalized Device Coordinate [-1..1]
 ```
 
 ``` hlsl
@@ -81,6 +82,19 @@ TransformWorldToView   - UNITY_MATRIX_V
 TransformWorldToHClip  - UNITY_MATRIX_VP
 ```
 
+| [_ProjectionParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html) | x  | y          | z         | w            |
+|-----------------------------------------------------------------------------------|----|------------|-----------|--------------|
+| DirectX                                                                           | 1  | near plane | far plane | 1 / farplane |
+| OpenGL                                                                            | -1 | near plane | far plane | 1 / farplane |
+
+
+|         | UNITY_REVERSED_Z | UNITY_NEAR_CLIP_VALUE | UNITY_RAW_FAR_CLIP_VALUE |
+|---------|------------------|-----------------------|--------------------------|
+| DirectX | 1                | 1                     | 0                        |
+| Vulkan  | 1                | 1                     | 0                        |
+| OpenGL  | 0                | -1                    | 1                        |
+
+
 ## NDC
 
 ``` hlsl
@@ -98,24 +112,37 @@ float2 positionScreen = uv_Screen * _ScreenParams.xy;
 ```
 
 ``` hlsl
+// float4 ndc = input.positionCS * 0.5f;
+// input.positionNDC.xy = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+// input.positionNDC.zw = input.positionCS.zw;
 NDC = float4(
-    (0.5 * CS.x                       ) * CS.w,
-    (0.5 * CS.y *  _ProjectionParams.x) * CS.w,
+    (0.5 * CS.x                       ) + 0.5 * CS.w,
+    (0.5 * CS.y *  _ProjectionParams.x) + 0.5 * CS.w,
     CS.z,
     CS.w
 );
 
-ndc = float3(
-    (CS.x                       / CS.w) - 1,
-    (CS.y * _ProjectionParams.x / CS.w) - 1,
-    (CS.z                       / CS.w) - 1,
+// pd = NDC.xyz / NDC.w
+pd = float3(
+    (0.5 * CS.x                        / CS.w) + 0.5,
+    (0.5 * CS.y *  _ProjectionParams.x / CS.w) + 0.5,
+    CS.z / CS.w
 );
 
+// ndc = pd * 2 - 1
+ndc = float3(
+    (CS.x                       / CS.w),
+    (CS.y * _ProjectionParams.x / CS.w),
+    (CS.z                       / CS.w) * 2  - 1,
+);
+
+// uv_Screen = NDC.xy / NDC.w
 uv_Screen = float2(
     (CS.x                       / CS.w),
     (CS.y * _ProjectionParams.x / CS.w)
 );
 
+// positionScreen = uv_Screen * _ScreenParams.xy
 positionScreen = float2(
     (CS.x                       / CS.w) * _ScreenParams.x,
     (CS.y * _ProjectionParams.x / CS.w) * _ScreenParams.y

@@ -14,19 +14,17 @@
 // NDC에서 depth를 이용 역산하여 데칼 위치를 구하는법.
 
 // vert:
-// positionNDCw: [0, w]
-OUT.positionNDCw = vertexPositionInput.positionNDC;
+OUT.positionNDC = vertexPositionInput.positionNDC;
 
 // frag:
 // ============== 1. 씬뎁스 구하기
-// positionNDCuv: [0, 1]
-half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
-half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+half2 uv_Screen = IN.positionNDC.xy / IN.positionNDC.w;
+half sceneRawDepth = SampleSceneDepth(uv_Screen);
 half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
 // ============== 2. 뎁스로부터 3D위치를 구하기
 // positionNDC: [-1, 1]
-float2 positionNDC = positionNDCuv * 2.0 - 1.0;
+float2 positionNDC = uv_Screen * 2.0 - 1.0;
 half4 positionVS_decal;
 positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
 positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
@@ -59,9 +57,8 @@ OUT.positionOSw_viewRay.w = vertexPositionInput.positionVS.z;
 
 // frag:
 // ============== 1. 씬뎁스 구하기
-// positionNDCuv: [0, 1]
-half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
-half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+half2 uv_Screen = IN.positionNDC.xy / IN.positionNDC.w;
+half sceneRawDepth = SampleSceneDepth(uv_Screen);
 half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
 // ============== 2. 뎁스로부터 3D위치를 구하기

@@ -1,42 +1,28 @@
 # Depth
 
-``` hlsl
-half3 perspectiveDivide = IN.positionNDC.xyz / IN.positionNDC.w;
-half2 uv_Screen         = perspectiveDivide.xy;
+- LinearEyeDepth : distance from the eye in world units
+- Linear01Depth : distance from the eye in [0;1]
 
-half  sceneRawDepth     = SampleSceneDepth(uv_Screen);
-half  sceneEyeDepth     = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
-half  scene01Depth      = Linear01Depth (sceneRawDepth, _ZBufferParams);
+``` hlsl
+half3 pd            = IN.positionNDC.xyz / IN.positionNDC.w; // perspectiveDivide
+half2 uv_Screen     = pd.xy;
+
+half  sceneRawDepth = SampleSceneDepth(uv_Screen);
+half  sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
+half  scene01Depth  = Linear01Depth (sceneRawDepth, _ZBufferParams);
 ```
 
-
-
-[SampleSceneDepth](https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl)
+- [SampleSceneDepth](https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl)
+- [Linear01Depth / LinearEyeDepth](https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl)
 
 ``` hlsl
-// com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
-
+/// com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
 float SampleSceneDepth(float2 uv)
 {
     return SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, UnityStereoTransformScreenSpaceTex(uv)).r;
 }
-```
 
-[_ZBufferParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html)
-Used to linearize Z buffer values. x is (1-far/near), y is (far/near), z is (x/far) and w is (y/far).
-|   |              |
-|---|--------------|
-| x | 1 - far/near |
-| y | far / near   |
-| z | x / far      |
-| w | y / far      |
-
-
-[Linear01Depth / LinearEyeDepth](https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl)
-
-``` hlsl
-// com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
-
+/// com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
 // Z buffer to linear 0..1 depth (0 at camera position, 1 at far plane).
 // Does NOT work with orthographic projections.
 // Does NOT correctly handle oblique view frustums.
@@ -56,41 +42,50 @@ float LinearEyeDepth(float depth, float4 zBufferParam)
 }
 ```
 
-[_ProjectionParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html)
+| [_ZBufferParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html) | x             | y        | z     | w     |
+|--------------------------------------------------------------------------------|---------------|----------|-------|-------|
+| DirectX                                                                        | -1 + far/near | 1        | x/far | 1/far |
+| OpenGL                                                                         | 1 - far/near  | far/near | x/far | y/far |
 
-|   |                                         |
-|---|-----------------------------------------|
-| x | 1.0 (or –1.0 flipped projection matrix) |
-| y | near plane                              |
-| z | far plane                               |
-| w | 1/FarPlane                              |
+![./res/EyeDepth.png](../res/EyeDepth.png)
 
-![ndc.png](./doc_res/ndc.png)
+## depth buffer value non-linear (in view space)
+
+![./res/DepthComparison.png](../res/DepthComparison.png)
+
+## Sample
 
 ``` hlsl
 // vert
-VertexPositionInputs vertexInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-OUT.positionNDC = vertexInputs.positionNDC;
+float currEyeDepth = -positionVS.z;
+float curr01Depth = -positionVS.z * _ProjectionParams.w;
+float4 positionNDC = GetVertexPositionInputs(positionOS).positionNDC;
 
 // frag
-half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
-half sceneRawDepth = SampleSceneDepth(screenUV);
+half2 uv_Screen = IN.positionNDC.xy / IN.positionNDC.w;
+half sceneRawDepth = SampleSceneDepth(uv_Screen);
 
 // --------------------------------------------
-// 0 ~ 1을 _ProjectionParams.z : far plane 으로 늘려주자
-half scene01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);   //  [Near / Far, 1]
-half sceneEyeDepth = scene01Depth * _ProjectionParams.z;            //  [Near, Far]
-// -----------------------------------------------
-half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams); //  [Near, Far]
-// -----------------------------------------------
-float fragmentEyeDepth = positionNDC.w;
-// -----------------------------------------------
-float fragmentEyeDepth = -positionWS.z;
-// -----------------------------------------------
+half scene01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);   //  [near/far, 1]
 
-// 물체와의 거리를 빼면
-half depth = sceneEyeDepth - fragmentEyeDepth;
+// -----------------------------------------------
+// scene01Depth을 _ProjectionParams.z(far plane)으로 늘리면 sceneEyeDepth
+half sceneEyeDepth = scene01Depth * _ProjectionParams.z;            //  [near, far]
+half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams); //  [near, far]
 
-// 얼마나 앞에 나와있는지 알 수 있다.
-half intersectGradient = 1 - min(depth, 1.0f);
+// -----------------------------------------------
+// 물체와의 거리를 빼면, 얼마나 앞에 나와있는지 알 수 있다.
+half diffEyeDepth = sceneEyeDepth - IN.currEyeDepth;
+half intersectGradient = 1 - min(diffEyeDepth, 1.0f);
 ```
+
+## Reversed-z
+
+TODO
+
+- <https://developer.nvidia.com/content/depth-precision-visualized>
+
+## Ref
+
+- <https://www.cyanilux.com/tutorials/depth/>
+- <https://beta.unity3d.com/talks/Siggraph2011_SpecialEffectsWithDepth_WithNotes.pdf>
