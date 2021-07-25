@@ -1,67 +1,35 @@
 # Transform
 
-![res/coordinate.png](./res/coordinate.png)
+- 좌표공간
 
-| 줄인말 | 공간                         | 다른말           | 타입   | 설명                             |
-|--------|------------------------------|------------------|--------|----------------------------------|
-| OS     | Object Space                 | Local Space      | float3 |                                  |
-| WS     | World Space                  | Global Space     | float3 |                                  |
-| VS     | View Space                   | Eye/Camera Space | float3 | 카메라에서 바라볼때              |
-| CS     | Clip Space                   |                  | float4 | 카메라 시야에서 안보인 것은 제외 |
-| NDC    | Normalized Device Coordinate |                  | float4 |                                  |
-|        | Screen Space                 |                  |        | 2D 화면                          |
+![res/coordinate.png](../res/coordinate.png)
 
-## NDC
+| position       | Space                                       | AKA           | 타입   | 설명                                              |
+|----------------|---------------------------------------------|---------------|--------|---------------------------------------------------|
+| positionOS     | Object                                      | Local / Model | float3 |                                                   |
+| positionWS     | World                                       | Global        | float3 |                                                   |
+| positionVS     | View                                        | Camera / Eye  | float3 | 카메라에서 바라볼때                               |
+| positionCS     | Homogeneous Clip                            |               | float4 | 카메라 시야에서 안보인 것은 제외, Orthogonal 적용 |
+| positionNDC    | Homogeneous Normalized Device Coordinate    |               | float4 | [0, w]  : (x, y, z, w)                            |
+| ndc            | Nonhomogeneous Normalized Device Coordinate |               | float3 | [-1, 1] : Perspective Division                    |
+| uv_Screen      | Screen                                      |               | float2 | [0, 1]                                            |
+| positionScreen | ViewPort                                    |               | float2 | [화면 넓이, 화면 높이]                            |
 
-- 이거 잘못쓰면 햇갈린다.
-
-``` hlsl
-// [0, w]
-float4 positionNDCw = GetVertexPositionInputs(positionOS).positionNDC;
-
-// [0, 1]
-float2 positionNDCuv = positionNDCw.xy / positionNDC.w;
-
-// [-1, 1]
-float2 positionNDC = positionNDCuv * 2.0 - 1.0;
-```
-
-``` hlsl
-float4 ndc = input.positionCS * 0.5f;
-input.positionNDC.xy = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
-input.positionNDC.zw = input.positionCS.zw;
-
-// 음.. 아랫부분이 좀 이상한데..
-NDCw = float4(
-    (0.5 * CS.x                       ) + 0.5 * CS.w,
-    (0.5 * CS.y *  _ProjectionParams.x) + 0.5 * CS.w,
-    CS.z,
-    CS.w
-);
-
-NDCuv = float2(
-    (0.5 * CS.x                       ) / CS.w + 0.5,
-    (0.5 * CS.y *  _ProjectionParams.x) / CS.w + 0.5
-);
-
-NDC = float2(
-    CS.x                       / CS.w,
-    CS.y * _ProjectionParams.x / CS.w
-);
-```
+![res/newtranspipe.png](../res/newtranspipe.png)
 
 ## UNITY_MATRIX
 
 ``` txt
-UNITY_MATRIX_M == renderer.localToWorldMatrix
-  - 유니티 4까지는 GPU에 넘겨주기전에 스케일을 가공 - transform.localToWorldMatrix, renderer.localToWorldMatrix가 달랐으나 지금은 같음.
-UNITY_MATRIX_V == camera.worldToCameraMatrix
-UNITY_MATRIX_P == GL.GetGPUProjectionMatrix(camera.projectionMatrix, false);
+UNITY_MATRIX_M            : renderer.localToWorldMatrix
+UNITY_MATRIX_V            : camera.worldToCameraMatrix
+UNITY_MATRIX_P            : GL.GetGPUProjectionMatrix(camera.projectionMatrix, false);
 
-
-unity_CameraProjection    : float4x4 Camera’s projection matrix.
-  - 스크린 공간 그리기
+unity_CameraProjection    : float4x4 Camera’s projection matrix. // 스크린 공간 그리기
 unity_CameraInvProjection : float4x4 Inverse of camera’s projection matrix.
+
+- localToWorldMatrix
+  - 유니티 4까지는 GPU에 넘겨주기전에 스케일을 가공하여
+  - renderer.localToWorldMatrix, transform.localToWorldMatrix가 달랐으나 지금은 같음.
 ```
 
 ``` txt
@@ -71,13 +39,15 @@ WS ----------------------- World Space
  | UNITY_MATRIX_V * WS
 VS ----------------------- View Space
  | UNITY_MATRIX_P * VS
-CS ----------------------- Clip Space
- | NDC = CS * 0.5
- | NDC.x = NDC.x + NDC.w
- | NDC.y =  NDC.y + NDC.w // DirectX
- | NDC.y = -NDC.y + NDC.w // OpenGL
+CS ----------------------- Homogeneous Clip Space
+ | NDC    = CS * 0.5
+ | NDC.x  =  NDC.x + NDC.w
+ | NDC.y  =  NDC.y + NDC.w // DirectX
+ | NDC.y  = -NDC.y + NDC.w // OpenGL
  | NDC.zw = CS.zw
-NDCw --------------------- Normalized Device Coordinate
+NDC --------------------- Homogeneous Normalized Device Coordinate [0..w]
+ | ndc = (NDC.xyz / NDC.w) * 2.0 - 1.0;
+ndc ---------------------- Normalized Device Coordinate [-1..1]
 ```
 
 ``` hlsl
@@ -111,15 +81,56 @@ TransformWorldToView   - UNITY_MATRIX_V
 TransformWorldToHClip  - UNITY_MATRIX_VP
 ```
 
+## NDC
+
+``` hlsl
+// [0, w] // Homogeneous Normalized Device Coordinate
+float4 positionNDC = GetVertexPositionInputs(positionOS).positionNDC;
+
+// [-1, 1] // Nonhomogeneous Normalized Device Coordinate
+float3 ndc = (positionNDC.xyz / positionNDC.w) * 2.0 - 1.0;
+
+// [0, 1]
+float2 uv_Screen = positionNDC.xy / positionNDC.w;
+
+// [0, screenWidth] / [0, screenHeight]
+float2 positionScreen = uv_Screen * _ScreenParams.xy;
+```
+
+``` hlsl
+NDC = float4(
+    (0.5 * CS.x                       ) * CS.w,
+    (0.5 * CS.y *  _ProjectionParams.x) * CS.w,
+    CS.z,
+    CS.w
+);
+
+ndc = float3(
+    (CS.x                       / CS.w) - 1,
+    (CS.y * _ProjectionParams.x / CS.w) - 1,
+    (CS.z                       / CS.w) - 1,
+);
+
+uv_Screen = float2(
+    (CS.x                       / CS.w),
+    (CS.y * _ProjectionParams.x / CS.w)
+);
+
+positionScreen = float2(
+    (CS.x                       / CS.w) * _ScreenParams.x,
+    (CS.y * _ProjectionParams.x / CS.w) * _ScreenParams.y
+);
+```
+
 ## Normal
 
-- [./NormalMap.md](./NormalMap.md)
+- [./NormalMap.md](../NormalMap.md)
 
 ## Pserspective Camera
 
 - <https://chengkehan.github.io/ReconstructPositionFromDepth.html>
 
-![./res/projectionMatrix.jpg](./res/projectionMatrix.jpg)
+![./res/projectionMatrix.jpg](../res/projectionMatrix.jpg)
 
 ``` cs
 // Find our current location in the camera's projection space.
