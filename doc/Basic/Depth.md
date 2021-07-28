@@ -16,13 +16,13 @@ half  scene01Depth  = Linear01Depth (sceneRawDepth, _ZBufferParams);
 - [Linear01Depth / LinearEyeDepth](https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl)
 
 ``` hlsl
-/// com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
+// mirror: com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl
 float SampleSceneDepth(float2 uv)
 {
     return SAMPLE_TEXTURE2D_X(_CameraDepthTexture, sampler_CameraDepthTexture, UnityStereoTransformScreenSpaceTex(uv)).r;
 }
 
-/// com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
+// mirror: com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl
 // Z buffer to linear 0..1 depth (0 at camera position, 1 at far plane).
 // Does NOT work with orthographic projections.
 // Does NOT correctly handle oblique view frustums.

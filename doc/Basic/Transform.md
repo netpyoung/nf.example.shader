@@ -10,12 +10,14 @@
 | positionWS     | World                                       | Global        | float3 |                                                   |
 | positionVS     | View                                        | Camera / Eye  | float3 | 카메라에서 바라볼때                               |
 | positionCS     | Homogeneous Clip                            |               | float4 | 카메라 시야에서 안보인 것은 제외, Orthogonal 적용 |
-| positionNDC    | Homogeneous Normalized Device Coordinate    |               | float4 | [0, w]  : (x, y, z, w)                            |
-| ndc            | Nonhomogeneous Normalized Device Coordinate |               | float3 | [-1, 1] : Perspective Division                    |
-| uv_Screen      | Screen                                      |               | float2 | [0, 1]                                            |
+| positionNDC    | Homogeneous Normalized Device Coordinate    |               | float4 | [ 0, w] : (x, y, z, w)                            |
+| ndc            | Nonhomogeneous Normalized Device Coordinate |               | float3 | [-1, 1] : PerspectiveDivision * 2 - 1             |
+| uv_Screen      | Screen                                      |               | float2 | [ 0, 1] : PerspectiveDivision                     |
 | positionScreen | ViewPort                                    |               | float2 | [화면 넓이, 화면 높이]                            |
 
 ![res/newtranspipe.png](../res/newtranspipe.png)
+
+![res/opengl_renderpipeline.png](../res/opengl_renderpipeline.png)
 
 ## UNITY_MATRIX
 
@@ -94,15 +96,17 @@ TransformWorldToHClip  - UNITY_MATRIX_VP
 | Vulkan  | 1                | 1                     | 0                        |
 | OpenGL  | 0                | -1                    | 1                        |
 
-
 ## NDC
 
 ``` hlsl
 // [0, w] // Homogeneous Normalized Device Coordinate
 float4 positionNDC = GetVertexPositionInputs(positionOS).positionNDC;
 
+// [0, 1] // Perspective Division
+float3 pd = positionNDC.xyz / positionNDC.w;
+
 // [-1, 1] // Nonhomogeneous Normalized Device Coordinate
-float3 ndc = (positionNDC.xyz / positionNDC.w) * 2.0 - 1.0;
+float3 ndc = pd * 2.0 - 1.0;
 
 // [0, 1]
 float2 uv_Screen = positionNDC.xy / positionNDC.w;
@@ -251,3 +255,4 @@ The one-based row-column position:
 - [Camera.worldToCameraMatrix](https://docs.unity3d.com/ScriptReference/Camera-worldToCameraMatrix.html)
 - [Camera.projectionMatrix](https://docs.unity3d.com/ScriptReference/Camera-projectionMatrix.html)
 - [GL.GetGPUProjectionMatrix](https://docs.unity3d.com/ScriptReference/GL.GetGPUProjectionMatrix.html)
+- <http://blog.hvidtfeldts.net/index.php/2014/01/combining-ray-tracing-and-polygons/>
