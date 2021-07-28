@@ -1,5 +1,9 @@
 ﻿Shader "ScreenSpaceDecal_v1"
 {
+    // ref:
+    // - [SIGGRAPH2012 : Screen space decals in Warhammer 40,000: Space Marine](https://dl.acm.org/doi/10.1145/2343045.2343053)
+    // - [스크린 스페이스 데칼에 대해 자세히 알아보자(워햄머 40,000: 스페이스 마린)](https://www.slideshare.net/blindrendererkr/40000)
+
     Properties
     {
         _MainTex("texture", 2D) = "white" {}

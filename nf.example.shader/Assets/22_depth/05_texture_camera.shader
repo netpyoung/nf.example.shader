@@ -61,7 +61,8 @@
                 float sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
                 float fragmentEyeDepth = -IN.positionVS.z;
-                float3 scenePositionWS = (-IN.toViewVectorWS / fragmentEyeDepth) * sceneEyeDepth + _WorldSpaceCameraPos;
+                float3 scenePositionWS = _WorldSpaceCameraPos + (-IN.toViewVectorWS / fragmentEyeDepth) * sceneEyeDepth;
+
                 float4 color = float4(frac(scenePositionWS), 1.0);
                 return color;
             }
