@@ -49,7 +49,7 @@
             struct VStoFS
             {
                 float4 positionCS    : SV_POSITION;
-                float4 positionNDCw : TEXCOORD0;
+                float4 positionNDC : TEXCOORD0;
             };
             
             VStoFS vert(APPtoVS IN)
@@ -60,8 +60,8 @@
                 VertexPositionInputs vertexPositionInput = GetVertexPositionInputs(IN.positionOS.xyz);
 
                 OUT.positionCS = vertexPositionInput.positionCS;
-                // positionNDCw: [0, w]
-                OUT.positionNDCw = vertexPositionInput.positionNDC;
+                // positionNDC: [0, w]
+                OUT.positionNDC = vertexPositionInput.positionNDC;
 
                 return OUT;
             }
@@ -69,17 +69,17 @@
             half4 frag(VStoFS IN) : SV_Target
             {
                 // ============== 1. 씬뎁스 구하기
-                // positionNDCuv: [0, 1]
-                half2 positionNDCuv = IN.positionNDCw.xy / IN.positionNDCw.w;
-                half sceneRawDepth = SampleSceneDepth(positionNDCuv);
+                // uv_Screen: [0, 1]
+                half2 uv_Screen = IN.positionNDC.xy / IN.positionNDC.w;
+                half sceneRawDepth = SampleSceneDepth(uv_Screen);
                 half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
                 // ============== 2. 뎁스로부터 3D위치를 구하기
-                // positionNDC: [-1, 1]
-                half2 positionNDC = positionNDCuv * 2.0 - 1.0;
+                // ndc: [-1, 1]
+                half2 ndc = uv_Screen * 2.0 - 1.0;
                 half4 positionVS_decal;
-                positionVS_decal.x = (positionNDC.x * sceneEyeDepth) / unity_CameraProjection._11;
-                positionVS_decal.y = (positionNDC.y * sceneEyeDepth) / unity_CameraProjection._22;
+                positionVS_decal.x = (ndc.x * sceneEyeDepth) / unity_CameraProjection._11;
+                positionVS_decal.y = (ndc.y * sceneEyeDepth) / unity_CameraProjection._22;
                 positionVS_decal.z = -sceneEyeDepth;
                 positionVS_decal.w = 1;
 
