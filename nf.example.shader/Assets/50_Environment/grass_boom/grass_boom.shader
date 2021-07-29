@@ -73,40 +73,22 @@
                 float2 uv            : TEXCOORD0;
             };
 
-            half2 RotateDegrees(half2 uv, in half2 center, in half degrees)
+            float3 RotateAboutAxis(
+                in float3 position,
+                in float3 positionOnAxis,
+                in float3 rotationAxis,
+                in float rotationAngle)
             {
-                uv -= center;
+                float3 closestPointOnAxis = positionOnAxis + rotationAxis * dot(rotationAxis, position - positionOnAxis);
+                float3 axisU = position - closestPointOnAxis;
+                float3 axisV = cross(rotationAxis, axisU);
 
-                half alpha = degrees * PI / 180;
-                half s; // sin alpha
-                half c; // cos alpha
-                sincos(alpha, s, c);
-
-                half2x2 m = half2x2(c, -s, s, c);
-                m *= 0.5;
-                m += 0.5;
-                m = m * 2 - 1;
-
-                uv = mul(uv, m);
-                uv += center;
-                
-                return uv;
-            }
-
-            void RotateAboutAxis_float(in float4 NormalizedRotationAxisAndAngle, in float3 PositionOnAxis, in float3 Position, out float3 RotatedPosition)
-            {
-                float3 ClosestPointOnAxis = PositionOnAxis + NormalizedRotationAxisAndAngle.xyz * dot(NormalizedRotationAxisAndAngle.xyz, Position - PositionOnAxis);
-                // Construct orthogonal axes in the plane of the rotation
-                float3 UAxis = Position - ClosestPointOnAxis;
-                float3 VAxis = cross(NormalizedRotationAxisAndAngle.xyz, UAxis);
                 float s;
                 float c;
-                sincos(NormalizedRotationAxisAndAngle.w, s, c);
-                // Rotate using the orthogonal axes
-                float3 R = UAxis * c + VAxis * s;
-                // Reconstruct the rotated world space position
-                RotatedPosition = (ClosestPointOnAxis + R);// -Position;
-                // Convert from position to a position offset
+                sincos(rotationAngle, s, c);
+
+                float3 rotated = axisU * c + axisV * s;
+                return (closestPointOnAxis + rotated);
             }
 
             VStoFS vert(APPtoVS IN)
@@ -124,19 +106,21 @@
                 float2 fxRenderTex = SAMPLE_TEXTURE2D_LOD(_FxRenderTex, sampler_FxRenderTex, uv_fxRenderTex, 0).rg;
                 fxRenderTex = fxRenderTex * 2 - 1; // [0, 1] => [-1, 1]
 
-                float3 rotationAxis = cross(normalize(float3(fxRenderTex.r, 0, fxRenderTex.g)), float3(0, -1, 0));
-                float rotationAngleMax = radians(90);
-                float rotationAngle = length(fxRenderTex) * rotationAngleMax;
+                float3 forceDir = normalize(float3(fxRenderTex.r, 0, fxRenderTex.g));
+                float forceStrength = length(fxRenderTex); // [0, 1]
+                float3 upDir = float3(0, 1, 0);
+                
+                float rotationAngleMax = radians(-90);
 
-                // TODO(pyoung)
-                // #define SHADERGRAPH_OBJECT_POSITION UNITY_MATRIX_M._m03_m13_m23
+                float3 rotationAxis = cross(forceDir, upDir);
+                float rotationAngle = forceStrength * rotationAngleMax;
+
                 // _m00, _m01, _m02, _m03
                 // _m10, _m11, _m12, _m13
                 // _m20, _m21, _m22, _m23
                 // _m30, _m31, _m32, _m33
-                float3 objectPosition = UNITY_MATRIX_M._m03_m13_m23;
-                float3 RotatedPositionWS;
-                RotateAboutAxis_float(float4(rotationAxis, rotationAngle), objectPosition, positionWS, RotatedPositionWS);
+                float3 objectRootPositionWS = UNITY_MATRIX_M._m03_m13_m23;
+                float3 RotatedPositionWS= RotateAboutAxis(positionWS, objectRootPositionWS, rotationAxis, rotationAngle);
 
                 OUT.positionCS = TransformWorldToHClip(RotatedPositionWS);
                 OUT.uv = IN.uv;
@@ -146,7 +130,7 @@
 
             half4 frag(VStoFS IN) : SV_Target
             {
-                return 0.5;
+                return half4(0, 0.5, 0, 1);
             }
             ENDHLSL
         }
