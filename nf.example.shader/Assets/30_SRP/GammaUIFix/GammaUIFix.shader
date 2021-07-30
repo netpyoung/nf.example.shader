@@ -32,10 +32,8 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_CameraColorTexture);
-            SAMPLER(sampler_CameraColorTexture);
+            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
+            TEXTURE2D(_CameraColorTexture); SAMPLER(sampler_CameraColorTexture);
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
