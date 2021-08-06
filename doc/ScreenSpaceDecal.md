@@ -8,7 +8,7 @@
 3. SSD상자 밖이면 그리지않기
 4. 데칼 그리기
 
-## ver. URP
+## ver1. URP
 
 ``` hlsl
 // NDC에서 depth를 이용 역산하여 데칼 위치를 구하는법.
@@ -44,6 +44,10 @@ half2 uv_decal = positionOS_decal.xz + 0.5;
 half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
 half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
 ```
+
+## ver2. URP
+
+- [Depth](./Basic/Depth.md)에선 WorldSpace상 좌표를 이용해서 Depth로부터 위치를 구했는데, 최적화를 위해 Object Space상에서 구함(한눈에 봐서는 어색하지만 따라가다보면 말이 되긴 한다)
 
 ``` hlsl
 // 오브젝트 공간의 viewRay를 구하고 depth에 맞추어 데칼 위치를 구하는법.

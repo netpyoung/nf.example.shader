@@ -79,9 +79,47 @@ if (_MainTex_TexelSize.y < 0)
 - [CDEDC2009 -  IMAGIRE DAY : 続・レンダリスト養成講座](https://cedil.cesa.or.jp/cedil_sessions/view/264)
 - [GDC2003 - Frame Buffer Postprocessing Effects in DOUBLE-S.T.E.A.L (Wreckless)](http://genderi.org/frame-buffer-postprocessing-effects-in-double-s-t-e-a-l-wreckl.html)
 - [GDC2003 - Real-Time 3D Scene Post-processing](https://developer.amd.com/wordpress/media/2012/10/Oat-ScenePostprocessing.pdf)
-- Dual filtering
-  - [SIGGRAPH2015 - Bandwidth-Efficient Rendering](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf)
 - https://github.com/nobnak/KawaseLightStreakUnity
+
+## Dual Filter
+
+``` hlsl
+// DownSampler pos
+// -0.5, -0.5 |   -   | +0.5, -0.5
+//    -       | 0,  0 |    -   
+// -0.5, +0.5 |   -   | +0.5, +0.5
+
+// DownSampler weight
+//   1/8  |   -   |   1/8
+//    -   |  1/2  |    - 
+//   1/8  |   -   |   1/8
+
+// UpSampler pos
+//     -   |     -      |   0, -1   |    -       |    -
+//     -   | -0.5, -0.5 |     -     | +0.5, -0.5 |    -
+//   -1, 0 |     -      |     -     |    -       |  +1, 0
+//     -   | -0.5, -0.5 |     -     | +0.5, -0.5 |    -
+//     -   |     -      |   0, +1   |    -       |    -
+
+// UpSampler weight
+//     -   |     -      |   1/12    |    -       |    -
+//     -   |    1/6     |     -     |    1/6     |    -
+//   1/12  |     -      |     -     |    -       |   1/12
+//     -   |    1/6     |     -     |    1/6     |    -
+//     -   |     -      |   1/12    |    -       |    -
+```
+
+- [SIGGRAPH2015 - Bandwidth-Efficient Rendering](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf)
+- <https://github.com/MarcusXie3D/FastBloomForMobiles>
+  - <https://zhuanlan.zhihu.com/p/126351976>
+
+|     |                          |                                                  |
+|-----|--------------------------|--------------------------------------------------|
+| MGF | Multiple Gaussian Filter | 여러 DownScale버퍼를 이용하여 가우시안 필터 적용 |
+| MRT | Multiple Render Targets  | 여러 렌더 타겟을 이용( COLOR0, COLOR1..)         |
+
+- [Tiled Rendering과 DiscardCont](https://dreamotion.tistory.com/4)
+- [Mali Performance 2: How to Correctly Handle Framebuffers](https://community.arm.com/developer/tools-software/graphics/b/blog/posts/mali-performance-2-how-to-correctly-handle-framebuffers)
 
 ## Radial / 방사형
 

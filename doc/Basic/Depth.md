@@ -4,6 +4,7 @@
 - Linear01Depth : distance from the eye in [0;1]
 
 ``` hlsl
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 half3 pd            = IN.positionNDC.xyz / IN.positionNDC.w; // perspectiveDivide
 half2 uv_Screen     = pd.xy;
 
@@ -84,6 +85,20 @@ half intersectGradient = 1 - min(diffEyeDepth, 1.0f);
 TODO
 
 - <https://developer.nvidia.com/content/depth-precision-visualized>
+
+## ReconstructPositionWS
+
+``` hlsl
+OUT.toViewVectorWS = _WorldSpaceCameraPos - vertexInputs.positionWS;
+
+float2 screenUV = (IN.positionNDC.xy / IN.positionNDC.w);
+
+float sceneRawDepth = SampleSceneDepth(screenUV);
+float sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
+
+float fragmentEyeDepth = -IN.positionVS.z;
+float3 scenePositionWS = _WorldSpaceCameraPos + (-IN.toViewVectorWS / fragmentEyeDepth) * sceneEyeDepth;
+```
 
 ## Ref
 

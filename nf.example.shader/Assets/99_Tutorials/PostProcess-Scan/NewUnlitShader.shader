@@ -73,6 +73,7 @@
                 half2 screenUV = IN.positionNDC.xy / IN.positionNDC.w;
 
                 half depth = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams);
+                //return depth;
                 if (depth >= _ProjectionParams.z)
                 {
                     return mainTex;

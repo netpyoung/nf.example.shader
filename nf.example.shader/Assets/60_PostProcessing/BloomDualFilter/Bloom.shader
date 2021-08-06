@@ -3,18 +3,17 @@
     Properties
     {
         [HideInInspector] _MainTex("UI Texture", 2D) = "white" {}
-        // [HideInInspector] _BloomBlurTex("UI Texture", 2D) = "white" {}
-        // [HideInInspector] _BloomNonBlurTex("UI Texture", 2D) = "white" {}
     }
 
     SubShader
     {
-        Pass
+        Pass // 0
         {
             NAME "BLOOM_THRESHOLD"
 
             Cull Back
             ZWrite Off
+            ZTest Off
 
             HLSLPROGRAM
             #pragma target 3.5
@@ -54,11 +53,18 @@
 
             half4 frag(VStoFS IN) : SV_Target
             {
+                /*float4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+
+                mainTex.rgb -= 1.5;
+                mainTex = max(mainTex, 0) * 3;
+
+                return mainTex;*/
+
                 float4 brightColor = 0;
                 float3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
                 float brightness = dot(mainTex, float3(0.2126, 0.7152, 0.0722));
-                if (brightness > 0.99)
+                if (brightness > 0.9)
                 {
                     brightColor = half4(mainTex, 1);
                 }
@@ -67,12 +73,13 @@
             ENDHLSL
         }
 
-        Pass
+        Pass // 1
         {
             NAME "BLOOM_COMPOSITE"
 
-            Cull Back
+            Cull Off
             ZWrite Off
+            ZTest Off
 
             HLSLPROGRAM
             #pragma target 3.5
@@ -84,8 +91,6 @@
 
             TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
             TEXTURE2D(_BloomBlurTex);       SAMPLER(sampler_BloomBlurTex);
-            TEXTURE2D(_BloomNonBlurTex);    SAMPLER(sampler_BloomNonBlurTex);
-
 
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
@@ -117,11 +122,8 @@
             {
                 float3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
                 float3 bloomBlurTex = SAMPLE_TEXTURE2D(_BloomBlurTex, sampler_BloomBlurTex, IN.uv).rgb;
-                float3 bloomNonBlurTex = SAMPLE_TEXTURE2D(_BloomNonBlurTex, sampler_BloomNonBlurTex, IN.uv).rgb;
-             
-                // return half4(bloomNonBlurTex, 1);
-                // return half4(bloomBlurTex, 1);
-                return half4(mainTex + bloomBlurTex + bloomNonBlurTex, 1);
+                return half4(mainTex + bloomBlurTex, 1);
+
             }
             ENDHLSL
         }

@@ -20,15 +20,16 @@
 | 4.0            |                 | Geometry                         |
 | 4.5            | es3.1           | Compute                          |
 | 4.6            |                 | Tessellation(* Metal은 지원안함) |
-| 5.0 | | RenderTexture.enableRandomWrite|
+| 5.0            |                 | RenderTexture.enableRandomWrite  |
+
 ## 안드로이드와 그래픽 라이브러리
 
-| Graphic Library | Android API | version | 코드명     | Linear지원 |
-|-----------------|-------------|---------|------------|------------|
-| es2.0           | 8           | 2.2.x   | Froyo      | x          |
-| es3.0           | 18          | 4.3.x   | Jelly Bean | O          |
-| es3.1           | 21          | 5.0     | Lollipop   | O          |
-| Vulkan          | 24          | 7.0     | Nougat     | O          |
+| Graphic Library | Android API | version | 코드명     | Linear지원 | SRP Batcher |
+|-----------------|-------------|---------|------------|------------|-------------|
+| es2.0           | 8           | 2.2.x   | Froyo      | x          | X           |
+| es3.0           | 18          | 4.3.x   | Jelly Bean | O          | X           |
+| es3.1           | 21          | 5.0     | Lollipop   | O          | O           |
+| Vulkan          | 24          | 7.0     | Nougat     | O          | O           |
 
 ## Linear지원 사양
 
@@ -57,3 +58,4 @@
 - <https://developer.android.com/ndk/guides/graphics/getting-started?hl=ko>
 - <https://forum.unity.com/threads/severe-banding-with-webgl-on-chrome.310326/#post-2035482>
 - <https://blog.mozilla.org/futurereleases/2015/03/03/an-early-look-at-webgl-2/>
+- SRP Batcher : <https://blog.unity.com/kr/technology/srp-batcher-speed-up-your-rendering>
