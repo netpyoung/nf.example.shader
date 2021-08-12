@@ -14,3 +14,4 @@ if (dot(v.normal, worldSnowAngle) >= snowSize)
 }
 
 - http://blog.naver.com/plasticbag0/221436480475
+- https://www.slideshare.net/proyZ/daniel-barrero-coh2renderingtech

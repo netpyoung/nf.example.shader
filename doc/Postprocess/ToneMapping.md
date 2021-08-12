@@ -1,4 +1,17 @@
-# Tone
+# ToneMapping
+
+- 컴퓨터 모니터와 같은 LDR 매체에서 볼 수 있지만 HDR 이미지의 선명도와 톤 범위를 갖는 결과 이미지를 생성
+
+|                                     | nits   |
+|-------------------------------------|--------|
+| eye                                 | 40,000 |
+| LDR/SDR(Low/Standard Dynamic Range) | 100    |
+| HDR(High Dynamic Range)             | 1,000  |
+
+- Tone-mapping -> 디스플레이에 출력가능한 값
+- 평균 Luminance
+- Luminance 중심으로 0~1 : Tone Mapping
+- RGB -> CIE XYZ -> CIE Yxy -> y : Luminance
 
 ## Color Space
 
@@ -116,20 +129,7 @@ half3x3 MAT_YUV_TO_RGB = {
 };
 ```
 
-## HDR & ToneMapping
-
-|                                     | nits   |
-|-------------------------------------|--------|
-| eye                                 | 40,000 |
-| LDR/SDR(Low/Standard Dynamic Range) | 100    |
-| HDR(High Dynamic Range)             | 1,000  |
-
-- Tone-mapping -> 디스플레이에 출력가능한 값
-- 평균 Luminance
-- Luminance 중심으로 0~1 : Tone Mapping
-- RGB -> CIE XYZ -> CIE Yxy -> y : Luminance
-
-## ToneMapping
+## ToneMappings
 
 - Reinhard
 

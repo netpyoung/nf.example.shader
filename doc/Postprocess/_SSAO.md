@@ -1,1 +1,3 @@
-[slideshare.net/youpyo/d2-depth-of-field](https://www.slideshare.net/youpyo/d2-depth-of-field)
+# Screen Space Ambient Occlusion
+
+- 더 알아볼것 GTAO(Ground True Occulusion)

@@ -1,5 +1,8 @@
 # SRP (Scriptable Render Pipeline)
 
+- <https://github.com/cinight/CustomSRP/tree/master/Assets>
+- <https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Runtime/UniversalRenderPipeline.cs>
+  - <https://github.com/Unity-Technologies/Graphics/blob/53fed35b0ed491fda85d87c8b39a3175c40d7fc3/com.unity.render-pipelines.universal/Runtime/UniversalRenderPipeline.cs#L348>
 - `_MainTex`로 화면을 받음.
 
 ## RenderPipelineAsset.asset
@@ -15,12 +18,32 @@ GraphicsSettings.renderPipelineAsset = _renderPipelineAsset;
 
 ``` cs
 // 클래스를 만들어서 사용자 렌더파이프라인에셋 만들기
-[CreateAssetMenu(menuName = "CreateRenderPipelineAsset/CustomRenderPipelineAsset")]
+[CreateAssetMenu(menuName = "Rendering/CustomRenderPipelineAsset")]
 public class CustomRenderPipelineAsset : RenderPipelineAsset
 {
-    protected override IRenderPipeline InternalCreatePipeline();
+    protected override RenderPipeline CreatePipeline()
+    {
+        return new CustomRenderPipeline();
+    }
+}
+
+public class CustomRenderPipeline : RenderPipeline
+{
+    protected override void Render(ScriptableRenderContext context, Camera[] cameras);
 }
 ```
+
+## RenderGraph
+
+TODO
+
+|                |        |                                            |                                                                                                                                   |
+|----------------|--------|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| RTHandles      | class  | RenderTexture API 감싼것                   | <https://docs.unity3d.com/Packages/com.unity.render-pipelines.core@12.0/api/UnityEngine.Rendering.RTHandles.html>                 |
+| ComputeBuffers | class  | Compute Shader를 위한 GPU data buffer      | <https://docs.unity3d.com/ScriptReference/ComputeBuffer.html>                                                                     |
+| RendererLists  | struct | 렌더링에 사용하는 셋팅같은 정보들 모아둔것 | <https://docs.unity3d.com/Packages/com.unity.render-pipelines.core@12.0/api/UnityEngine.Experimental.Rendering.RendererList.html> |
+
+- <https://github.com/cinight/CustomSRP/tree/master/Assets/SRP0802_RenderGraph>
 
 ## Renderer.asset
 
@@ -64,6 +87,57 @@ public class CustomRenderPipelineAsset : RenderPipelineAsset
 
 ## Example
 
+### RenderPipeline
+
+``` hlsl
+Pass
+{
+    Tags
+    {
+        // LightMode 태그는 라이팅 파이프 라인에서 패스의 역할을 정의.
+        "LightMode" = "CustomLightMode"
+    }
+}
+
+```
+
+``` cs
+[CreateAssetMenu(menuName = "Rendering/CustomRenderPipelineAsset")]
+public class CustomRenderPipelineAsset : RenderPipelineAsset
+{
+    protected override RenderPipeline CreatePipeline()
+    {
+        return new CustomRenderPipeline();
+    }
+}
+
+// ==========================================================================
+public class CustomRenderPipeline : RenderPipeline
+{
+    CustomRenderer _renderer = new CustomRenderer();
+
+    protected override void Render(ScriptableRenderContext context, Camera[] cameras)
+    {
+        foreach (Camera cam in cameras)
+        {
+            _renderer.Render(ref context, cam);
+        }
+    }
+}
+
+// ==========================================================================
+public class CustomRenderer
+{
+    readonly static ShaderTagId unlitShaderTagId = new ShaderTagId("CustomLightMode");
+
+    public void Render(ref ScriptableRenderContext context, Camera cam)
+    {
+        // ...
+        context.Submit();                 // 실행
+    }
+}
+```
+
 ```cs
 context.SetupCameraProperties(camera); // cmd전에 설정해주자(빠른 지우기)
 var cmd = new CommandBuffer();
@@ -85,28 +159,17 @@ if (!CulllResults.GetCullingParameters(camera, out ScriptableCullingParameters c
 {
     continue;
 }
-CullResults cr = CullResults.Cull(ref cullingParams, context);
+CullResults cullingResults = context.Cull(ref cullingParams);
 
+SortingSettings sortingSettings = new SortingSettings(cam);
+DrawingSettings drawingSettings = new DrawingSettings(unlitShaderTagId, sortingSettings);
+FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
+
+context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
 context.DrawRenderers             // 렌더링
 context.DrawSkybox(camera)        // Skybox
-
-var drawSettings = new DrawRendererSettings(camera, new ShaderPassName("CustomLightMode"));
-
-var filterSettings = new FilterRenderersSettings(true) {
-    renderQueueRange = RenderQueueRange.opaque
-    // 투명(Opaque)
-    // 반투명(Transparent)
-
-    // layerMask
-    // renderingLayerMask
-};
 ```
 
-``` hlsl
-// LightMode 태그는 라이팅 파이프 라인에서 패스의 역할을 정의.
-
-Tags { "LightMode" = "CustomLightMode" }
-```
 
 ``` cs
 // cs
@@ -171,28 +234,6 @@ CullResults cr = CullResults.Cull(ref cullingParams, context);
 InitializeRenderingData(settings, ref cameraData, ref cullResults, out var renderingData);
 renderer.Setup(context, ref renderingData); // RenderPass 쌓기.
 renderer.Execute(context, ref renderingData);
-```
-
-``` cs
-public class MyScriptableRenderPass : ScriptableRenderPass
-{
-    public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData);
-}
-
-public class MyScriptableRenderFeature : ScriptableRenderFeature
-{
-    MyScriptableRenderPass mPass;
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(mPass);
-    }
-
-    public override void Create()
-    {
-        mPass = new MyScriptableRenderPass();
-    }
-}
 ```
 
 ``` cs

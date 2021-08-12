@@ -8,9 +8,9 @@
 | 3.0   | 2.5 + interpolators10 + samplelod + fragcoord                  |
 | 3.5   | 3.0 + interpolators15 + mrt4 + integers + 2darray + instancing |
 | 4.0   | 3.5 + geometry                                                 |
-| 5.0   | 4.0 + compute + randomwrite + tesshw + tessellation            |
 | 4.5   | 3.5 + compute + randomwrite                                    |
 | 4.6   | 4.0 + cubearray + tesshw + tessellation                        |
+| 5.0   | 4.0 + compute + randomwrite + tesshw + tessellation            |
 
 | #pragma target | 설명            |                                  |
 |----------------|-----------------|----------------------------------|
@@ -21,6 +21,11 @@
 | 4.5            | es3.1           | Compute                          |
 | 4.6            |                 | Tessellation(* Metal은 지원안함) |
 | 5.0            |                 | RenderTexture.enableRandomWrite  |
+
+## Deferred support
+
+- 최소 셰이더 모델 4.5이상
+- OpenGL기반 API에서는 지원하지 않음.
 
 ## 안드로이드와 그래픽 라이브러리
 
@@ -59,3 +64,4 @@
 - <https://forum.unity.com/threads/severe-banding-with-webgl-on-chrome.310326/#post-2035482>
 - <https://blog.mozilla.org/futurereleases/2015/03/03/an-early-look-at-webgl-2/>
 - SRP Batcher : <https://blog.unity.com/kr/technology/srp-batcher-speed-up-your-rendering>
+- <https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@12.0/manual/rendering/deferred-rendering-path.html>
