@@ -94,7 +94,7 @@
                 // ============== 4. 데칼 그리기
                 // uv_decal: [0, 1]
                 half2 uv_decal = positionOS_decal.xz + 0.5;
-                half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex);
+                half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex); // for Texture Tiling
                 half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
                 return mainTex;
             }

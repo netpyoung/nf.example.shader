@@ -1,9 +1,5 @@
-﻿Shader "ScreenSpaceDecal_v1"
+﻿Shader "ScreenSpaceDecal_v3"
 {
-    // ref:
-    // - [SIGGRAPH2012 : Screen space decals in Warhammer 40,000: Space Marine](https://dl.acm.org/doi/10.1145/2343045.2343053)
-    // - [스크린 스페이스 데칼에 대해 자세히 알아보자(워햄머 40,000: 스페이스 마린)](https://www.slideshare.net/blindrendererkr/40000)
-
     Properties
     {
         _MainTex("texture", 2D) = "white" {}
@@ -14,13 +10,13 @@
         Tags
         {
             "RenderPipeline" = "UniversalRenderPipeline"
-            "Queue" = "AlphaTest"
-            "RenderType" = "TransparentCutout"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
         }
 
         Pass
         {
-            Name "SCREEN_SPACE_DECAL_V1"
+            Name "SCREEN_SPACE_DECAL_V3"
 
             Tags
             {
@@ -29,6 +25,7 @@
 
             Cull Back
             ZWrite Off
+            Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
             #pragma target 3.5
@@ -52,10 +49,12 @@
 
             struct VStoFS
             {
-                float4 positionCS    : SV_POSITION;
-                float4 positionNDC : TEXCOORD0;
+                float4 positionCS           : SV_POSITION;
+                float4 positionNDC          : TEXCOORD0;
+                float3 positionOS_camera    : TEXCOORD2;
+                float4 positionOSw_viewRay  : TEXCOORD1;
             };
-            
+
             VStoFS vert(APPtoVS IN)
             {
                 VStoFS OUT;
@@ -64,12 +63,20 @@
                 VertexPositionInputs vertexPositionInput = GetVertexPositionInputs(IN.positionOS.xyz);
 
                 OUT.positionCS = vertexPositionInput.positionCS;
-                // positionNDC: [0, w]
                 OUT.positionNDC = vertexPositionInput.positionNDC;
 
+                // float4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
+                // OUT.positionOS_camera = mul(I_MV, float4(0, 0, 0, 1)).xyz;
+                // OUT.positionOSw_viewRay.xyz = mul((float3x3)I_MV, -vertexPositionInput.positionVS);
+                // OUT.positionOSw_viewRay.w = vertexPositionInput.positionVS.z;
+
+                float3 positionOS_camera = mul(UNITY_MATRIX_I_M, float4(_WorldSpaceCameraPos, 1)).xyz;
+                OUT.positionOS_camera = positionOS_camera;
+                OUT.positionOSw_viewRay.xyz = (positionOS_camera - IN.positionOS.xyz);
+                OUT.positionOSw_viewRay.w = vertexPositionInput.positionVS.z;
                 return OUT;
             }
-            
+
             half4 frag(VStoFS IN) : SV_Target
             {
                 // ============== 1. 씬뎁스 구하기
@@ -79,18 +86,9 @@
                 half sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
 
                 // ============== 2. 뎁스로부터 3D위치를 구하기
-                // ndc: [-1, 1]
-                half2 ndc = uv_Screen * 2.0 - 1.0;
-                half4 positionVS_decal;
-                positionVS_decal.x = (ndc.x * sceneEyeDepth) / unity_CameraProjection._11;
-                positionVS_decal.y = (ndc.y * sceneEyeDepth) / unity_CameraProjection._22;
-                positionVS_decal.z = -sceneEyeDepth;
-                positionVS_decal.w = 1;
-
-                half4x4 I_MV = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
                 // positionOS_decal: [-0.5, 0.5] // clip 으로 잘려질것이기에
-                half4 positionOS_decal = mul(I_MV, positionVS_decal);
-
+                half3 positionOS_decal = IN.positionOS_camera + (IN.positionOSw_viewRay.xyz / IN.positionOSw_viewRay.w) * sceneEyeDepth;
+                
                 // ============== 3. SSD상자 밖이면 그리지않기
                 clip(0.5 - abs(positionOS_decal.xyz));
 
@@ -99,6 +97,12 @@
                 half2 uv_decal = positionOS_decal.xz + 0.5;
                 half2 uv_MainTex = TRANSFORM_TEX(uv_decal, _MainTex); // for Texture Tiling
                 half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv_MainTex);
+
+                // ============== 4. 페이드아웃 적용
+                // ref: [http://ttmayrin.tistory.com/37](https://web.archive.org/web/20170508024615/http://ttmayrin.tistory.com/37)
+                // #define HALF_Y 0.25f
+                // mainTex *= (1.f - max((positionOS_decal.y - HALF_Y) / HALF_Y, 0.f));
+                mainTex *= (1.f - max(4 * positionOS_decal.y - 1, 0.f));
                 return mainTex;
             }
             ENDHLSL

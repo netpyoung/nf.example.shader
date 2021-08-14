@@ -1,6 +1,6 @@
 # Screen Space Decal / SSD
 
-- `[SIGGRAPH2012 ScreenSpaceDecal]`
+- [SIGGRAPH2012 ScreenSpaceDecal](https://www.slideshare.net/blindrenderer/screen-space-decals-in-warhammer-40000-space-marine-14699854)
 - 큐브를 프로젝터처럼 이용, 화면에 데칼을 그린다.
 - 뎁스로부터 포지션을 다시 구축하는 것이므로 `Reconstructing position from depth`라고도 한다.
 
@@ -117,9 +117,10 @@ clip(dot(normal, orientation) - gNormalThreshold);
 수직인 지형에서의 경계면이 잘리는 거 fadeout
 
 ``` hlsl
-#define HALF_Z 0.25f
-// Fade by Z
-OutColor *= (1.f - max((positionOS_decal.z - HALF_Z)/HALF_Z, 0.f));
+// 유니티는 Y가 높이이기에
+// #define HALF_Y 0.25f
+// OutColor *= (1.f - max((positionOS_decal.y - HALF_Y) / HALF_Y, 0.f));
+OutColor *= (1.f - max(4 * positionOS_decal.y - 1, 0.f));
 ```
 
 
