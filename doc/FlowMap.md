@@ -50,6 +50,7 @@ half2 subUV = GetSubUV(IN.uv, frameNumber, uint2(_ColumnsX, _RowsY));
 - [youtube: Flow Map Material Setup in 13 Minutes](https://www.youtube.com/watch?v=tEr3NE_XLbc)
 - [GDC2012 - Water Technology of Uncharted](https://www.gdcvault.com/play/1015309/Water-Technology-of)
 - [Graphics Runner: Animating Water Using Flow Maps by Kyle Hayward](http://graphicsrunner.blogspot.com/2010/08/water-using-flow-maps.html)
+- [http://ttmayrin.tistory.com/40](https://web.archive.org/web/20170508024645/http://ttmayrin.tistory.com/40)
 
 ![./res/01-uv-256.png](./res/01-uv-256.png)
 

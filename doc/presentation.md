@@ -19,6 +19,7 @@
 - [2019 - [Unite Seoul 2019] 최재영 류재성 - 일곱개의 대죄 : “애니메이션의 감성을 그대로＂와 “개발 최적화](https://youtu.be/0LwlNVS3FJo)
   - MatCap / Imposter / LookAt
   - ChromaticAberrationFilter / Bloom / Noise / RadialBlur / VignetteEffect / InvertColorFilter / ScratchedFilmFilter / ColorGradingLUT
+- [2020 - Dev Weeks: A3 Still Alive - Technical Art Review](https://www.youtube.com/watch?v=ufNYLgE2WGA)
 
 ## 일본
 

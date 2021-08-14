@@ -49,6 +49,7 @@ half specular = pow(sinTH, specularPower);
 - SIGGRAPH 2003
 - [blog - Hair Rendering Lighting Model - (Marschner)](https://blog.naver.com/sorkelf/40186644136)
 - [pdf - Light Scattering from Human Hair Fibers - Stephen R. Marschner, Henrik Wann Jensen, Mike Cammarano](www.cs.cornell.edu/~srm/publications/SG03-hair.pdf)
+- [2020 - Dev Weeks: A3 Still Alive - Technical Art Review](https://youtu.be/ufNYLgE2WGA?t=1952)
 
 ![Marschner.png](./res/Marschner.png)
 

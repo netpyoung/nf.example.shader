@@ -1,5 +1,6 @@
 # Screen Space Decal / SSD
 
+- `[SIGGRAPH2012 ScreenSpaceDecal]`
 - 큐브를 프로젝터처럼 이용, 화면에 데칼을 그린다.
 - 뎁스로부터 포지션을 다시 구축하는 것이므로 `Reconstructing position from depth`라고도 한다.
 
@@ -108,6 +109,19 @@ gNormalThreashold == cos(각도)
 float3 normal = DecodeGbufferNormal(tex2D(GNormalMap, depth_uv));
 clip(dot(normal, orientation) - gNormalThreshold);
 ```
+
+## fadeout
+
+- [http://ttmayrin.tistory.com/37](https://web.archive.org/web/20170508024615/http://ttmayrin.tistory.com/37)
+
+수직인 지형에서의 경계면이 잘리는 거 fadeout
+
+``` hlsl
+#define HALF_Z 0.25f
+// Fade by Z
+OutColor *= (1.f - max((positionOS_decal.z - HALF_Z)/HALF_Z, 0.f));
+```
+
 
 ## Ref
 

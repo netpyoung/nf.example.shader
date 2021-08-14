@@ -24,6 +24,12 @@
 - linear color를 마지막에 gamma적용시킴
 - `pow(linearColor, 2.2);`
 
+## RGBM과 LogLUV 
+
+TODO
+http://egloos.zum.com/cagetu/v/5697725
+https://kblog.popekim.com/2013/11/blendable-rgbm.html
+
 ## 통합셰이더 예제
 
 CHROMATIC_ABERRATION 색수차 - 렌즈 무지개현상
