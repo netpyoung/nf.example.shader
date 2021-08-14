@@ -125,7 +125,7 @@
 
             half SpecularStrand(half dotTH, half strength, half exponent)
             {
-                // Strand : ����
+                // Strand : (실전선머리카락 등의) 가닥.
                 half sinTH = sqrt(1.0 - dotTH * dotTH);
                 half dirAtten = smoothstep(-1.0, 0.0, dotTH);
                 return dirAtten * strength * pow(sinTH, exponent);

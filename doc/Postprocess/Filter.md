@@ -30,9 +30,9 @@ if (_MainTex_TexelSize.y < 0)
 // -1, +1 | 0, +1 | +1, +1
 
 // weight
-// 1, 1, 1,
-// 1, 1, 1,
-// 1, 1, 1
+// 1 | 1 | 1
+// 1 | 1 | 1
+// 1 | 1 | 1
 ```
 
 ## Gaussian / 가우스
@@ -47,9 +47,9 @@ if (_MainTex_TexelSize.y < 0)
 
 // weight
 // Sigma: 1.0 | Kernel Size : 3
-// 0.077847,    0.123317,   0.077847,
-// 0.123317,    0.195346,   0.123317,
-// 0.077847,    0.123317,   0.077847
+// 0.077847 |  0.123317 | 0.077847
+// 0.123317 |  0.195346 | 0.123317
+// 0.077847 |  0.123317 | 0.077847
 ```
 
 - [Gaussian Kernel Calculator](http://dev.theomader.com/gaussian-kernel-calculator/)

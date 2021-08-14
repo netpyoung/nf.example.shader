@@ -20,6 +20,8 @@ TRANSFER_SHADOW_CASTER
 
 ### 평면 투영 (Planar Projected) 그림자
 
+- 그림자용 모델 따로 만들어서 셰이더 연산 절약.
+
 ### RenderTexture이용
 
 - Shadow용 모델
