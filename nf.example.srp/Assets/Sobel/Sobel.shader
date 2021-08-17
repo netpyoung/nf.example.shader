@@ -97,14 +97,7 @@
 
             half4 frag(VStoFS IN) : SV_Target
             {
-                half3 pd = IN.positionNDC.xyz / IN.positionNDC.w; // perspectiveDivide
-                half2 uv_Screen = pd.xy;
-
-                half  sceneRawDepth = SampleSceneDepth(uv_Screen);
-                half  sceneEyeDepth = LinearEyeDepth(sceneRawDepth, _ZBufferParams);
-
                 float s = pow(1 - saturate(Sobel(IN.uv, _LineThickness)), 1);
-
                 half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
                 return mainTex * s;
             }

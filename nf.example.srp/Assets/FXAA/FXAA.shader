@@ -325,7 +325,7 @@
             half4 frag(VStoFS IN) : SV_Target
             {
                 float4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-
+                
                 // Local Contrast Check
                 LuminanceData l = (LuminanceData) 0;
                 l.c = Luma(mainTex);
