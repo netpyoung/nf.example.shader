@@ -50,3 +50,4 @@ float FxaaLuma(float3 rgb)
   - <http://iryoku.com/aacourse/>
 - [Implementing FXAA - Simon Rodriguez](http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html)
   - [[번역] Implementing FXAA](https://scahp.tistory.com/68)
+- <https://www.slideshare.net/JinWooLee2/anti-aliasing>

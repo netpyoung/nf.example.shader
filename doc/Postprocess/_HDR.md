@@ -11,9 +11,7 @@
 
 ## Eye Adaptation
 
-1. 현재화면 평균밝기 저장(사이즈를 줄여가며 1x1텍스쳐로)
-2. 이전화면 평균밝기와 비교해서 적절한 밝기 구함
-3. 앞서구한 밝기를 원본 이미지에 적용
+- 참고: [EyeAdaptation](./EyeAdaptation.md)
 
 ## ToneMapping
 

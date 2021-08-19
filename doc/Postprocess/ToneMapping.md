@@ -279,6 +279,9 @@ float3 Unreal3(float3 color_Linear)
 - Color Control : <https://www.slideshare.net/cagetu/928501785227148871>
 - [SIGGRAPH2016 - Technical Art of Uncharted 4](http://advances.realtimerendering.com/other/2016/naughty_dog/index.html)
 - [GDC2017 - High Dynamic Range Color Grading and Display in Frostbite](https://www.youtube.com/watch?v=7z_EIjNG0pQ)
+- https://mynameismjp.wordpress.com/2010/04/30/a-closer-look-at-tone-mapping/
+- http://renderwonk.com/publications/s2010-color-course/
+- [shadertoy -  Tone mapping](https://www.shadertoy.com/view/lslGzl)
 
 GDC2004 - Advanced Depth of Field
 - [GDC2009 - Star Ocean 4 - Flexible Shader Managment and Post-processing](https://www.slideshare.net/DAMSIGNUP/so4-flexible-shadermanagmentandpostprocessing)
