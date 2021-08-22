@@ -7,6 +7,9 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _Key("_Key", Float) = 1
+
+    
     }
 
     SubShader
@@ -25,7 +28,8 @@
             TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
             TEXTURE2D(_LumaAdaptTex);   SAMPLER(sampler_LumaAdaptTex);
             TEXTURE2D(_LumaCurrTex);    SAMPLER(sampler_LumaCurrTex);
-            TEXTURE2D(_LumaPrevTex);    SAMPLER(sampler_LumaPrevTex);
+
+            float _Key;
 
             struct APPtoVS
             {
@@ -43,48 +47,51 @@
             {
                 VStoFS OUT;
                 ZERO_INITIALIZE(VStoFS, OUT);
-                VertexPositionInputs vpi = GetVertexPositionInputs(IN.positionOS.xyz);
-                OUT.positionCS = vpi.positionCS;
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = IN.uv;
                 return OUT;
             }
 
-            float3 ACES_Slim(float3 x)
+            float CalcLuminance(float3 color)
             {
-                // ref: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
-
-                x *= 0.6;
-                const float a = 2.51f;
-                const float b = 0.03f;
-                const float c = 2.43f;
-                const float d = 0.59f;
-                const float e = 0.14f;
-                return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+                return dot(color, float3(0.299f, 0.587f, 0.114f));
             }
 
-            half3 TonemapFilmic_Hejl2015(half3 hdr, half whitePoint)
+
+            float3 Reinhard_extended(float3 v, float max_white)
             {
-                half4 vh = half4(hdr, whitePoint);
-                half4 va = (1.425 * vh) + 0.05;
-                half4 vf = ((vh * va + 0.004) / ((vh * (va + 0.55) + 0.0491))) - 0.0821;
-                return vf.rgb / vf.aaa;
+                float3 numerator = v * (1.0f + (v / (max_white * max_white)));
+                return numerator / (1.0f + v);
             }
 
-            float3 Tonemap_Filmic(float3 color, float exposure)
+
+            static const float3x3 RGB2XYZ = {
+                0.5141364, 0.3238786, 0.16036376,
+                0.265068, 0.67023428, 0.06409157,
+                0.0241188, 0.1228178, 0.84442666
+            };
+
+            static const float3x3 XYZ2RGB = {
+                2.5651,-1.1665,-0.3986,
+                -1.0217, 1.9777, 0.0439,
+                0.0753, -0.2543, 1.1892
+            };
+
+            half AutoKey(half avgLum)
             {
-                color *= exposure;
-                float3 x = max(0, color - 0.004);
-                color = (x * (6.2 * x + 0.5)) / (x * (6.2 * x + 1.7) + 0.06);
-                return saturate(color);
+                return saturate(1.5 - 1.5 / (avgLum * 0.1 + 1)) + 0.1;
             }
 
             half4 frag(VStoFS IN) : SV_Target
             {
-                half adaptLuma = SAMPLE_TEXTURE2D(_LumaAdaptTex, sampler_LumaAdaptTex, float2(0, 0)).r;
-                half currLuma = SAMPLE_TEXTURE2D(_LumaCurrTex, sampler_LumaCurrTex, float2(0, 0)).r;
-
                 half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-                half3 color = ACES_Slim(mainTex * (1 + (currLuma - adaptLuma)));
+                half lumaAverageCurr = SAMPLE_TEXTURE2D(_LumaCurrTex, sampler_LumaCurrTex, float2(0, 0)).r;
+                half lumaAdaptCurr = SAMPLE_TEXTURE2D(_LumaAdaptTex, sampler_LumaAdaptTex, float2(0, 0)).r;
+
+                _Key = AutoKey(lumaAverageCurr);
+
+                half3 color = mainTex * (_Key / (lumaAdaptCurr + 0.0001));
+                color = Reinhard_extended(color, 1);
                 return half4(color, 1);
             }
             ENDHLSL

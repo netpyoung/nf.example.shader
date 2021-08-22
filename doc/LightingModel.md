@@ -50,6 +50,11 @@ half NdotH = max(0.0, dot(N, H));
 half specular = pow(NdotH ,_SpecularGloss) * _SpecularPower;
 ```
 
+## Strauss - 스트라우스
+
+- 1990 - Paul Strauss
+
+
 ## Gooch - 구치
 
 - 1998 - Gooch

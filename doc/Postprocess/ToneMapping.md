@@ -55,8 +55,47 @@ https://github.com/ampas/aces-dev
 https://www.slideshare.net/hpduiker/acescg-a-common-color-encoding-for-visual-effects-applications
 
 CIE XYZ
+
+X -
+Y 휘도
+Z 청색 자극
+
+- ITU1990
+
+``` hlsl
+const static half3x3 MAT_RGB_TO_XYZ = {
+    0.4124, 0.3576, 0.1805,
+    0.2126, 0.7152, 0.0722,
+    0.0193, 0.1192, 0.9505
+};
+
+const static half3x3 MAT_XYZ_TO_RGB = {
+    +3.2405, -1.5371, -0.4985,
+    -0.9693, +1.8760, +0.0416,
+    +0.0556, -0.2040, +1.0572
+};
+```
+
+``` hlsl
+// ======================================
+/// XYZ => Yxy
+float SUM_XYZ = dot(float3(1.0, 1.0, 1.0), XYZ);
+Yxy.r  = XYZ.g;
+Yxy.gb = XYZ.rg / SUM_XYZ;
+
+// ======================================
+/// Yxy => XYZ
+XYZ.r = Yxy.r * Yxy.g / Yxy. b;
+XYZ.g = Yxy.r;
+XYZ.b = Yxy.r * (1 - Yxy.g - Yxy.b) / Yxy.b;
+```
+
 CIE Yxy
 CIE Lab
+
+
+XYZ
+Yxy
 
 ## Simple
 
@@ -64,13 +103,13 @@ CIE Lab
 
 ``` hlsl
 // YUV로 변환후, 밝기만 취하기.
-half3x3 MAT_RGB_TO_YUV = {
+const static half3x3 MAT_RGB_TO_YUV = {
   +0.299, +0.587, +0.114, // 밝기
   -0.147, -0.289, +0.436,
   +0.615, -0.515, -0.100
 };
 
-half3x3 MAT_YUV_TO_RGB = {
+const static half3x3 MAT_YUV_TO_RGB = {
   +1.0, +0.000, +1.140,
   +1.0, -0.396, -0.581,
   +1.0, +2.029, +0.000
@@ -116,13 +155,13 @@ half3x3 MAT_YIQ_TO_RGB = {
 // Cb : -0.2
 // Cr : 0.1
 
-half3x3 MAT_RGB_TO_YUV = {
+const static half3x3 MAT_RGB_TO_YUV = {
   +0.299, +0.587, +0.114, // 밝기
   -0.147, -0.289, +0.436,
   +0.615, -0.515, -0.100
 };
 
-half3x3 MAT_YUV_TO_RGB = {
+const static half3x3 MAT_YUV_TO_RGB = {
   +1.0, +0.000, +1.140,
   +1.0, -0.396, -0.581,
   +1.0, +2.029, +0.000
