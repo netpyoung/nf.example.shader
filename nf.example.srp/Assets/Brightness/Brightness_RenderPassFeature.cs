@@ -17,52 +17,67 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
     class Brightness_RenderPass : ScriptableRenderPass
     {
         Brightness_RenderPassSettings _settings;
-        readonly static int _TmpCurrMipmapTex = Shader.PropertyToID("_TmpCurrMipmapTex");
-        readonly static int _TmpCopyTex = Shader.PropertyToID("_TmpCopyTex");
+        readonly static int _TmpCurrMipmapRT = Shader.PropertyToID("_TmpCurrMipmapTex");
+        readonly static int _TmpCopyRT = Shader.PropertyToID("_TmpCopyTex");
         readonly static int _LumaCurrTex = Shader.PropertyToID("_LumaCurrTex");
-        readonly static int _LumaPrevTex = Shader.PropertyToID("_LumaPrevTex");
-        readonly static int _LumaAdaptTex = Shader.PropertyToID("_LumaAdaptTex");
+        readonly static int _LumaAdaptPrevTex = Shader.PropertyToID("_LumaAdaptPrevTex");
+        readonly static int _LumaAdaptCurrTex = Shader.PropertyToID("_LumaAdaptCurrTex");
 
-        const int PASS_SobelFilter = 0;
-        const int PASS_AdaptedFilter = 1;
+        const int PASS_Brightness_CalcuateLuma = 0;
+        const int PASS_Brightness_CopyLuma = 1;
+        const int PASS_Brightness_AdaptedFilter = 2;
+        const int PASS_EyeAdaptation_ToneMapping = 0;
+
         RenderTargetIdentifier _source;
         private RenderTargetIdentifier _destination;
-        Material _bright_material;
-        Material _eye_material;
+        Material _mat_Brightness;
+        Material _mat_EyeAdaptation;
         RenderTexture _LumaPrevRT;
         RenderTexture _LumaCurrRT;
-        RenderTexture _LumaAdaptRT;
-        RenderTextureDescriptor _brightCurrRTD;
+        RenderTexture _LumaAdaptCurrRT;
+        RenderTextureDescriptor _TmpCurrMipmapRTD;
 
         public Brightness_RenderPass(Brightness_RenderPassSettings settings)
         {
             _settings = settings;
-            if (_bright_material == null)
+            if (_mat_Brightness == null)
             {
 
-                _bright_material = CoreUtils.CreateEngineMaterial("Hidden/Brightness");
+                _mat_Brightness = CoreUtils.CreateEngineMaterial("Hidden/Brightness");
             }
-            if (_eye_material == null)
+            if (_mat_EyeAdaptation == null)
             {
-                _eye_material = CoreUtils.CreateEngineMaterial("Hidden/EyeAdaptation");
+                _mat_EyeAdaptation = CoreUtils.CreateEngineMaterial("Hidden/EyeAdaptation");
             }
 
-            _bright_material.SetFloat("_AdaptionConstant", settings._AdaptionConstant);
-            _eye_material.SetFloat("_Key", settings._Key);
-            
-            _LumaPrevRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0);
-            _LumaCurrRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0);
-            _LumaAdaptRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0);
+            _mat_Brightness.SetFloat("_AdaptionConstant", settings._AdaptionConstant);
+            _mat_EyeAdaptation.SetFloat("_Key", settings._Key);
+
+            _LumaPrevRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
+            {
+                useMipMap = false,
+                autoGenerateMips = false,
+            };
+            _LumaCurrRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
+            {
+                useMipMap = false,
+                autoGenerateMips = false,
+            };
+            _LumaAdaptCurrRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
+            {
+                useMipMap = false,
+                autoGenerateMips = false,
+            };
             _LumaPrevRT.Create();
             _LumaCurrRT.Create();
-            _LumaAdaptRT.Create();
+            _LumaAdaptCurrRT.Create();
         }
 
         ~Brightness_RenderPass()
         {
             _LumaPrevRT.Release();
             _LumaCurrRT.Release();
-            _LumaAdaptRT.Release();
+            _LumaAdaptCurrRT.Release();
         }
 
         public static int ToPow2RoundUp(int x)
@@ -93,10 +108,11 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
             int h = renderingData.cameraData.camera.pixelHeight;
             w = ToPow2RoundUp(w / 2);
             h = ToPow2RoundUp(h / 2);
-            _brightCurrRTD = new RenderTextureDescriptor(w, h, GraphicsFormat.R16G16B16A16_SFloat, 0);
-            // _brightCurrRTD = new RenderTextureDescriptor(w, h, GraphicsFormat.R32G32B32A32_SFloat, 0);
-            _brightCurrRTD.autoGenerateMips = true;
-            _brightCurrRTD.useMipMap = true;
+            _TmpCurrMipmapRTD = new RenderTextureDescriptor(w, h, GraphicsFormat.R16G16_SFloat, 0)
+            {
+                autoGenerateMips = true,
+                useMipMap = true
+            };
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -107,23 +123,25 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
             }
             
             CommandBuffer cmd = CommandBufferPool.Get(nameof(Brightness_RenderPass));
-            cmd.SetGlobalTexture(_LumaPrevTex, _LumaPrevRT);
+            cmd.SetGlobalTexture(_LumaAdaptPrevTex, _LumaPrevRT);
             cmd.SetGlobalTexture(_LumaCurrTex, _LumaCurrRT);
-            cmd.SetGlobalTexture(_LumaAdaptTex, _LumaAdaptRT);
+            cmd.SetGlobalTexture(_LumaAdaptCurrTex, _LumaAdaptCurrRT);
 
-            cmd.GetTemporaryRT(_TmpCopyTex, renderingData.cameraData.cameraTargetDescriptor);
-            cmd.CopyTexture(_source, _TmpCopyTex);
+            cmd.GetTemporaryRT(_TmpCopyRT, renderingData.cameraData.cameraTargetDescriptor, FilterMode.Bilinear);
+            Blit(cmd, _source, _TmpCopyRT);
 
-            cmd.GetTemporaryRT(_TmpCurrMipmapTex, _brightCurrRTD);
-            Blit(cmd, _source, _TmpCurrMipmapTex);
-            Blit(cmd, _TmpCurrMipmapTex, _LumaCurrRT, _bright_material, PASS_SobelFilter);
-            cmd.ReleaseTemporaryRT(_TmpCurrMipmapTex);
+            cmd.GetTemporaryRT(_TmpCurrMipmapRT, _TmpCurrMipmapRTD, FilterMode.Bilinear);
+            cmd.SetGlobalTexture("_TmpCurrMipmapTex", _TmpCurrMipmapRT);
 
-            Blit(cmd, _LumaCurrRT, _LumaAdaptRT, _bright_material, PASS_AdaptedFilter);
-            Blit(cmd, _TmpCopyTex, _source, _eye_material, 0);
-            cmd.ReleaseTemporaryRT(_TmpCopyTex);
+            Blit(cmd, _source, _TmpCurrMipmapRT, _mat_Brightness, PASS_Brightness_CalcuateLuma);
+            Blit(cmd, _TmpCurrMipmapRT, _LumaCurrRT, _mat_Brightness, PASS_Brightness_CopyLuma);
+            cmd.ReleaseTemporaryRT(_TmpCurrMipmapRT);
 
-            Blit(cmd, _LumaAdaptRT, _LumaPrevRT);
+            Blit(cmd, _LumaCurrRT, _LumaAdaptCurrRT, _mat_Brightness, PASS_Brightness_AdaptedFilter);
+            Blit(cmd, _TmpCopyRT, _source, _mat_EyeAdaptation, PASS_EyeAdaptation_ToneMapping);
+            cmd.ReleaseTemporaryRT(_TmpCopyRT);
+
+            Blit(cmd, _LumaAdaptCurrRT, _LumaPrevRT);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             CommandBufferPool.Release(cmd);

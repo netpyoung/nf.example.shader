@@ -8,8 +8,6 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Key("_Key", Float) = 1
-
-    
     }
 
     SubShader
@@ -26,9 +24,12 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
-            TEXTURE2D(_LumaAdaptTex);   SAMPLER(sampler_LumaAdaptTex);
+            TEXTURE2D(_LumaAdaptCurrTex);   SAMPLER(sampler_LumaAdaptCurrTex);
             TEXTURE2D(_LumaCurrTex);    SAMPLER(sampler_LumaCurrTex);
-
+            
+            // for debug
+            // TEXTURE2D(_TmpCurrMipmapTex);    SAMPLER(sampler_TmpCurrMipmapTex);
+            
             float _Key;
 
             struct APPtoVS
@@ -52,11 +53,10 @@
                 return OUT;
             }
 
-            float CalcLuminance(float3 color)
+            half AutoKey(half avgLum)
             {
-                return dot(color, float3(0.299f, 0.587f, 0.114f));
+                return saturate(1.5 - 1.5 / (avgLum * 0.1 + 1)) + 0.1;
             }
-
 
             float3 Reinhard_extended(float3 v, float max_white)
             {
@@ -64,29 +64,17 @@
                 return numerator / (1.0f + v);
             }
 
-
-            static const float3x3 RGB2XYZ = {
-                0.5141364, 0.3238786, 0.16036376,
-                0.265068, 0.67023428, 0.06409157,
-                0.0241188, 0.1228178, 0.84442666
-            };
-
-            static const float3x3 XYZ2RGB = {
-                2.5651,-1.1665,-0.3986,
-                -1.0217, 1.9777, 0.0439,
-                0.0753, -0.2543, 1.1892
-            };
-
-            half AutoKey(half avgLum)
-            {
-                return saturate(1.5 - 1.5 / (avgLum * 0.1 + 1)) + 0.1;
-            }
-
             half4 frag(VStoFS IN) : SV_Target
             {
+                // for debug
+                // return SAMPLE_TEXTURE2D_LOD(_TmpCurrMipmapTex, sampler_TmpCurrMipmapTex, IN.uv, 5).rrrr;
+                // return exp(SAMPLE_TEXTURE2D_LOD(_TmpCurrMipmapTex, sampler_TmpCurrMipmapTex, IN.uv, 5).gggg);
+
                 half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
                 half lumaAverageCurr = SAMPLE_TEXTURE2D(_LumaCurrTex, sampler_LumaCurrTex, float2(0, 0)).r;
-                half lumaAdaptCurr = SAMPLE_TEXTURE2D(_LumaAdaptTex, sampler_LumaAdaptTex, float2(0, 0)).r;
+                half lumaAdaptCurr = SAMPLE_TEXTURE2D(_LumaAdaptCurrTex, sampler_LumaAdaptCurrTex, float2(0, 0)).r;
+
+                // return lumaAdaptCurr;
 
                 _Key = AutoKey(lumaAverageCurr);
 
