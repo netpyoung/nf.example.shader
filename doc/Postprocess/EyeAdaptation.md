@@ -5,17 +5,23 @@
 
 ## Overview
 
-1. 현재밝기
+1. 현재밝기(lumaAverageCurr)
    - 현재 화면의 평균밝기 저장(사이즈를 줄여가며 1x1텍스쳐로)
    - 휘도 전용, POT(Power of Two), Mipmap 적용(1x1용), R16 색이면 충분.
-2. 적절한밝기
+2. 적절한밝기(lumaAdaptCurr)
    - 이전화면 평균밝기와 비교해서 적절한 밝기 얻기
 3. 적절한밝기 적용
    - 앞서구한 적절한 밝기를 원본 이미지에 적용
-4. 이전밝기
+4. 이전밝기(lumaAdaptPrev)
    - 적절한밝기를 이전밝기에 저장
 
 ## 예제코드
+
+L_w   : 해당 픽셀의 밝기
+L_avg : 씬 평균 밝기
+L_min : 최소밝기. 이 값 아래로 가면강제로 0이됨.
+L_white(WhitePoint) : 최대밝기. 이 값 위로가면 강제로 1로됨.
+Logarithmic / Exponential - 로그/지수 성질 이용.
 
 ``` hlsl
 // https://en.wikipedia.org/wiki/Relative_luminance
@@ -50,8 +56,12 @@ half lumaAdaptCurr = lumaAdaptedPrev + (lumaAverageCurr - lumaAdaptedPrev) * (1 
 ``` hlsl
 ///  ref: Programming Vertex Geometry and Pixel Shaders : High-Dynamic Range Rendering
 float lumaScaled = Yxy.r * MiddleGray / (AdaptedLum.x + 0.001f);
-Yxy.r = (lumaScaled * (1.0f + lumaScaled / White))/(1.0f + lumaScaled);
+Yxy.r = (lumaScaled * (1.0f + lumaScaled / WhitePoint))/(1.0f + lumaScaled);
 ```
+
+// HSV로 변경후 V(명도)를 이용하는 방법도 있음.
+// HSV를 이용하는 방식은 LUT를 이용해서 성능을 올려야함.
+// Yxy를 이용하는 방식은 충분히 빠름.
 
 ``` hlsl
 AutoKey = saturate(1.5 - (1.5 / (lumaAverageCurr * 0.1 + 1))) + 0.1; 
@@ -77,12 +87,16 @@ rgbL = rgb * (lumaToned * (1 - s)) / luma + (1.05, 0.97, 1.27) * lumaToned * s;
 ## Ref
 
 - [GDC2006 - Hdr Meets Black And White 2](https://www.slideshare.net/fcarucci/HDR-Meets-Black-And-White-2-2006)
-- [canny708 - Eye Adaptation (Automatic Exposure)](https://blog.naver.com/canny708/221892561143)
 - [HDRToneMappingCS11](https://github.com/walbourn/directx-sdk-samples/tree/master/HDRToneMappingCS11)
 - [Reverse engineering the rendering of The Witcher 3, part 2 - eye adaptation](https://astralcode.blogspot.com/2017/10/reverse-engineering-rendering-of.html)
 - <https://github.com/przemyslawzaworski/Unity3D-CG-programming/tree/master/HDR>
 - <http://developer.download.nvidia.com/SDK/9.5/Samples/samples.html>
   - <http://developer.download.nvidia.com/SDK/9.5/Samples/DEMOS/Direct3D9/DeferredShading.zip>
+- High dynamic range : <https://www.slideshare.net/cagetu/high-dynamic-range>
 - Programming Vertex Geometry and Pixel Shaders : Range Mapping, Light Adaptation
 - <https://www.cg.tuwien.ac.at/research/publications/2007/Luksch_2007_RHR/>
 - <https://knarkowicz.wordpress.com/2016/01/09/automatic-exposure/>
+- <http://resources.mpi-inf.mpg.de/tmo/logmap/>
+- 블로그
+  - [canny708 - Eye Adaptation (Automatic Exposure)](https://blog.naver.com/canny708/221892561143)
+  - [SuperRealizm - HDR + Bloom](https://superrealizm.tistory.com/entry/HDR-Bloom)

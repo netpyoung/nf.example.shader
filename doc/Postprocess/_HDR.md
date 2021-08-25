@@ -25,17 +25,18 @@
 ## RGBM과 LogLUV 
 
 TODO
-http://egloos.zum.com/cagetu/v/5697725
-https://kblog.popekim.com/2013/11/blendable-rgbm.html
+
+- <http://egloos.zum.com/cagetu/v/5697725>
+- <https://kblog.popekim.com/2013/11/blendable-rgbm.html>
 
 ## 통합셰이더 예제
 
-CHROMATIC_ABERRATION 색수차 - 렌즈 무지개현상
-BLOOM(dirt w/o)
-Vignette 카메라 가장자리 어둡게 하는 효과
-ApplyColorGrading
-FlimGrain 필름 표면 미세한 입자(노이즈)
-DITHERING
+- CHROMATIC_ABERRATION 색수차 - 렌즈 무지개현상
+- BLOOM(dirt w/o)
+- Vignette 카메라 가장자리 어둡게 하는 효과
+- ApplyColorGrading
+- FlimGrain 필름 표면 미세한 입자(노이즈)
+- DITHERING
 
 ## Ref
 
@@ -43,3 +44,5 @@ DITHERING
 - [Ndc11 이창희_hdr](https://www.slideshare.net/cagetu/ndc11-hdr)
 - [HDR - 김정희, 최유표](https://www.slideshare.net/youpyo/hdr-8480350)
 - [KGC2014 - 울프나이츠 엔진 프로그래밍 기록](https://www.slideshare.net/hyurichel/kgc2014-41150275)
+- <https://www.ea.com/frostbite/news/high-dynamic-range-color-grading-and-display-in-frostbite>
+- <https://research.activision.com/publications/archives/hdr-in-call-of-duty>
