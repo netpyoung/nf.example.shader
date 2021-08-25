@@ -67,22 +67,15 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
 
             cmd.Blit(_source, _bloomBrightRT, _materialBloom, PASS_BLOOM_THRESHOLD);
 
-            //cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter, DUALFILTER_DOWN_PASS);
             cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter);
             cmd.Blit(_dualFilterDownRT, _dualFilterDownRT1, _materialDualFilter, PASS_DUALFILTER_DOWN);
             cmd.Blit(_dualFilterDownRT1, _dualFilterDownRT2, _materialDualFilter, PASS_DUALFILTER_DOWN);
             cmd.Blit(_dualFilterDownRT2, _dualFilterDownRT3, _materialDualFilter, PASS_DUALFILTER_DOWN);
 
-            //cmd.Blit(_dualFilterDownRT2, _dualFilterUpRT2, _materialDualFilter, DUALFILTER_UP_PASS);
-
             cmd.Blit(_dualFilterDownRT3, _dualFilterUpRT3, _materialDualFilter, PASS_DUALFILTER_UP);
             cmd.Blit(_dualFilterUpRT3, _dualFilterUpRT2, _materialDualFilter, PASS_DUALFILTER_UP);
             cmd.Blit(_dualFilterUpRT2, _dualFilterUpRT1, _materialDualFilter, PASS_DUALFILTER_UP);
             cmd.Blit(_dualFilterUpRT1, _dualFilterUpRT, _materialDualFilter);
-            //cmd.Blit(_dualFilterUpRT1, _dualFilterUpRT, _materialDualFilter, DUALFILTER_UP_PASS);
-
-            //cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter, DUALFILTER_DOWN_PASS);
-            //cmd.Blit(_dualFilterDownRT, _dualFilterUpRT, _materialDualFilter, DUALFILTER_UP_PASS);
 
             cmd.SetGlobalTexture(_BloomBrightTex, _bloomBrightRT);
             cmd.SetGlobalTexture(_DualFilterUpTex, _dualFilterUpRT);
@@ -123,17 +116,19 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
             _dualFilterUpRT2 = new RenderTargetIdentifier(_DualFilterUpTex2);
             _dualFilterUpRT1 = new RenderTargetIdentifier(_DualFilterUpTex1);
             _dualFilterUpRT = new RenderTargetIdentifier(_DualFilterUpTex);
+        }
 
-
-            ConfigureTarget(_bloomBrightRT);
-            ConfigureTarget(_dualFilterDownRT);
-            ConfigureTarget(_dualFilterUpRT);
-            ConfigureTarget(_dualFilterDownRT1);
-            ConfigureTarget(_dualFilterUpRT1);
-            ConfigureTarget(_dualFilterDownRT2);
-            ConfigureTarget(_dualFilterUpRT2);
-            ConfigureTarget(_dualFilterDownRT3);
-            ConfigureTarget(_dualFilterUpRT3);
+        public override void OnCameraCleanup(CommandBuffer cmd)
+        {
+            cmd.ReleaseTemporaryRT(_BloomBrightTex);
+            cmd.ReleaseTemporaryRT(_DualFilterDownTex);
+            cmd.ReleaseTemporaryRT(_DualFilterDownTex1);
+            cmd.ReleaseTemporaryRT(_DualFilterDownTex2);
+            cmd.ReleaseTemporaryRT(_DualFilterDownTex3);
+            cmd.ReleaseTemporaryRT(_DualFilterUpTex3);
+            cmd.ReleaseTemporaryRT(_DualFilterUpTex2);
+            cmd.ReleaseTemporaryRT(_DualFilterUpTex1);
+            cmd.ReleaseTemporaryRT(_DualFilterUpTex);
         }
     }
 
