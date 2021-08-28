@@ -127,19 +127,19 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             _brightRTD = new RenderTextureDescriptor(brightW, brightH)
             {
                 depthBufferBits = 0,
-                graphicsFormat = GraphicsFormat.R16G16B16A16_SFloat
+                graphicsFormat = GraphicsFormat.R8G8B8A8_SNorm
             };
 
             UpdateMesh(_brightnessExtractionMesh, scaledW, scaledH, 2, 2);
 
             cmd.GetTemporaryRT(_ScaledTex, scaledW, scaledH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
             cmd.GetTemporaryRT(_BrightTex, _brightRTD, FilterMode.Bilinear);
-            cmd.GetTemporaryRT(_BaseStarBlurredTex1, brightW, brightH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
-            cmd.GetTemporaryRT(_BaseStarBlurredTex2, brightW, brightH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
+            cmd.GetTemporaryRT(_BaseStarBlurredTex1, brightW, brightH, 0, FilterMode.Bilinear, GraphicsFormat.R8G8B8A8_SNorm);
+            cmd.GetTemporaryRT(_BaseStarBlurredTex2, brightW, brightH, 0, FilterMode.Bilinear, GraphicsFormat.R8G8B8A8_SNorm);
 
             for (int i = 0; i < _StarTexs.Length; ++i)
             {
-                cmd.GetTemporaryRT(_StarTexs[i], scaledW, scaledH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
+                cmd.GetTemporaryRT(_StarTexs[i], scaledW, scaledH, 0, FilterMode.Bilinear, GraphicsFormat.R8G8B8A8_SNorm);
             }
 
             cmd.SetRenderTarget(_BrightTex);

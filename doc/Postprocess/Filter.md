@@ -35,6 +35,47 @@ if (_MainTex_TexelSize.y < 0)
 // 1 | 1 | 1
 ```
 
+## 16 박스
+
+- 바이너리필터를 이용 4개의 샘플링으로 16개의 텍셀의 평균값을 구함
+
+```txt
+/// 16박스
+//   .   | 0,-1 |   .  
+// -1, 0 |  .   |  1, 0  
+//   .   | 0, 1 |   .  
+
+// weight
+// 0 | 1 | 0
+// 1 | 0 | 1
+// 0 | 1 | 0
+
+
+/// 64박스
+// -2,-2 | -1,-2 | 0,-2 | 1,-2
+// -2,-1 | -1,-1 | 0,-1 | 1,-1
+// -2, 0 | -1, 0 | 0, 0 | 1, 0
+// -2, 1 | -1, 1 | 0, 1 | 1, 1
+
+// weight
+// 1 | 1 | 1 | 1
+// 1 | 1 | 1 | 1
+// 1 | 1 | 1 | 1
+```
+
+## 9콘 - tent blur
+
+``` txt
+// -1, -1 | 0, -1 | +1, -1
+// -1,  0 | 0,  0 | +1,  0
+// -1, +1 | 0, +1 | +1, +1
+
+// weight
+// 1 | 2 | 1
+// 2 | 4 | 2
+// 1 | 2 | 1
+```
+
 ## Gaussian / 가우스
 
 - N * N 블럭
@@ -55,6 +96,12 @@ if (_MainTex_TexelSize.y < 0)
 - [Gaussian Kernel Calculator](http://dev.theomader.com/gaussian-kernel-calculator/)
 - <https://www.sysnet.pe.kr/2/0/11623>
 - <https://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/>
+
+## two-pass Gaussian blur
+
+- <https://learnopengl.com/Advanced-Lighting/Bloom>
+- 가로로 한번 블러먹이고
+- 세로로 한번 블러먹인다
 
 ## Bilateral / 쌍방
 

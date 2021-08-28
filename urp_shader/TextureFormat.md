@@ -2,11 +2,11 @@
 
 요세는 좋아져서 ASTC쓰면 될듯.
 
-|       |                                       |
-|-------|---------------------------------------|
-| ETC   | Ericsson Texture Compression          |
-| ASTC  | Adaptive Scalable Texture Compression |
-| PVRTC | PowerVR Texture Compression           |
+|       |                                       | NPOT|
+|-------|---------------------------------------|-----|
+| ETC   | Ericsson Texture Compression          |  X  |
+| PVRTC | PowerVR Texture Compression           |  X  |
+| ASTC  | Adaptive Scalable Texture Compression |  O  |
 
 |           | Graphic Library | Android API | version | 코드명     | Linear지원 |
 |-----------|-----------------|-------------|---------|------------|------------|

@@ -5,11 +5,12 @@
   - 공통되게 사용되는 정보(예: 밝기)등 이용
 
 ``` hlsl
-multi_compile_local_fragment 
+#pragma multi_compile_local_fragment _ _KEY_A
 ```
 
 ``` cs
-material.EnableKeyword
+material.EnableKeyword("_KEY_A");
+material.DisableKeyword("_KEY_A");
 ```
 
 ## Ref

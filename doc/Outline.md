@@ -1,11 +1,3 @@
----
-
-layout: post
-title: 'outline'
-tags: outline , 아웃라인
-
----
-
 # Outline
 
 - 2-pass
@@ -127,7 +119,7 @@ half rim = 1 - NdotV;
 final.rgb *= pow(rim, 3);
 ```
 
-## Post Processing
+## Post Processing 이용
 
 - <https://roystan.net/articles/outline-shader.html>
 - <https://alexanderameye.github.io/outlineshader.html>
@@ -140,10 +132,15 @@ final.rgb *= pow(rim, 3);
 
 - UniversalRenderPipelineAsset.asset > General > Depth Texture
 
-
-
-
 ### 외곽선 검출 필터
+
+|                |                                  |
+|----------------|----------------------------------|
+| 색성분 엣지    | 밝기차                           |
+| ID 엣지        | 알파값에 id: 1, 0이런식으로 넣기 |
+| 깊이 엣지      | 깊이 맵 필요                     |
+| 법선 엣지      | 노말 맵 필요                     |
+| 확대 모델 엣지 | 셰이더 2패스                     |
 
 - <https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch12.md>
 - <https://en.wikipedia.org/wiki/Sobel_operator>
