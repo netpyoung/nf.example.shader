@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DualFilter1
+  m_Name: CrossFilter_Filter
   m_Shader: {fileID: 4800000, guid: b28c8b6fc67d46a439968014fec8343c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4

@@ -1,4 +1,4 @@
-﻿Shader "srp/Bloom1"
+﻿Shader "srp/CrossFilter_Bloom"
 {
     Properties
     {
