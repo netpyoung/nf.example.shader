@@ -4,8 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - MaterialBloom: {fileID: 2100000, guid: bc26bc8b4574e4741a378091ce4548fa, type: 2}
-  - MaterialDualFilter: {fileID: 2100000, guid: d96f5d86746a9d9478b244390534441d, type: 2}
+  - MaterialBloom: {instanceID: 0}
+  - MaterialDualFilter: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

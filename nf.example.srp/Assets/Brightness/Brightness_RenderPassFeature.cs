@@ -29,7 +29,6 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         const int PASS_EyeAdaptation_ToneMapping = 0;
 
         RenderTargetIdentifier _source;
-        private RenderTargetIdentifier _destination;
         Material _mat_Brightness;
         Material _mat_EyeAdaptation;
         RenderTexture _LumaPrevRT;
@@ -102,7 +101,6 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             _source = renderingData.cameraData.renderer.cameraColorTarget;
-            _destination = RenderTargetHandle.CameraTarget.Identifier();
 
             int w = renderingData.cameraData.camera.pixelWidth;
             int h = renderingData.cameraData.camera.pixelHeight;
@@ -153,7 +151,7 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
     }
 
     [SerializeField]
-    Brightness_RenderPassSettings _settings;
+    Brightness_RenderPassSettings _settings = new Brightness_RenderPassSettings();
     Brightness_RenderPass _pass;
 
     public override void Create()

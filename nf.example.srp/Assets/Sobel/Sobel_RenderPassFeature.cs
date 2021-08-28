@@ -54,7 +54,7 @@ public class Sobel_RenderPassFeature : ScriptableRendererFeature
     }
 
     [SerializeField]
-    Sobel_RenderPassSettings _settings;
+    Sobel_RenderPassSettings _settings = null;
     Sobel_RenderPass _pass;
 
     public override void Create()

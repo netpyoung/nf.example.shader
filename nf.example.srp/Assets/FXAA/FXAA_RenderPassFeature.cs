@@ -69,7 +69,7 @@ public class FXAA_RenderPassFeature : ScriptableRendererFeature
     }
 
     [SerializeField]
-    FXAA_RenderPassSettings _settings;
+    FXAA_RenderPassSettings _settings = null;
     FXAA_RenderPass _pass;
 
     public override void Create()
