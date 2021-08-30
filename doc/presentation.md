@@ -21,6 +21,10 @@
   - ChromaticAberrationFilter / Bloom / Noise / RadialBlur / VignetteEffect / InvertColorFilter / ScratchedFilmFilter / ColorGradingLUT
 - [2020 - Dev Weeks: A3 Still Alive - Technical Art Review](https://www.youtube.com/watch?v=ufNYLgE2WGA)
 
+### 디퍼드
+
+- [2012 - [KGC 2012] 디퍼드 랜더링 케이스 스터디 : 레이더즈 & 건즈2](https://www.slideshare.net//ozlael/deferred-rendering-case-study)
+
 ## 일본
 
 - [2018 - 【Unite Tokyo 2018】『崩壊3rd』開発者が語るアニメ風レンダリングの極意](https://www.youtube.com/watch?v=ZpWsinhPFLM)

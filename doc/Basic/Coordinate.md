@@ -1,38 +1,50 @@
-# Transform
+# Coordinate
 
 - 좌표공간
 
 ![res/coordinate.png](../res/coordinate.png)
 
-| position       | Space                                       | AKA           | 타입   | 설명                                              |
-|----------------|---------------------------------------------|---------------|--------|---------------------------------------------------|
-| positionOS     | Object                                      | Local / Model | float3 |                                                   |
-| positionWS     | World                                       | Global        | float3 |                                                   |
-| positionVS     | View                                        | Camera / Eye  | float3 | 카메라에서 바라볼때                               |
-| positionCS     | Homogeneous Clip                            |               | float4 | 카메라 시야에서 안보인 것은 제외, Orthogonal 적용 |
-| positionNDC    | Homogeneous Normalized Device Coordinate    |               | float4 | [ 0, w] : (x, y, z, w)                            |
-| ndc            | Nonhomogeneous Normalized Device Coordinate |               | float3 | [-1, 1] : PerspectiveDivision * 2 - 1             |
-| uv_Screen      | Screen                                      |               | float2 | [ 0, 1] : PerspectiveDivision                     |
-| positionScreen | ViewPort                                    |               | float2 | [화면 넓이, 화면 높이]                            |
+## 유니티 정의 positions
 
-![res/newtranspipe.png](../res/newtranspipe.png)
+| position    | Space                                    | AKA           | 타입   | 설명                                              |
+| ----------- | ---------------------------------------- | ------------- | ------ | ------------------------------------------------- |
+| positionOS  | Object                                   | Local / Model | float3 |                                                   |
+| positionWS  | World                                    | Global        | float3 |                                                   |
+| positionVS  | View                                     | Camera / Eye  | float3 | 카메라에서 바라볼때                               |
+| positionCS  | Homogeneous Clip                         |               | float4 | 카메라 시야에서 안보인 것은 제외, Orthogonal 적용 |
+| positionNDC | Homogeneous Normalized Device Coordinate |               | float4 | [ 0, w] : (x, y, z, w)                            |
+
+## 내가 임의로 정한것
+
+| 이름 붙여봄 position | Space                                       | 타입   | 설명                                  |
+| -------------------- | ------------------------------------------- | ------ | ------------------------------------- |
+| ndc                  | Nonhomogeneous Normalized Device Coordinate | float3 | [-1, 1] : PerspectiveDivision * 2 - 1 |
+| uv_Screen            | Screen                                      | float2 | [ 0, 1] : PerspectiveDivision         |
+| positionScreen       | ViewPort                                    | float2 | [화면 넓이, 화면 높이]                |
+
+## 공간 변환 그림 예
+
+예1)
 
 ![res/opengl_renderpipeline.png](../res/opengl_renderpipeline.png)
 
+예2)
+
+![res/newtranspipe.png](../res/newtranspipe.png)
+
 ## UNITY_MATRIX
 
-``` txt
-UNITY_MATRIX_M            : renderer.localToWorldMatrix
-UNITY_MATRIX_V            : camera.worldToCameraMatrix
-UNITY_MATRIX_P            : GL.GetGPUProjectionMatrix(camera.projectionMatrix, false);
-
-unity_CameraProjection    : float4x4 Camera’s projection matrix. // 스크린 공간 그리기
-unity_CameraInvProjection : float4x4 Inverse of camera’s projection matrix.
+| Matrix                    | 설명                                                       |
+| ------------------------- | ---------------------------------------------------------- |
+| UNITY_MATRIX_M            | renderer.localToWorldMatrix                                |
+| UNITY_MATRIX_V            | camera.worldToCameraMatrix                                 |
+| UNITY_MATRIX_P            | GL.GetGPUProjectionMatrix(camera.projectionMatrix, false); |
+| unity_CameraProjection    | float4x4 Camera’s projection matrix. // 스크린 공간 그리기 |
+| unity_CameraInvProjection | float4x4 Inverse of camera’s projection matrix.            |
 
 - localToWorldMatrix
   - 유니티 4까지는 GPU에 넘겨주기전에 스케일을 가공하여
   - renderer.localToWorldMatrix, transform.localToWorldMatrix가 달랐으나 지금은 같음.
-```
 
 ``` txt
 OS  ----------------------- Object Space
@@ -84,14 +96,14 @@ TransformWorldToView   - UNITY_MATRIX_V
 TransformWorldToHClip  - UNITY_MATRIX_VP
 ```
 
-| [_ProjectionParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html) | x  | y          | z         | w            |
-|-----------------------------------------------------------------------------------|----|------------|-----------|--------------|
-| DirectX                                                                           | 1  | near plane | far plane | 1 / farplane |
-| OpenGL                                                                            | -1 | near plane | far plane | 1 / farplane |
+| [_ProjectionParams](https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html) | x   | y          | z         | w            |
+| --------------------------------------------------------------------------------- | --- | ---------- | --------- | ------------ |
+| DirectX                                                                           | 1   | near plane | far plane | 1 / farplane |
+| OpenGL                                                                            | -1  | near plane | far plane | 1 / farplane |
 
 
 |         | UNITY_REVERSED_Z | UNITY_NEAR_CLIP_VALUE | UNITY_RAW_FAR_CLIP_VALUE |
-|---------|------------------|-----------------------|--------------------------|
+| ------- | ---------------- | --------------------- | ------------------------ |
 | DirectX | 1                | 1                     | 0                        |
 | Vulkan  | 1                | 1                     | 0                        |
 | OpenGL  | 0                | -1                    | 1                        |
@@ -155,7 +167,7 @@ positionScreen = float2(
 
 ## Normal
 
-- [./NormalMap.md](../NormalMap.md)
+- [./NormalMap.md](./NormalMap.md)
 
 ## Pserspective Camera
 
@@ -241,7 +253,38 @@ The one-based row-column position:
 
 ```
 
-## ref
+## UV
+
+texel(TExture + piXEL) coordinate
+
+``` txt
+Direct X
+(0,0)            (1,0)
+  +-------+-------+
+  |       |       |
+  |       |       |
+  +-------+-------+
+  |       |       |
+  |       |       |
+  +-------+-------+
+(0,1)            (1,1)
+
+
+OpenGL / UnityEngine
+(0,1)            (1,1)
+  +-------+-------+
+  |       |       |
+  |       |       |
+  +-------+-------+
+  |       |       |
+  |       |       |
+  +-------+-------+
+(0,0)            (1,0)
+```
+
+- 수학적으로 바라보면 모든 2D좌표계를 OpenGL방식으로하면 좌표계를 헷갈릴 걱정이 없다. 하지만, 프로그래밍 하는 입장에서는 DirectX방식이 좀 더 와닿을 것이다.
+
+## Ref
 
 - [Computergrafik - Vorlesung 6 - Coordinate Systems](https://www.youtube.com/watch?v=u_qKLcszwXA)
 - [Unity - shader의 World matrix(unity_ObjectToWorld)를 수작업으로 구성](https://www.sysnet.pe.kr/2/0/11633)

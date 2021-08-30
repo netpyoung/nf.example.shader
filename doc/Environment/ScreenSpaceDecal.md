@@ -123,6 +123,30 @@ clip(dot(normal, orientation) - gNormalThreshold);
 OutColor *= (1.f - max(4 * positionOS_decal.y - 1, 0.f));
 ```
 
+## 컨택트 섀도(Contact Shadow)
+
+- [전형규, 가성비 좋은 렌더링 테크닉 10선, NDC2012](https://www.slideshare.net/devcatpublications/10ndc2012)
+
+``` hlsl
+float4 ContactShadowPSMain(PSInput input) : COLOR
+{
+  input.screenTC.xyz /= input.screenTC.w;
+
+  float depthSample = tex2D(DepthSampler, input.screenTC.xy).x;
+  float sceneDepth = GetClipDistance(depthSample);
+  float3 scenePos = FromScreenToView(input.screenTC.xy, sceneDepth);
+
+  float shadow = length(scenePos - input.origin) / (input.attributes.x + 0.001f);
+  shadow = pow(saturate(1 - shadow), 2);
+
+  const float radiusInMeter = input.attributes.x;
+  float aoIntensity = saturate(4.0f - 2.5 * radiusInMeter);
+
+  shadow *= 0.7f * input.attributes.y;
+
+  return float4(shadow, 0.0f, shadow * aoIntensity, 0);
+}
+```
 
 ## Ref
 
@@ -137,3 +161,4 @@ OutColor *= (1.f - max(4 * positionOS_decal.y - 1, 0.f));
 - <http://www.ozone3d.net/tutorials/glsl_texturing_p08.php#part_8>
   - <https://diehard98.tistory.com/entry/Projective-Texture-Mapping-with-OpenGL-GLSL>
 - <https://blog.csdn.net/puppet_master/article/details/84310361>
+- <https://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/>

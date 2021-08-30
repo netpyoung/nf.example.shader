@@ -94,7 +94,7 @@ float3 worldNormal = mul(tangentNormal, TBN);
 | y   | color0,1      | 32  |
 |     | color indices | 32  |
 
-![d3d10-compression-bc3.png](./res/d3d10-compression-bc3.png)
+![d3d10-compression-bc3.png](../res/d3d10-compression-bc3.png)
 
 | BC5 | channel       | bit |
 |-----|---------------|-----|
@@ -103,7 +103,7 @@ float3 worldNormal = mul(tangentNormal, TBN);
 | y   | g0, g1        | 32  |
 |     | green indices | 32  |
 
-![d3d10-compression-bc5.png](./res/d3d10-compression-bc5.png)
+![d3d10-compression-bc5.png](../res/d3d10-compression-bc5.png)
 
 ### UNITY_NO_DXT5nm
 
@@ -175,7 +175,7 @@ A라는 도형을 x에 대해서 2만큼 스케일 업하고 싶다고 가정하
 | B | (2, 1) | 2        | (2, 1)   |
 | C | (2, 1) | 2        | (0.5, 1) |
 
-![res](res/scaleproblem.png)
+![res](../res/scaleproblem.png)
 
 C처럼 x의 스케일 2배 됐다고, 노멀의 x값에 `곱하기` 2를 해서는 안된다. 역인 `나누기` 2 를 해야한다.
 
@@ -185,15 +185,15 @@ C처럼 x의 스케일 2배 됐다고, 노멀의 x값에 `곱하기` 2를 해서
 
 월드행렬(M)식으로 나타내면
 
-![normal-1](res/normal-1.png)
+![normal-1](../res/normal-1.png)
 
 우리가 구하고 싶은 행렬을 M-want라 했을시 `world-Normal = mul(M-want, obj-Normal)`
 
-![normal-2](res/normal-2.png)
+![normal-2](../res/normal-2.png)
 
-![1](res/DeriveInvTrans_1.svg)
-![2](res/FactorOutTranspose_2.svg)
-![3](res/FactorOutInverse_3.svg)
+![1](../res/DeriveInvTrans_1.svg)
+![2](../res/FactorOutTranspose_2.svg)
+![3](../res/FactorOutInverse_3.svg)
 
 즉 `M-want     = traspose(inverse(M))`.
 
@@ -235,7 +235,7 @@ world-Normal
 
 - <https://blender.stackexchange.com/questions/100017/directx-vs-opengl-normal-maps>
 
-![./res/directx_opengl_normalmap.png](./res/directx_opengl_normalmap.png)
+![../res/directx_opengl_normalmap.png](../res/directx_opengl_normalmap.png)
 
 - 유니티는 OpenGL(Y+) 를 써서 보기 비교적 편하다.
 - DirectX와 같은 엔진에서는 작업자를 위해 Y+텍스쳐 제작 쉐이더에서 y에 `-1`을 곱해 뒤집어 주는 코드를 넣어주면 작업자들이 편해진다.

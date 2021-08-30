@@ -17,16 +17,10 @@
 
 ## Shader
 
-- [Vector](./doc/Vector.md)
-  - Transform
-  - Swizzling
-- Coordinate
-- UV
-- [Normal Mapping](./doc/NormalMap.md)
-- [Parallax Mapping](./doc/ParallaxMapping.md)
-- Blend
-- Cull
-- Stencil
+- [Vector](./doc/basic/Vector.md)
+- [Coordinate](./doc/basic/Coordinate.md)
+- [Normal Mapping](./doc/basic/NormalMap.md)
+
 - [Lighiting Model](./doc/LightingModel.md)
 - [AnisTropy Specular](./doc/HairAnisotropic.md)
 - IBL(Image-based Lighting)
@@ -35,6 +29,9 @@
   - Refraction
 - Depth
   - [Screen Space Decal](./doc/ScreenSpaceDecal.md)
+
+- [Parallax Mapping](./doc/ParallaxMapping.md)
+
 
 ## tech
 

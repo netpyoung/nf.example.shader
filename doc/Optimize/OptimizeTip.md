@@ -34,3 +34,8 @@ void OnWillRenderObject()
 
 - NPOT지원안하는 ETC/PVRTC같은경우 POT로 자르고 셰이더로 붙여주는걸 작성해서 최적화
   - <https://blog.naver.com/jinwish/221576705990>
+
+## GGX 공식 간략화
+
+- Optimizing PBR for Mobile
+  - [pdf](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_renaldas_2D00_slides.pdf), [note](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_renaldas_2D00_notes.pdf)
