@@ -17,9 +17,9 @@
 
 ## Shader
 
-- [Vector](./doc/basic/Vector.md)
-- [Coordinate](./doc/basic/Coordinate.md)
-- [Normal Mapping](./doc/basic/NormalMap.md)
+- [Vector](./doc/Basic/Vector.md)
+- [Coordinate](./doc/Basic/Coordinate.md)
+- [Normal Mapping](./doc/Basic/NormalMap.md)
 
 - [Lighiting Model](./doc/LightingModel.md)
 - [AnisTropy Specular](./doc/HairAnisotropic.md)
