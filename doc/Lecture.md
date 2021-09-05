@@ -4,6 +4,7 @@
 
 - [2004 - Directx 9 셰이더 프로그래밍 - 타카시 이마기레](https://www.hanbit.co.kr/store/books/look.php?p_code=B9447539340)
   - DirectX기준
+  - 저자 블로그 : <https://t-pot.com/program/index.html>
   - [부록소스](https://dw.hanbit.co.kr/exam/1285/cd.zip)
 - [2012 - 셰이더 프로그래밍 입문 - Pope Kim](http://www.hanbit.co.kr/store/books/look.php?p_code=B8421024205)
   - DirectX기준, rendermonkey

@@ -65,12 +65,18 @@ if (_MainTex_TexelSize.y < 0)
 
 ## 9콘 - tent blur
 
+- 바이너리필터를 이용 4개의 샘플링으로 각기다른 가중치를 지닌 9개 텍셀을 얻어옴
+
 ``` txt
-// -1, -1 | 0, -1 | +1, -1
-// -1,  0 | 0,  0 | +1,  0
-// -1, +1 | 0, +1 | +1, +1
+// 0,  0 | +1,  0
+// 0, +1 | +1, +1
 
 // weight
+// 1 | 1
+// 1 | 1
+
+
+// 샘플링하면 다음과 같은 9개의 텍셀 가중치를 지니게 된다
 // 1 | 2 | 1
 // 2 | 4 | 2
 // 1 | 2 | 1
@@ -98,6 +104,8 @@ if (_MainTex_TexelSize.y < 0)
 - <https://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/>
 
 ## two-pass Gaussian blur
+
+![bloom_gaussian_two_pass.png](../res/bloom_gaussian_two_pass.png)
 
 - <https://learnopengl.com/Advanced-Lighting/Bloom>
 - 가로로 한번 블러먹이고
@@ -166,14 +174,6 @@ ex)
 - [SIGGRAPH2015 - Bandwidth-Efficient Rendering](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf)
 - <https://github.com/MarcusXie3D/FastBloomForMobiles>
   - <https://zhuanlan.zhihu.com/p/126351976>
-
-|     |                          |                                                  |
-|-----|--------------------------|--------------------------------------------------|
-| MGF | Multiple Gaussian Filter | 여러 DownScale버퍼를 이용하여 가우시안 필터 적용 |
-| MRT | Multiple Render Targets  | 여러 렌더 타겟을 이용( COLOR0, COLOR1..)         |
-
-- [Tiled Rendering과 DiscardCont](https://dreamotion.tistory.com/4)
-- [Mali Performance 2: How to Correctly Handle Framebuffers](https://community.arm.com/developer/tools-software/graphics/b/blog/posts/mali-performance-2-how-to-correctly-handle-framebuffers)
 
 ## Radial / 방사형
 

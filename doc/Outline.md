@@ -4,7 +4,7 @@
   - Scale 확장
   - Normal 확장
 - Rim
-- Post Processing
+- SSO(Screen Space Outline)
 
 ## 2-pass
 
@@ -119,55 +119,29 @@ half rim = 1 - NdotV;
 final.rgb *= pow(rim, 3);
 ```
 
-## Post Processing 이용
+## Post Processing 이용 - SSO(Screen Space Outline)
 
-- <https://roystan.net/articles/outline-shader.html>
-- <https://alexanderameye.github.io/outlineshader.html>
-- <https://musoucrow.github.io/2020/07/05/urp_outline/>
-- <https://docs.unity3d.com/Manual/SL-CameraDepthTexture.html>
+- <https://en.wikipedia.org/wiki/Roberts_cross>
+- <https://en.wikipedia.org/wiki/Sobel_operator>
 
-
-`_CameraColorTexture`
-`_CameraDepthNormalsTexture`
-
-- UniversalRenderPipelineAsset.asset > General > Depth Texture
-
-### 외곽선 검출 필터
+### 외곽선 검출(Edge detection) 필터
 
 |                |                                  |
-|----------------|----------------------------------|
+| -------------- | -------------------------------- |
 | 색성분 엣지    | 밝기차                           |
 | ID 엣지        | 알파값에 id: 1, 0이런식으로 넣기 |
 | 깊이 엣지      | 깊이 맵 필요                     |
 | 법선 엣지      | 노말 맵 필요                     |
 | 확대 모델 엣지 | 셰이더 2패스                     |
 
+## Ref
+
+- <https://roystan.net/articles/outline-shader.html>
+- <https://alexanderameye.github.io/outlineshader.html>
+- <https://alexanderameye.github.io/notes/rendering-outlines/>
+- <https://musoucrow.github.io/2020/07/05/urp_outline/>
 - <https://github.com/netpyoung/bs.introduction-to-shader-programming/blob/master/note/ch12.md>
-- <https://en.wikipedia.org/wiki/Sobel_operator>
 - <https://www.ronja-tutorials.com/2020/07/23/sprite-outlines.html>
-  
-  https://medium.com/@bgolus/the-quest-for-very-wide-outlines-ba82ed442cd9
-
-https://www.codinblack.com/outline-effect-using-shader-graph-in-unity3d/
-
-
-- BRDF이용
-
-
-
-- https://assetstore.unity.com/packages/tools/particles-effects/highlighting-system-41508#content
-
-
-https://github.com/unity3d-jp/UnityChanToonShaderVer2_Project/blob/release/urp/2.2/Runtime/Shaders/UniversalToonOutline.hlsl
-
-
-
-1. 캐릭터 등의 어차피 SRP Batcher가 작동하지 않는 오브젝트에서는 코드에 아웃라인 패스를 삽입하여 머티리얼별로 제어를 해 주도록 하자
-2. 배경 등의 오브젝트에 외곽선을 그릴일이 있고 멀티-서브 머티리얼을 사용하지 않는다면 강제로 두번째 머티리얼을 사용해 주자.
-3. 배경 등의 오브젝트에 외곽선을 그릴일이 있고 멀티-서브 머티리얼을 사용한다면 렌더오브젝트 - 오버라이드 머티리얼을 사용하자.
-​[출처] UPR 셰이더 코딩 튜토리얼 : 제 2편 - SRP Batcher와 MultiPass Outline|작성자 Madumpa
-
+- <https://bgolus.medium.com/the-quest-for-very-wide-outlines-ba82ed442cd9>
+- <https://www.codinblack.com/outline-effect-using-shader-graph-in-unity3d/>
 - [외곽선 렌더링 구현에 관한 허접한 정리](https://gamedevforever.com/18)
-- <https://gpgstudy.com/forum/viewtopic.php?t=5869>
-
-- edge 검출 - https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-23-high-speed-screen-particles
