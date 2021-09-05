@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -238,7 +238,7 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             float worldRotY = Mathf.PI / 2;
             float radOffset = worldRotY / 5;
 
-            int starRayCount = 6;// ±¤¼±ÀÇ ÁÙ±â °³¼ö
+            int starRayCount = 6;// ê´‘ì„ ì˜ ì¤„ê¸° ê°œìˆ˜
 
             for (int d = 0; d < starRayCount; d++)
             {
@@ -293,7 +293,7 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
                 }
             }
 
-            // ÇÕ¼º.
+            // í•©ì„±.
             cmd.SetGlobalTexture(_StarTexs[0 + 2], _StarTexs[0 + 2]);
             cmd.SetGlobalTexture(_StarTexs[1 + 2], _StarTexs[1 + 2]);
             cmd.SetGlobalTexture(_StarTexs[2 + 2], _StarTexs[2 + 2]);

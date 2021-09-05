@@ -122,6 +122,7 @@
             {
                 float3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
                 float3 bloomBlurTex = SAMPLE_TEXTURE2D(_BloomBlurTex, sampler_BloomBlurTex, IN.uv).rgb;
+                bloomBlurTex *= 3;
                 return half4(mainTex + bloomBlurTex, 1);
 
             }
