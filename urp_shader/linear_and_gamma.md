@@ -177,3 +177,4 @@ finalColor.a = 1;
 - [3D scene need Linear but UI need Gamma](https://cmwdexint.com/2019/05/30/3d-scene-need-linear-but-ui-need-gamma/)
 - [1 - PBR Linear Workflow](https://forum.reallusion.com/308094/1-PBR-Linear-Workflow)
 - [[Unity] Always Be Linear: Shader-Based Gamma Correction](https://medium.com/@abdulla.aldandarawy/unity-always-be-linear-1a30db4765db)
+- <https://nbertoa.wordpress.com/2016/06/20/gamma-correction/>

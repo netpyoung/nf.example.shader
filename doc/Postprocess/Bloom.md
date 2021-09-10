@@ -33,6 +33,21 @@
 | 늘리기 | w/4, h/4       | 품질(R16G16B16A16) // 속도(R8G8B8A8) | 6장은 방향늘리기, 2장은 임시버퍼 |
 
 ``` txt
+                source,             _TmpCopy : 복사
+               _TmpCopy,          _ScaledTex : 축소
+            _ScaledTex,           _BrightTex : 밝기 추출
+            _BrightTex, _BaseStarBlurredTex1 : 블러
+  _BaseStarBlurredTex1, _BaseStarBlurredTex2 : 블러
+
+  _BaseStarBlurredTex2,            _StarTex0 : 늘리기
+             _StarTex0,            _StarTex1 : 늘리기2
+             _StarTex1,            _StarTex2 : 광선 임시저장
+             ...
+           _StarTex2~7,            _StarTex0 : 최종적으로 광선별 합치기
+  _TmpCopy + _StarTex0,               source : 원본 텍스쳐에 적용
+```
+
+``` txt
 cropW = srcW - srcW / Scale
 cropH = srcH - srcH / Scale
 scaledW = cropW / Scale
