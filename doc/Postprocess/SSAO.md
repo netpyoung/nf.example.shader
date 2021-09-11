@@ -82,15 +82,39 @@ float occlusion = step(0.02h, depthDiff) * (1.0h - smoothstep(0.02h, _Area, dept
 /// [canny - SSAO (Screen Space Ambient Occlusion)](https://blog.naver.com/canny708/221878564749)
 // 중앙점 픽셀로부터 일정 범위 내에 있는 랜덤 위치의 샘플 좌표의 위치 값과 노멀 벡터를 얻어온 후,
 // 중앙점의 노멀과 비교하여 각도가 가파를수록, 위치가 가까울수록 차폐의 영향이 크다고 판단.
+// depth버퍼로 positionWS랑 normal을 구할 수 있다.
+
+inline float Random(in float2 uv)
+{
+    // 렌덤텍스쳐 이용하는 방법
+    // return SAMPLE_TEXTURE2D(_RandTex, sampler_RandTex, uv).r;
+
+    // 그냥 계산하는 방법
+    return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float3 GetWorldSpacePosition(in float2 uv)
+{
+    float sceneRawDepth = SampleSceneDepth(uv);
+    return ComputeWorldSpacePosition(uv, sceneRawDepth, UNITY_MATRIX_I_VP);
+}
+
+inline float3 GetNormal(in float2 uv)
+{
+    return SampleSceneNormals(uv);
+}
 
 float3 srcPos = GetWorldSpacePosition(IN.uv);
 float3 srcNormal = GetNormal(IN.uv);
 
+const int SAMPLE_COUNT = 32;
 float AO = 0;
-for (int i = 0; i < 32; ++i)
+
+// 매 계산마다 depth를 불러오니 => 32번 depth를 불러온다
+for (int i = 0; i < SAMPLE_COUNT; ++i)
 {
     float2 dstUV = IN.uv + (float2(Random(IN.uv.xy + i), Random(IN.uv.yx + i)) * 2 - 1) / _ScreenParams.xy * _Radius;
-    float3 dstPos =  GetWorldSpacePosition(dstUV);
+    float3 dstPos = GetWorldSpacePosition(dstUV);
 
     float3 distance = dstPos - srcPos;
     float3 direction = normalize(distance);
@@ -99,7 +123,10 @@ for (int i = 0; i < 32; ++i)
     AO += max(0, dot(srcNormal, direction) - _Bias) * (1 / (1 + delta)) * _Amount;
 }
 
-AO /= 32;
+AO /= SAMPLE_COUNT;
+AO = 1 - AO;
+
+return half4(AO.xxx, 1);
 ```
 
 ``` glsl
@@ -121,93 +148,96 @@ float ph = 1.0/600.0*0.5;
 
 float readDepth(in vec2 coord) 
 { 
-  if (coord.x<0||coord.y<0) return 1.0;
-  float nearZ = camerarange.x; 
-  float farZ =camerarange.y; 
-  float posZ = texture2D(som, coord).x;  
-  return (2.0 * nearZ) / (nearZ + farZ - posZ * (farZ - nearZ)); 
+    if (coord.x<0||coord.y<0) return 1.0;
+    float nearZ = camerarange.x; 
+    float farZ =camerarange.y; 
+    float posZ = texture2D(som, coord).x;  
+    return (2.0 * nearZ) / (nearZ + farZ - posZ * (farZ - nearZ)); 
 }  
 
 float compareDepths(in float depth1, in float depth2,inout int far) 
 { 
+    float diff = (depth1 - depth2)*100; //depth difference (0-100)
+    float gdisplace = 0.2; //gauss bell center
+    float garea = 2.0; //gauss bell width 2
 
-  float diff = (depth1 - depth2)*100; //depth difference (0-100)
-  float gdisplace = 0.2; //gauss bell center
-  float garea = 2.0; //gauss bell width 2
+    //reduce left bell width to avoid self-shadowing
+    if (diff < gdisplace)
+    {
+        garea = 0.1;
+    }
+    else
+    {
+        far = 1;
+    }
+    float gauss = pow(2.7182,-2*(diff-gdisplace)*(diff-gdisplace)/(garea*garea));
 
-  //reduce left bell width to avoid self-shadowing
-  if (diff<gdisplace){
-    garea = 0.1;
-  }else{
-    far = 1;
-  }
-  float gauss = pow(2.7182,-2*(diff-gdisplace)*(diff-gdisplace)/(garea*garea));
-
-  return gauss;
+    return gauss;
 } 
 
 float calAO(float depth,float dw, float dh) 
 { 
-  float temp = 0;
-  float temp2 = 0;
-  float coordw = gl_TexCoord[0].x + dw/depth;
-  float coordh = gl_TexCoord[0].y + dh/depth;
-  float coordw2 = gl_TexCoord[0].x - dw/depth;
-  float coordh2 = gl_TexCoord[0].y - dh/depth;
+    float temp = 0;
+    float temp2 = 0;
+    float coordw = gl_TexCoord[0].x + dw/depth;
+    float coordh = gl_TexCoord[0].y + dh/depth;
+    float coordw2 = gl_TexCoord[0].x - dw/depth;
+    float coordh2 = gl_TexCoord[0].y - dh/depth;
 
-  if (coordw  < 1.0 && coordw  > 0.0 && coordh < 1.0 && coordh  > 0.0)
-  {
-    vec2 coord = vec2(coordw , coordh);
-    vec2 coord2 = vec2(coordw2, coordh2);
-    int far = 0;
-    temp = compareDepths(depth, readDepth(coord),far);
-    //DEPTH EXTRAPOLATION:
-    if (far > 0){
-      temp2 = compareDepths(readDepth(coord2),depth,far);
-      temp += (1.0-temp)*temp2;
+    if (coordw  < 1.0 && coordw  > 0.0 && coordh < 1.0 && coordh  > 0.0)
+    {
+        vec2 coord = vec2(coordw , coordh);
+        vec2 coord2 = vec2(coordw2, coordh2);
+        int far = 0;
+        temp = compareDepths(depth, readDepth(coord),far);
+        //DEPTH EXTRAPOLATION:
+        if (far > 0)
+        {
+            temp2 = compareDepths(readDepth(coord2),depth,far);
+            temp += (1.0-temp)*temp2;
+        }
     }
-  }
-  return temp; 
+    return temp; 
 }  
 
 void main(void) 
 { 
-  //randomization texture:
-  vec2 fres = vec2(20,20);
-  vec3 random = texture2D(rand, gl_TexCoord[0].st*fres.xy);
-  random = random*2.0-vec3(1.0);
+    //randomization texture:
+    vec2 fres = vec2(20,20);
+    vec3 random = texture2D(rand, gl_TexCoord[0].st*fres.xy);
+    random = random*2.0-vec3(1.0);
 
-  //initialize stuff:
-  float depth = readDepth(gl_TexCoord[0]); 
-  float ao = 0.0;
+    //initialize stuff:
+    float depth = readDepth(gl_TexCoord[0]); 
+    float ao = 0.0;
 
-  for(int i=0; i<4; ++i)
-  { 
-    //calculate color bleeding and ao:
-    ao+=calAO(depth,  pw, ph); 
-    ao+=calAO(depth,  pw, -ph); 
-    ao+=calAO(depth,  -pw, ph); 
-    ao+=calAO(depth,  -pw, -ph);
+    for(int i=0; i<4; ++i)
+    { 
+        //calculate color bleeding and ao:
+        ao+=calAO(depth,  pw, ph); 
+        ao+=calAO(depth,  pw, -ph); 
+        ao+=calAO(depth,  -pw, ph); 
+        ao+=calAO(depth,  -pw, -ph);
 
-    ao+=calAO(depth,  pw*1.2, 0); 
-    ao+=calAO(depth,  -pw*1.2, 0); 
-    ao+=calAO(depth,  0, ph*1.2); 
-    ao+=calAO(depth,  0, -ph*1.2);
+        ao+=calAO(depth,  pw*1.2, 0); 
+        ao+=calAO(depth,  -pw*1.2, 0); 
+        ao+=calAO(depth,  0, ph*1.2); 
+        ao+=calAO(depth,  0, -ph*1.2);
 
-    //sample jittering:
-    pw += random.x*0.0007;
-    ph += random.y*0.0007;
+        //sample jittering:
+        pw += random.x*0.0007;
+        ph += random.y*0.0007;
 
-    //increase sampling area:
-    pw *= 1.7; 
-    ph *= 1.7;   
-  }        
+        //increase sampling area:
+        pw *= 1.7;
+        ph *= 1.7;
+    }        
 
-  //final values, some adjusting:
-  vec3 finalAO = vec3(1.0-(ao/32.0));
+    //final values, some adjusting:
+    vec3 finalAO = vec3(1.0-(ao/32.0));
 
 
-  gl_FragColor = vec4(0.3+finalAO*0.7,1.0); 
+    gl_FragColor = vec4(0.3+finalAO*0.7,1.0); 
 }
 ```
 

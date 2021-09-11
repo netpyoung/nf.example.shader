@@ -1,5 +1,15 @@
 # Shadow
 
+- ShadowCaster패스로 그림자를 그려주고
+- 메인 패스에서
+  - shadowCoord를 얻어와
+    - OUT.shadowCoord = TransformWorldToShadowCoord(OUT.positionWS);로
+  - 라이트를 얻고
+    - Light mainLight = GetMainLight(inputData.shadowCoord);
+  - 그림자를 적용시킨다
+    - half shadow = mainLight.shadowAttenuation;
+    - finalColor.rgb *= shadow;
+
 ``` hlsl
 // Light & Shadow
 #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
@@ -12,7 +22,19 @@ UnityEngine.Rendering.Universal.ShaderKeywordStrings
 ```
 
 ``` hlsl
-OUT.shadowCoord   = TransformWorldToShadowCoord(OUT.positionWS);// float4
+// com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl
+float4 TransformWorldToShadowCoord(float3 positionWS)
+{
+#ifdef _MAIN_LIGHT_SHADOWS_CASCADE
+    half cascadeIndex = ComputeCascadeIndex(positionWS);
+#else
+    half cascadeIndex = half(0.0);
+#endif
+    float4 shadowCoord = mul(_MainLightWorldToShadow[cascadeIndex], float4(positionWS, 1.0));
+    return float4(shadowCoord.xyz, 0);
+}
+
+OUT.shadowCoord = TransformWorldToShadowCoord(positionWS);// float4
 ```
 
 ``` hlsl
@@ -147,12 +169,17 @@ half shadowAttenuation = MainLightRealtimeShadow(shadowCoord);
 
 ``` hlsl
 // 그림자 그려주는놈
-Name "ShadowCaster"
-Tags{"LightMode" = "ShadowCaster"}
-ZWrite On
-Cull Back
+Pass
+{
+    Tags{"LightMode" = "ShadowCaster"}
+}
 
 vert()
+{
+    OUT.positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, lightDirectionWS));
+}
+
+frag()
 {
     1 : lit
     0 : shadow
