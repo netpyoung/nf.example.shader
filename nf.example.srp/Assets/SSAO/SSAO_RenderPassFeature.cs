@@ -11,8 +11,8 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         NONE,
         AO_ONLY,
         AO_BLUR_ONLY,
+        AO_FINAL_WITHOUT_BLUR,
         AO_FINAL_WITH_BLUR,
-        AO_FINAL_WITHOUT_BLUR
     }
 
     [Serializable]

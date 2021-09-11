@@ -82,4 +82,4 @@ MonoBehaviour:
   _settings:
     MaterialAmbientOcclusion: {fileID: 2100000, guid: 189af6277978f9343b92a9e1743a45c2, type: 2}
     MaterialDualFilter: {fileID: 2100000, guid: d96f5d86746a9d9478b244390534441d, type: 2}
-    DebugMode: 3
+    DebugMode: 4
