@@ -11,7 +11,8 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         NONE,
         AO_ONLY,
         AO_BLUR_ONLY,
-        AO_FINAL,
+        AO_FINAL_WITH_BLUR,
+        AO_FINAL_WITHOUT_BLUR
     }
 
     [Serializable]
@@ -50,6 +51,7 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             _settings = settings;
 
             _materialAmbientOcclusion = settings.MaterialAmbientOcclusion;
+
             _materialDualFilter = settings.MaterialDualFilter;
         }
 
@@ -67,13 +69,15 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             var height = description.height;
 
             cmd.GetTemporaryRT(_TmpCopyTex, description);
-            cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
+            // cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
+            cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
 
             int dualFilterW = width / 8;
             int dualFilterH = height / 8;
             for (int i = 0; i < _DualFilterTexs.Length; ++i)
             {
-                cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
+                // cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
+                cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
                 dualFilterW /= 2;
                 dualFilterH /= 2;
             }
@@ -91,6 +95,11 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            if (renderingData.cameraData.isSceneViewCamera)
+            {
+                return;
+            }
+
             if (_settings.DebugMode == E_DEBUG.NONE)
             {
                 return;
@@ -105,8 +114,9 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             {
                 cmd.Blit(_AmbientOcclusionTex, _source);
             }
-            else
+            else if (_settings.DebugMode == E_DEBUG.AO_BLUR_ONLY || _settings.DebugMode == E_DEBUG.AO_FINAL_WITH_BLUR)
             {
+
                 cmd.Blit(_AmbientOcclusionTex, _DualFilterTexs[0], _materialDualFilter, PASS_DUALFILTER_DOWN);
                 for (int i = 0; i < _DualFilterTexs.Length - 1; ++i)
                 {
@@ -126,6 +136,10 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
                 {
                     cmd.Blit(_TmpCopyTex, _source, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
                 }
+            }
+            else if (_settings.DebugMode == E_DEBUG.AO_FINAL_WITHOUT_BLUR)
+            {
+                cmd.Blit(_TmpCopyTex, _source, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
             }
 
             context.ExecuteCommandBuffer(cmd);
