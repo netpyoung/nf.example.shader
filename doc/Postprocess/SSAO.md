@@ -1,4 +1,4 @@
-# Screen Space Ambient Occlusion
+# SSAO / Screen Space Ambient Occlusion
 
 - 주변물체에 의해서 가려지는 곳이 어둡게 되어, 장면의 깊이감을 더함.
 - Ambient : 주변
@@ -43,6 +43,15 @@ half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 half ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.uv).r;
 col.rgb *= ambientOcclusionTex;
 return col;
+```
+
+``` txt
+// https://babytook.tistory.com/171
+꽁수 1 : 2x downscaled depth buffer 사용
+꽁수 2 : 랜덤 ray 벡터를 랜덤 벡터로 reflect (회전 변환보다 싸다)
+꽁수 3 : view normal 값을 사용할 수 있다면 self occlusion 을 피하기 위해 sign(dot(ray, n)) 을 곱한다
+꽁수 4 : 카메라와 가까이 있는 픽셀의 ray 는 작게 scale 하여 어색함을 줄임
+꽁수 5 : 깊이값 비교 함수를 적절히 조절 ^^;
 ```
 
 ``` txt
@@ -244,6 +253,7 @@ void main(void)
 ## Ref
 
 - Game Engine Gems, Volume 1 - 18. Fast Screen-space Ambient Occlusion and Indirect Lighting
+- https://babytook.tistory.com/171
 - <https://github.com/sebastianhein/urp-ssao>
 - <https://learnopengl.com/Advanced-Lighting/SSAO>
 - <https://ogldev.org/www/tutorial45/tutorial45.html>
