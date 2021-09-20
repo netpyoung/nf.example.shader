@@ -1,3 +1,0 @@
-- https://www.youtube.com/watch?v=4QOcCGI6xO
-- https://github.com/SebLague/Clouds
-  - NoiseGenerator

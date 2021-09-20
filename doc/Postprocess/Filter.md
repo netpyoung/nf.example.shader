@@ -174,6 +174,9 @@ ex)
 - [SIGGRAPH2015 - Bandwidth-Efficient Rendering](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf)
 - <https://github.com/MarcusXie3D/FastBloomForMobiles>
   - <https://zhuanlan.zhihu.com/p/126351976>
+- <https://developer.arm.com/documentation/102259/0100/Bloom>
+- [Unite Berlin 2018 - Attaining Post Processing Effects on Mid Range Smartphones](https://www.youtube.com/watch?v=7mmWPtAoflI)
+  - [slide](https://developer.arm.com/-/media/Files/pdf/graphics-and-multimedia/Unite18_Nordeus_Arm.pdf?revision=3bf9cd9d-08cd-488b-adbd-512899718cba)
 
 ## Radial / 방사형
 

@@ -27,13 +27,47 @@ half rimIntensity = rim * pow(NdotL, 0.1);
 half toonSpecular = smoothstep(0.005, 0.01, blinnphongSpecular);
 ```
 
+## 아웃라인
+
+- 버텍스 확장
+  - 단순 확장
+  - 버텍스 칼라이용 세부 조절
+- 포스트이펙트
+
+## 기타 예제
+
+- SSS 텍스쳐
+
+``` hlsl
+half3 sssColor = mainTex * sssTex;
+half3 afterSssColor = lerp(sssColor, mainTex, diffuse);
+```
+
+- maskTex
+
+| 채널 | 마스크        |
+| ---- | ------------- |
+| r    | 반사영역      |
+| g    | 어두어짐      |
+| b    | 스펙큘러 세기 |
+| a    | 내부 선       |
+
+- vertex's color
+
+| 채널 | 마스크                                  |
+| ---- | --------------------------------------- |
+| r    | 어두워짐                                |
+| g    | 카메라와의 거리                         |
+| b    | 카메라의 zoffset. 헤어에서 storoke 조절 |
+| a    | 윤곽두께                                |
+
 ## Ref
 
 - <https://alexanderameye.github.io/simple-toon.html>
 - <https://roystan.net/articles/toon-shader.html>
   - <https://github.com/IronWarrior/UnityToonShader>
 - [The Art Direction of Street Fighter V: The Role of Art in Fighting Games](https://www.youtube.com/watch?v=EDlbJdmo7KE)
- - <https://www.gdcvault.com/play/1024506/Art-Direction-of-Street-Fighter>
+  - <https://www.gdcvault.com/play/1024506/Art-Direction-of-Street-Fighter>
 - [[마비노기] 마비노기 카툰렌더링 제작과정 영상 [Mabinogi] Cartoon rendering Production Process Video](https://www.youtube.com/watch?v=lYV_-x2aFX0)
 - [SIGGRAPH2006 - Shading In Valve's Source Engine](https://steamcdn-a.akamaihd.net/apps/valve/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
 - [Team Fortress 2 Shader for RenderMan RSL](https://vimeo.com/25953235)

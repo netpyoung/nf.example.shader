@@ -2,6 +2,15 @@
 
 - Illumination : 조명
 
+## 구현
+
+- 반구 주변의 점으로 가려짐 정도(Occlusion factor) 계산
+  - 성능상 샘플링 갯수를 줄이는게...
+- 계산된 가려짐 정도를 블러(Blur)로 적당히 흐려지게 만들기
+- 원본 텍스쳐에 적용
+
+## Case
+
 ``` glsl
 // [(X) SSGI 관련 정리 (소스 포함)](http://eppengine.com/zbxe/programmig/2985)
 // - backup article: https://babytook.tistory.com/157
