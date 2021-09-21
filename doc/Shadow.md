@@ -21,6 +21,8 @@ TRANSFER_SHADOW_CASTER
 ### 평면 투영 (Planar Projected) 그림자
 
 - 그림자용 모델 따로 만들어서 셰이더 연산 절약.
+- 캡슐로 몸통이랑 다리랑만 만들어서 대략적인 계산
+  - [基于近似演算的Capsule Shadow（胶囊体阴影）](http://walkingfat.com/%e5%9f%ba%e4%ba%8e%e8%bf%91%e4%bc%bc%e6%bc%94%e7%ae%97%e7%9a%84capsule-shadow%ef%bc%88%e8%83%b6%e5%9b%8a%e4%bd%93%e9%98%b4%e5%bd%b1%ef%bc%89/)
 
 ### RenderTexture이용
 

@@ -9,15 +9,16 @@
 
 - [EasyChannelPacking](https://gumroad.com/l/EasyChannelPacking)
 
-|              |     |                |
-|--------------|-----|----------------|
-| DiffuseTex   | RGB | 불투명시 3채널 |
-| NormalTex    | RG  |                |
-| SpecularTex  | R   |                |
-| MaskTex      | R   |                |
-| HeightMapTex | R   |                |
-| NoiseTex     | R   |                |
-| ...          | R   |                |
+|               |     |                |
+| ------------- | --- | -------------- |
+| _DiffuseTex   | RGB | 불투명시 3채널 |
+| _NormalTex    | RG  |                |
+| _SpecularTex  | R   |                |
+| _MaskTex      | R   |                |
+| _HeightMapTex | R   |                |
+| _NoiseTex     | R   |                |
+| _BrdfTex      |     |                |
+| ...           | R   |                |
 
 ## ex) [NormalMap](../NormalMap.md)와 [ParallaxMapping](../ParallaxMapping.md)
 
@@ -40,3 +41,9 @@ real3 UnpackNormalmapRGorAG(real4 packedNormal, real scale = 1.0)
     return UnpackNormalAG(packedNormal, scale);
 }
 ```
+
+## ex
+
+![texture_example1.jpg](../res/texture_example1.jpg)
+
+![texture_example1.jpg](../res/texture_example2.jpg)

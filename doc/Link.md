@@ -12,6 +12,8 @@
 도구
 https://renderdoc.org/
 
+텍스쳐 생성 : https://github.com/mtwoodard/TextureGenerator
+
 그래프
 https://www.geogebra.org/graphing
 https://www.desmos.com/calculator

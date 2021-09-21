@@ -29,9 +29,14 @@
 
 - [2018 - 【Unite Tokyo 2018】『崩壊3rd』開発者が語るアニメ風レンダリングの極意](https://www.youtube.com/watch?v=ZpWsinhPFLM)
   - <https://www.youtube.com/watch?v=egHSE0dpWRw>
-- [유나이트 서울 2020 - 원신 콘솔 플랫폼 개발 경험 및 렌더링 파이프라인 기술 소개 Track3-1](https://www.youtube.com/watch?v=00QugD5u1CU)
-  - [Unite Seoul 2020 세션 다시보기 - 원신 콘솔 플랫폼 개발 및 렌더링 파이프라인 기술 소개](https://www.youtube.com/watch?v=t0rOOs1701o)
 
 ## 중국
 
+- [유나이트 서울 2020 - 원신 콘솔 플랫폼 개발 경험 및 렌더링 파이프라인 기술 소개 Track3-1](https://www.youtube.com/watch?v=00QugD5u1CU)
+  - [Unite Seoul 2020 세션 다시보기 - 원신 콘솔 플랫폼 개발 및 렌더링 파이프라인 기술 소개](https://www.youtube.com/watch?v=t0rOOs1701o)
+
 ## 해외
+
+- RIME
+  - [ADDON2017 - GAT #65: Stylized VFX in RIME](https://www.youtube.com/watch?v=fwKQyDZ4ark)
+  - [UNREALFEST2018 - GAT #67: Stylized VFX in RIME 2.0 - Water Edition](https://www.youtube.com/watch?v=4FIDBeF_4SI)

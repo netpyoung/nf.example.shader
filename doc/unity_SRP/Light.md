@@ -12,6 +12,8 @@ float3 probe1 = DecodeHDREnvironment(SAMPLE_TEXTURECUBE_LOD(unity_SpecCube1, sam
 float3 probe = lerp(probe1, probe0, unity_SpecCube0_BoxMin.w);
 ```
 
+- 유니티 Skybox 설정 : `Window > Rendering > Lighting > Environment`
+  - `unity_SpecCube0`가 위에서 설정된 메테리얼로 스카이박스를 렌더링함.(`Camera > Background Type`과는 상관없음)
 
 주변광
 Light probe GI(Global Illumination)

@@ -113,3 +113,4 @@ void main(void)
 - <https://forum.unity.com/threads/my-ssao-ssgi-prototype.78566/#post-521710>
 - <https://github.com/demonixis/StylisticFog-URP/tree/master/Assets/StylisticFog-URP>
 - <https://people.mpi-inf.mpg.de/~ritschel/SSDO/index.html>
+- [用Unity SRP实现SSGI，和手机端的效果测试（一）](http://walkingfat.com/%e7%94%a8unity-srp%e5%ae%9e%e7%8e%b0ssgi%ef%bc%8c%e5%92%8c%e6%89%8b%e6%9c%ba%e7%ab%af%e7%9a%84%e6%95%88%e6%9e%9c%e6%b5%8b%e8%af%95%ef%bc%88%e4%b8%80%ef%bc%89/)

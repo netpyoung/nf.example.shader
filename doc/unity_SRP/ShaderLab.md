@@ -96,13 +96,34 @@ Cube            | float4 | "", "white", "black", "gray", "bump"
 // ex) pow(gray, 2.2);
 ```
 
-| color string | RGBA            |
-|--------------|-----------------|
-| white        | 1,1,1,1         |
-| black        | 0,0,0,0         |
-| gray         | 0.5,0.5,0.5,0.5 |
-| bump         | 0.5,0.5,1,0.5   |
-| red          | 1,0,0,0         |
+``` hlsl
+// color string
+red
+black
+white
+gray
+grey
+linearGray
+linearGrey
+grayscaleRamp
+greyscaleRamp
+bump
+blackCube
+lightmap
+unity_Lightmap
+unity_LightmapInd
+unity_ShadowMask
+unity_DynamicLightmap
+unity_DynamicDirectionality
+unity_DynamicNormal
+unity_DitherMask
+_DitherMaskLOD
+_DitherMaskLOD2D
+unity_RandomRotation16
+unity_NHxRoughness
+unity_SpecCube0
+unity_SpecCube1
+```
 
 ## Properties attributes
 

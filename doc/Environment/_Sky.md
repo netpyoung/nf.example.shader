@@ -5,6 +5,7 @@
 - Cubemap
   - 앞뒤좌우/상하 6면을 이용
   - 유니티 Skybox 설정 : `Window > Rendering > Lighting > Environment`
+  - `unity_SpecCube0`가 위에서 설정된 메테리얼로 스카이박스를 렌더링함.(`Camera > Background Type`과는 상관없음)
   - Cubemap : `Create > Legacy > Cubemap`
 - SkyDome / SkySphere
   - 돔(반구: hemisphere)/구(Sphere) 형태의 매쉬 이용
@@ -70,8 +71,6 @@ uv.y = uv.y * 0.5 + 0.5
 SunsetColor
 SkyColor
 HorizonKolor
-
-
 
 
 돔 맵핑

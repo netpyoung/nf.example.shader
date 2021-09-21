@@ -1,7 +1,7 @@
 # Alpha
 
 - 알파쓰면 Testing(discard)이나 Blend가 할 것 없이 성능 잡아먹는다.
-  - Blend쪽이 모바일에서 성능이 잘 나오는 경향이 있다.
+  - 구형 모바일 디바이스에선 Blend쪽이 성능이 잘 나오는 경향이 있었다.
 
 ``` hlsl
 SubShader
