@@ -1,7 +1,7 @@
 # MatCap
 
-- SEM(Spherical Environment Mapping)
-  - MatCap(Material Capture) / Lit Sphere
+- MatCap(Material Capture)
+  - SEM(Spherical Environment Mapping) / Lit Sphere
 - 환경을 텍스쳐에 맵핑하고, `뷰스페이스 노말`로 색을 얻어온다.
 - 케릭터에 사용할때는 Diffuse용/Reflect용 맵캡을 이용하도록 하자
 

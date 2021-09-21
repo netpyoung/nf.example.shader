@@ -1,10 +1,14 @@
 # Dissolve
 
-Dissolve텍스쳐를 이용하여, 특정 값 이하일때 표시를 안하면 사라지는 효과를 얻을 수 있다.
+- dissolve : 녹다, 용해되다.
+- Dissolve텍스쳐를 이용하여, 특정 값 이하일때 표시를 안하면 사라지는 효과를 얻을 수 있다.
+- [Alpha.md](../Basic/Alpha.md) 참조.
+
+## Sample
 
 ``` hlsl
-half cutout = SAMPLE_TEXTURE2D(_TexDissolve, sampler_TexDissolve, IN.uv).r;
-clip(cutout - _Amount);
+half dissolveTex = SAMPLE_TEXTURE2D(_DissolveTex, sampler_DissolveTex, IN.uv).r;
+clip(dissolveTex - _Amount);
 ```
 
 ``` hlsl

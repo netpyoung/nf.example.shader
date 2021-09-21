@@ -1,4 +1,4 @@
-# Toon Shader
+# Toon
 
 - ceil / Ramp Texture / smoothstep
 
