@@ -1,13 +1,17 @@
-# Screen Space Decal / SSD
+# Screen Space Decal
 
-- [SIGGRAPH2012 - ScreenSpaceDecal](https://www.slideshare.net/blindrenderer/screen-space-decals-in-warhammer-40000-space-marine-14699854)
+- Deferred Decals(Jan Krassnigg, 2010)
+- Volume Decals (Emil Persson, 2011)
+- SSD : [SIGGRAPH2012 - ScreenSpaceDecal](https://www.slideshare.net/blindrenderer/screen-space-decals-in-warhammer-40000-space-marine-14699854)
 - 큐브를 프로젝터처럼 이용, 화면에 데칼을 그린다.
 - 뎁스로부터 포지션을 다시 구축하는 것이므로 `Reconstructing position from depth`라고도 한다.
 
-1. 씬뎁스 구하기
-2. 뎁스로부터 3D위치를 구하기
-3. SSD상자 밖이면 그리지않기
-4. 데칼 그리기
+1. SSD를 제외한 메쉬들을 화면에 그림
+2. SSD 상자를 그림(rasterization)
+3. 각 픽셀마다 장면깊이(scene depth)를 읽어옴
+4. 그 깊이로부터 3D 위치를 계산함
+5. 그 3D 위치가 SSD 상자 밖이면 레젝션(rejection)
+6. 그렇지 않으면 데칼 텍스처를 그림
 
 ## ver1. URP
 

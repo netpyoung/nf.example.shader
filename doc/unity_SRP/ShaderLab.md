@@ -50,7 +50,7 @@ Shader <shader-name>
             }
             
             // http://docs.unity3d.com/Manual/SL-CullAndDepth.html
-            Cull <Back | Front | Off>
+            Cull <Back | Front | Off> // default: Back 
             ZTest <(Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)> // default: LEqual 
             ZWrite <On | Off> // default: On 
             Offset <OffsetFactor>, <OffsetUnits>
@@ -174,17 +174,15 @@ Tags
 
 ### Queue
 
-렌더링 순서
+- 렌더링 순서 지정. `Geometry+1`, `Geometry-1` 과 같이 가중치 적용가능
 
-`Geometry+1`, `Geometry-1` 과 같이 가중치 적용가능
-
-| min  | default | max  |             | order               |
-|------|---------|------|-------------|---------------------|
-| 0    | 100     | 1499 | Background  | render First / back |
-| 1500 | 2000    | 2399 | Geometry    |                     |
-| 2400 | 2450    | 2699 | AlphaTest   |                     |
-| 2700 | 3000    | 3599 | Transparent |                     |
-| 3600 | 4000    | 5000 | Overlay     | render last / front |
+| Queue       | [min,  max]   | default | order                | etc                      |
+| ----------- | ------------- | ------- | -------------------- | ------------------------ |
+| Background  | [0    , 1499] | 100     | render first -> back |                          |
+| Geometry    | [1500 , 2399] | 2000    |                      | <기본값> Opaque는 이쪽에 |
+| AlphaTest   | [2400 , 2699] | 2450    |                      | AlphaTest는 이쪽에       |
+| Transparent | [2700 , 3599] | 3000    | render back -> front | AlphaBlend는 이쪽에      |
+| Overlay     | [3600 , 5000] | 4000    | render last -> front |                          |
 
 ### RenderType
 
@@ -194,7 +192,7 @@ Tags
 - <https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.shadergraph/Editor/Generation/Enumerations/RenderType.cs>
 
 | RenderType        |                                            |
-|-------------------|--------------------------------------------|
+| ----------------- | ------------------------------------------ |
 | Opaque            | 대부분의 쉐이더                            |
 | Transparent       | 투명한 쉐이더                              |
 | TransparentCutout | 마스킹 된 투명 쉐이더(2pass 식물쉐이더 등) |
@@ -227,7 +225,7 @@ Pass
 - <https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@10.3/manual/urp-shaders/urp-shaderlab-pass-tags.html>
 
 | LightMode            | URP / Built-in |                                               |
-|----------------------|----------------|-----------------------------------------------|
+| -------------------- | -------------- | --------------------------------------------- |
 | UniversalForward     | URP            | Forward Rendering                             |
 | UniversalGBuffer     | URP            | Deferred Rendering                            |
 | UniversalForwardOnly | URP            | Forward & Deferred Rendering                  |
@@ -246,10 +244,10 @@ Pass
 
 ## Blend
 
-대표적인 Blend 옵션 조합
+- 대표적인 Blend 옵션 조합
 
-|          |                  |                                               |
-|----------|------------------|-----------------------------------------------|
+| A        | B                | 효과                                          |
+| -------- | ---------------- | --------------------------------------------- |
 | SrcAlpha | OneMinusSrcAlpha | Alpha Blend                                   |
 | One      | One              | Additive(Without alpha, black is Transparent) |
 | SrcAlpha | One              | Additive(With Alpha)                          |

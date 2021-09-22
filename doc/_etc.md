@@ -1,27 +1,9 @@
 
 
-## Toon Ramp
-NPAR07_IllustrativeRenderingInTeamFortress2
-
-
 
 ## Parallax Refraction  ??
 시차(視差: 관측 위치에 따른 물체의 위치나 방향의 차이)
 
-## SSS (Subsurface Scattering)
-
-## AO(Ambient Occlusion) - https://gpgstudy.com/forum/viewtopic.php?t=22536
-ambient occlusion 은 말 그대로 "주변의 빛이 얼마나 가렸느냐"를 의미하기 때문에
-경계가 불분명하고 광원이 움직여도 영향을 받지 않습니다.
-
-shadow 같은 경우에는 "광원에서 나오는 빛이 얼마나 가렸느냐"를 의미하기 때문에
-경계가 분명하며 광원이 움직일때 같이 변경됩니다
-
-
-## IBL
-### IBL-Reflection
-### IBL-Refraction
-### Frenel
 
 
 ## BRDF(Bidirectional Reflectance Distribution Function)
@@ -82,36 +64,7 @@ PBS하려면 지원해야할것.
 -- High Dynamic Range Rendering
 -- Tone mapping
 
-====
-[SSD 스크린스페이스데칼](https://www.slideshare.net/blindrendererkr/40000)
-
-SSD이전 데칼
-벽에 총알 자국
-쉬움: 벽 메쉬의 폴리곤 수 늘림
-복잡: 복제한 메쉬 패치에 있는 정점마다 UV좌표를 "잘" 계산.
-
-SSD 배경
-- Deferred Decals(Jan Krassnigg, 2010)
-- Volume Decals (Emil Persson, 2011)
-
-SSD 절차
-1. SSD를 제외한 메쉬들을 화면에 그림
-2. SSD 상자를 그림(rasterization)
-3. 각 픽셀마다 장면깊이(scene depth)를 읽어옴
-4. 그 깊이로부터 3D 위치를 계산함
-5. 그 3D 위치가 SSD 상자 밖이면 레젝션(rejection)
-6. 그렇지 않으면 데칼 텍스처를 그림
-
 ==============
-GI: Global Illumination
-https://en.wikipedia.org/wiki/Global_illumination - 사진
-
-
-서피스에서 반사되거나 굴절되는 모든 빛을 새로운 광원으로 삼는 것을
-
-출처: https://lifeisforu.tistory.com/374?category=567143 [그냥 그런 블로그]
-
-
 이미지 IBL
 https://wiki.jmonkeyengine.org/jme3/advanced/pbr_part3.html
 
@@ -130,12 +83,9 @@ https://blog.hybrid3d.dev/2018-04-12-misunderstandings-in-pbr
 환경맵을 사용한 PBR 기반 `IBL(Image-Based Lighting)`
 
 ===========
-그리면 코드 알려줌
-http://detexify.kirelabs.org/classify.html
 
 
-https://en.wikipedia.org/wiki/List_of_common_3D_test_models
-Cornell Box https://en.wikipedia.org/wiki/Cornell_box
+- [Cornell Box](https://en.wikipedia.org/wiki/Cornell_box)
 Sponza - Frank Meinl
 
 =====
@@ -165,80 +115,7 @@ https://www.sysnet.pe.kr/Default.aspx?mode=2&sub=0&pageno=0&detail=1&wid=11636
 dot을 이용 cos 각도값으로 비교하면 성능향상 가능성.
 
 
-
-나무
-  빌보드쉐이더
-  https://www.sysnet.pe.kr/2/0/11641
-
-
 parallex shader 평면 원근감
-Spherical Mask - https://www.youtube.com/watch?v=Ws4ukvCgTOU
-```
-Shader "MinGyu/SphericalMask" {
-	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_ColorStrength ("Color Strength", Range(1,4)) = 1
-
-		_EmissionColor ("Emission Color", Color) = (1,1,1,1)
-		_EmissionTex ("Emission (RGB)", 2D) = "white" {}
-		_EmissionStrength ("Emission Strength", Range(0,10)) = 1
-
-		_Position ("World Position", Vector) = (0,0,0,0)
-		_Radius ("Sphere Radius", Range(0,100)) = 0
-		_Softness ("Sphere Softness", Range(0,100)) = 0	
-	}
-	SubShader {
-		Tags { "RenderType"="Opaque" }
-		LOD 200
-
-		CGPROGRAM
-		#pragma surface surf Standard fullforwardshadows
-		#pragma target 3.0
-
-		sampler2D _MainTex;
-		sampler2D _EmissionTex;
-
-		struct Input {
-			float2 uv_MainTex;
-			float2 uv_EmissionTex;
-			float3 worldPos;
-		};
-
-		fixed4 _Color, _EmissionColor;
-		half _ColorStrength, _EmissionStrength;
-
-		// Spherical Mask
-		uniform float4 GLOBALmask_Position;
-		uniform half GLOBALmask_Radius;
-		uniform half GLOBALmask_Softness;
-
-		void surf (Input IN, inout SurfaceOutputStandard o) {
-			// Color
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			
-			// Grayscale
-			float grayscale = (c.r + c.g + c.b) * 0.333;
-			fixed3 c_g = fixed3(grayscale, grayscale, grayscale);
-
-			// Emission
-			fixed4 e = tex2D(_EmissionTex, IN.uv_EmissionTex) * _EmissionColor * _EmissionStrength;
-
-			half d = distance(GLOBALmask_Position, IN.worldPos);
-			half sum = saturate((d - GLOBALmask_Radius) / -GLOBALmask_Softness);
-			fixed4 lerpColor = lerp(fixed4(c_g,1), c * _ColorStrength, sum);
-			fixed4 lerpEmission = lerp(fixed4(0,0,0,0), e, sum);
-						
-			o.Albedo = lerpColor.rgb;
-			o.Emission = lerpEmission.rgb;
-			o.Alpha = c.a;
-		}
-		ENDCG
-	}
-	FallBack "Diffuse"
-}
-
-```
 
 tex2Dlod
 https://developer.download.nvidia.com/cg/tex2Dbias.html
@@ -252,8 +129,6 @@ Banded Lighting
 NDF(Normal Distribution Function)
 gpg3권 4.19 수작업으로 만든 셰이딩 모형으로 렌더링하기
 https://www.jordanstevenstechart.com/physically-based-rendering
-
-
 
 
 https://github.com/wdas/brdf - compiled - https://www.disneyanimation.com/technology/brdf.html

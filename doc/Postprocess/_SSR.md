@@ -26,3 +26,6 @@ jitter 흐뜨려트림
   - <https://github.com/playdeadgames/temporal>
 - [GPU Pro 6: Advanced Rendering Techniques - II: RENDERING - 1.2.3 Screen-Space Reflections](https://books.google.co.kr/books?id=30ZOCgAAQBAJ&pg=PA65&lpg=PA65#v=onepage&q&f=false)
 - Approximating ray traced reflections using screen-space data by MATTIAS JOHNSSON
+- <https://dataprocess.tistory.com/315>
+- <https://sakibsaikia.github.io/graphics/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html>
+- <http://roar11.com/2015/07/screen-space-glossy-reflections/>

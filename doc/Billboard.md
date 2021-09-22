@@ -47,6 +47,7 @@ positionOS.y = IN.positionOS.y;
 
 ## Ref
 
+- <https://www.sysnet.pe.kr/2/0/11641>
 - <https://en.wikibooks.org/wiki/Cg_Programming/Unity/Billboards>
 - <https://80.lv/articles/the-shader-approach-to-billboarding/>
 - <http://unity3d.ru/distribution/viewtopic.php?f=35&t=24903>

@@ -14,6 +14,9 @@ https://renderdoc.org/
 
 텍스쳐 생성 : https://github.com/mtwoodard/TextureGenerator
 
+http://research.tri-ace.com/
+
+
 그래프
 https://www.geogebra.org/graphing
 https://www.desmos.com/calculator
@@ -23,3 +26,7 @@ http://tobyschachman.com/Shadershop/editor/
 모델
 https://www.mixamo.com/
 https://www.models-resource.com/
+https://en.wikipedia.org/wiki/List_of_common_3D_test_models
+
+튜토리얼
+ https://www.ronja-tutorials.com/

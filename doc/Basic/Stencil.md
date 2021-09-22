@@ -190,3 +190,4 @@ Pass
 - <https://docs.unity3d.com/Manual/SL-Stencil.html>
 - <https://www.ronja-tutorials.com/post/022-stencil-buffers/>
 - <https://rito15.github.io/posts/unity-transparent-stencil/#스텐실>
+- [유니티 URP 멀티 렌더 오브젝트 기법으로 겹쳐진면 투명화하기](https://chulin28ho.tistory.com/567)

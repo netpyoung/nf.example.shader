@@ -31,3 +31,6 @@ https://blog.selfshadow.com/publications/s2014-shading-course/frostbite/s2014_pb
 ## Ref
 
 - <https://www.slideshare.net/MRESC/pbr-vol2-131205432>
+- Adobe The PBR Guide
+  - <https://substance3d.adobe.com/tutorials/courses/the-pbr-guide-part-1>
+  - <https://substance3d.adobe.com/tutorials/courses/the-pbr-guide-part-2>
