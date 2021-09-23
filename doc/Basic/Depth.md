@@ -158,3 +158,4 @@ float3 normalVS = normalize(cross(diff_h, diff_v));
 
 - <https://www.cyanilux.com/tutorials/depth/>
 - <https://beta.unity3d.com/talks/Siggraph2011_SpecialEffectsWithDepth_WithNotes.pdf>
+- <https://www.reedbeta.com/blog/depth-precision-visualized/>

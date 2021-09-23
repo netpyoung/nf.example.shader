@@ -163,6 +163,15 @@ void MixRealtimeAndBakedGI(inout Light light, half3 normalWS, inout half3 bakedG
 
 TODO occlusion?
 
+## Reflection Probe
+
+| TimeSlicing       |          | (렌더링 프레임네 스크립트를 통해 새로고침 호출은 무시)                                                     |
+| ----------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| All Faces at once | 9 Frame  | 6면(1 Frame x 1), 1레벨 밉맵은 각각 프레임마다(1 Frame x 6), 나머지 밉맵들(1 Frame), 큐브맵 복사(1 Frame). |
+| Individual Faces  | 14 Frame | 6면(1 Frame x 6), 1레벨 밉맵은 각각 프레임마다(1 Frame x 6), 나머지 밉맵들(1 Frame), 큐브맵 복사(1 Frame). |
+| No Time Slicing   | 1 Frame  |                                                                                                            |
+
+
 ## TOOD lightmap
 
 - https://chulin28ho.tistory.com/441?category=458928

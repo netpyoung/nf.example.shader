@@ -1,5 +1,7 @@
 # Cubemap
 
+- 텍스쳐를 받을 수 있는 Cubemap생성하기 : `Create > Legacy > Cubemap`
+
 ``` hlsl
 TEXTURECUBE(_CubeMap);  SAMPLER(sampler_CubeMap);
 
@@ -17,8 +19,6 @@ half4 cubeRefract = SAMPLE_TEXTURECUBE_LOD(_CubeMap, sampler_CubeMap, refractVN,
 - <https://github.com/gscept/CubeMapGen>
 
 ``` cs
-// Cubemap : Create > Legacy > Cubemap
-
 // | AMD CubeMapGen | Unity |
 // | -------------- | ----- |
 // | X+             | -X    |
