@@ -3,10 +3,6 @@
     Properties
     {
         _MainTex("texture", 2D) = "white" {}
-        _NoiseTex("_NoiseTex", 2D) = "white" {}
-        _Translation("_Translation", Float) = 1
-        _Scale("_Scale", Float) = 1
-        _Brightness("_Brightness", Float) = 1
     }
 
     SubShader
@@ -32,28 +28,29 @@
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-            TEXTURE2D(_NoiseTex);    SAMPLER(sampler_NoiseTex);
         
             CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_ST;
-
-            float _Translation;
-            float _Scale;
-            float _Brightness;
             CBUFFER_END
 
             struct APPtoVS
             {
                 float4 positionOS    : POSITION;
                 float2 uv            : TEXCOORD0;
+                float3 normalOS     : NORMAL;
             };
 
             struct VStoFS
             {
                 float4 positionCS    : SV_POSITION;
                 float2 uv            : TEXCOORD0;
+
+                float3 N            : TEXCOORD1;
+                float3 V            : TEXCOORD2;
+                float3 L            : TEXCOORD3;
             };
 
             VStoFS vert(APPtoVS IN)
@@ -64,21 +61,25 @@
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
 
+                OUT.N = TransformObjectToWorldNormal(IN.normalOS);
+                OUT.V = GetWorldSpaceViewDir(TransformObjectToWorld(IN.positionOS.xyz));
+
+                Light light = GetMainLight();
+                OUT.L = light.direction;
+
                 return OUT;
             }
 
             half4 frag(VStoFS IN) : SV_Target
             {
-                IN.uv.x += _Translation;
+                half3 N = normalize(IN.N);
+                half3 V = normalize(IN.V);
 
-                float4 perturbValue = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, IN.uv);
+                float3 VrN = reflect(-V, N);
+                float lod = 1;
+                float3 probe0 = DecodeHDREnvironment(SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, samplerunity_SpecCube0, VrN, lod), unity_SpecCube0_HDR);
 
-                perturbValue = perturbValue * _Scale;
-                perturbValue.xy = perturbValue.xy + IN.uv.xy + _Translation;
-
-                float4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, perturbValue.xy);
-                mainTex *= _Brightness;
-                return mainTex;
+                return float4(probe0, 1);
             }
             ENDHLSL
         }
