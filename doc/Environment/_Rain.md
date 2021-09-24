@@ -9,3 +9,5 @@ postprocess식으로 전체화면하기에는 부하가 있고, 메쉬를 생성
 - [SIGGRAPH2011-FastMobileShaders](https://blog-api.unity.com/sites/default/files/2011/08/FastMobileShaders_siggraph2011.pdf)
 - [Rain And Snow Effect With Geometry Shaders In Unity](https://medium.com/@andresgomezjr89/rain-snow-with-geometry-shaders-in-unity-83a757b767c1)
   - <https://github.com/tiredamage42/RainSnowGeometryShader>
+  - <https://seblagarde.wordpress.com/2012/12/27/water-drop-2a-dynamic-rain-and-its-effects/>
+  
