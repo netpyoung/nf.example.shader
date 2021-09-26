@@ -2,7 +2,6 @@
 
 - based on [[built-in] UnityShadersCheatSheet.shader](https://gist.github.com/Split82/d1651403ffb05e912d9c3786f11d6a44)
 
-
 ``` hlsl
 // Cheetsheet for URP
 
@@ -28,6 +27,7 @@ Shader "Name"
         _Name ("display name", 3D)      = "default-ColorString" {}
 
         // ## Property Attribute
+        // ref: https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html
         // |                                                                          |                                                                                                                                                                                                     |
         // | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
         // | [HideInInspector]                                                        | 머테리얼 인스펙터에서 표시안함                                                                                                                                                                      |
@@ -36,13 +36,20 @@ Shader "Name"
         // | [HDR]                                                                    | 텍스쳐 설정 HDR 아니면 경고                                                                                                                                                                         |
         // | [Gamma]                                                                  | indicates that a float/vector property is specified as sRGB value in the UI (just like colors are), and possibly needs conversion according to color space used. See Properties in Shader Programs. |
         // | [PerRendererData]                                                        | indicates that a texture property will be coming from per-renderer data in the form of a MaterialPropertyBlock. Material inspector changes the texture slot UI for these properties.                |
-        // | [Enum(UnityEngine.Rendering.BlendMode)] _Blend ("Blend mode", Float) = 1 | blend modes selection.                                                                                                                                                                              |
+        // | [Toggle]                                                                 |                                                                                                                                                                                                     |
         // | [Toggle(ENABLE_FANCY)] _Fancy ("Fancy?", Float) = 0                      | Will set "ENABLE_FANCY" shader keyword when set.                                                                                                                                                    |
-        // | [KeywordEnum(None, Add, Multiply)] _Overlay ("Overlay mode", Float) = 0  | Display a popup with None,Add,Multiply choices. Each option will set _OVERLAY_NONE, _OVERLAY_ADD, _OVERLAY_MULTIPLY shader keywords.                                                                |
+        // | [ToggleOff]                                                              |                                                                                                                                                                                                     |
+        // | [ToggleOff(DISABLE_EXAMPLE_FEATURE)]                                     |                                                                                                                                                                                                     |
+        // | [Enum(UnityEngine.Rendering.BlendMode)] _Blend ("Blend mode", Float) = 1 | blend modes selection.                                                                                                                                                                              |
         // | [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("ZTest", Float) = 0 |                                                                                                                                                                                                     |
         // | [Enum(UnityEngine.Rendering.CullMode)] _CullMode("Cull Mode", Int) = 0   |                                                                                                                                                                                                     |
+        // | [KeywordEnum(None, Add, Multiply)] _Overlay ("Overlay mode", Float) = 0  | Display a popup with None,Add,Multiply choices. Each option will set _OVERLAY_NONE, _OVERLAY_ADD, _OVERLAY_MULTIPLY shader keywords.                                                                |
         // | [MainTexture]                                                            |                                                                                                                                                                                                     |
         // | [MainColor]                                                              |                                                                                                                                                                                                     |
+        // | [Header(A group of things)]                                              |                                                                                                                                                                                                     |
+        // | [PowerSlider(3.0)]                                                       |                                                                                                                                                                                                     |
+        // | [IntRange]                                                               |                                                                                                                                                                                                     |
+        
         // Later on in the shader’s fixed function parts, property values can be accessed using property name in square brackets: [name] e.g. Blend [_SrcBlend] [_DstBlend].
 
         // ## ColorString
