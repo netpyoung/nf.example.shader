@@ -31,3 +31,5 @@ https://en.wikipedia.org/wiki/List_of_common_3D_test_models
 튜토리얼
  https://www.ronja-tutorials.com/
  https://guru/unity-cpu-performance/mesh-baker-interview-ian-deane/
+
+ https://www.gamedevpensieve.com/graphics/3d/3d_lighting

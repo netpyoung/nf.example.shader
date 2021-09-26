@@ -3,6 +3,10 @@
 반사
 Reflect probe : 주변의 Static오브젝트들을 캡쳐하여 CubeMap데이터로 저장
 
+- `_MainLightPosition` 이라고 병신같은 이름이 있는데, 실제 메인 라이트는 위치정보를 가지고 있지 않다. 방향정보이다.
+  - 인스펙터에서 암만 position값을 가지고 바꿔봐도 안바뀜. rotation을 움직이면 바뀜.
+  - GameObject rotation X : 0도 ~ 90도 => light.direction.y :0 ~ 1
+
 // [커스텀쉐이더에서 리플렉션 프로브 사용하기 (Using Reflection Probes in Custom Shader)](https://ozlael.tistory.com/38)
 
 ``` hlsl

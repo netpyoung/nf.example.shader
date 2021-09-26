@@ -86,6 +86,7 @@ half3 rampTex = SAMPLE_TEXTURE2D(_RampTex, sampler_RampTex, rampUV).rgb;
 
 ## Ref
 
+- [Cheap realisticskinshading kor ](https://www.slideshare.net/leemwymw/cheap-realisticskinshading-kor)
 - [SIGGRAPH2010 - Uncharted 2: Character Lighting and Shading](https://advances.realtimerendering.com/s2010/index.html)
 - [GDC2011 - Iterating Realistic Human Rendering: Boxers in FIGHT NIGHT CHAMPION](https://www.gdcvault.com/browse/gdc-11/play/1014661)
 - <https://zhuanlan.zhihu.com/p/97892884>

@@ -35,7 +35,7 @@ half diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
 ``` hlsl
 half3 R = reflect(-L, N);
 half RdotV = max(0.0f, dot(R, V));
-half specular = pow(RdotV, _SpecularGloss) * _SpecularPower;
+half specular = pow(RdotV, _SpecularPower) * _SpecularNormFactor;
 ```
 
 ## Blinn Phong - 블린 퐁
@@ -44,10 +44,9 @@ half specular = pow(RdotV, _SpecularGloss) * _SpecularPower;
 
 ``` hlsl
 half3 H = normalize(V + L); 
-half NdotL = max(0.0, dot(N, L));
 half NdotH = max(0.0, dot(N, H));
 
-half specular = pow(NdotH ,_SpecularGloss) * _SpecularPower;
+half specular = pow(NdotH ,_SpecularPower) * _SpecularNormFactor;
 ```
 
 ## Strauss - 스트라우스

@@ -30,3 +30,4 @@ jitter 흐뜨려트림
 - <https://sakibsaikia.github.io/graphics/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html>
 - <http://roar11.com/2015/07/screen-space-glossy-reflections/>
 - [Screen Space Reflections in The Surge](https://www.slideshare.net/MicheleGiacalone1/screen-space-reflections-in-the-surge)
+- [SIGGRAPH2015 -  Stochastic Screen-Space Reflections](https://www.slideshare.net/DICEStudio/stochastic-screenspace-reflections)

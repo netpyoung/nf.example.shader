@@ -68,3 +68,12 @@ half specular = pow(sinTH, specularPower);
 
 - GDC 2004 Hair Rendering and Shading
 - Kajiya-Kay랑 Marschner를 믹스함
+
+## 에니메이션
+
+- [버텍스 셰이더로 하는 머리카락 애니메이션](https://www.slideshare.net/jalnaga/ss-61522038)
+
+
+## Ref
+
+- [Hair in Tomb Raider](https://www.slideshare.net/WolfgangEngel/hair-intombraider-final)

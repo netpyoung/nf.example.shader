@@ -2,7 +2,9 @@
 
 ## Skybox 메쉬 형태
 
-- Cube, HemiSphere(SkySphere), Sphere(SkyDome), Plane(SkyPlane)
+- Cube, Sphere, HemiSphere, Ring, Plane
+
+- 유니티 Shader별 사용 메쉬 형태
 
 | Shader            | Mesh   | draw        |
 | ----------------- | ------ | ----------- |
@@ -13,7 +15,7 @@
 | Skybox/Procedural | Sphere | Draw(5040)  |
 
 - 렌더독으로 본 유니티의 Sphere Sky Mesh
-  - 일반 스피어와는 다르게, 버텍스 갯수는 적게 그리고 수평선 부분이 조금 디테일에 힘을 줬다.
+  - 일반 Sphere 와는 다르게, 버텍스 갯수는 적게 그리고 수평선 부분이 조금 디테일에 힘을 줬다.
 
   ![renderdoc_skyboxmesh.png](../res/renderdoc_skyboxmesh.png)
 
@@ -22,11 +24,6 @@
 - 유니티 Skybox 설정 : `Window > Rendering > Lighting > Environment`
   - `unity_SpecCube0`가 위에서 설정된 메테리얼로 스카이박스를 렌더링함.(`Camera > Background Type`과는 상관없음)
 - URP 환경이라도 Built-in(legacy)의 기본 Pass의 태그값 `"LightMode" = "ForwardBase"`로 하여야만 동작한다.
-- `_MainLightPosition`이 먹히질 않는다.
-  - CGPROGRAM으로 Legacy방식으로 _WorldSpaceLightPos0을 쓰거나...
-  - 불편하지만 포지션대신 방향(light.direction)으로 컨트롤하거나.
-    - GameObject rotation X : 0도 ~ 90도
-    - light.direction.y :0 ~ 1
 
 ## 유니티의 Skybox
 
@@ -180,35 +177,28 @@ quadSize = skyPlaneWidth / skyPlaneResolution
 ## Ref
 
 - [Unity's built-in Skybox-Procedural.shader](https://github.com/TwoTailsGames/Unity-Built-in-Shaders/blob/master/DefaultResourcesExtra/Skybox-Procedural.shader)
+- [EasySky: Breakdown of a Procedural Skybox for UE4](https://80.lv/articles/easysky-breakdown-of-a-procedural-skybox-for-ue4/)
+- [GDC2014  - Moving the Heavens: An Artistic and Technical Look at the Skies of The Last of Us](https://www.youtube.com/watch?v=o66p1QDH7aI)
+- [Reaching for the stars - Let’s create a procedural skybox shader with Unity’s Shader Graph!](https://medium.com/@jannik_boysen/procedural-skybox-shader-137f6b0cb77c)
+- [Volumetric Clouds – 体积云的做法](http://walkingfat.com/volumetric-clouds-%e4%bd%93%e7%a7%af%e4%ba%91%e7%9a%84%e5%81%9a%e6%b3%95/)
+- Unity ShaderGraph Procedural Skybox Tutorial : [pt1](https://timcoster.com/2019/09/03/unity-shadergraph-skybox-quick-tutorial/), [pt2](https://timcoster.com/2020/02/26/unity-shadergraph-procedural-skybox-tutorial-pt-2-day-night-cycle/)
+- Rastertek's Terrain Tutorial
+  - Tutorial 10: Sky Domes : [원문](http://www.rastertek.com/tertut10.html), [번역](https://copynull.tistory.com/313)
+  - Tutorial 11: Bitmap Clouds : [원문](http://www.rastertek.com/tertut11.html), [번역](https://copynull.tistory.com/314)
+  - Tutorial 12: Perturbed Clouds : [원문](http://www.rastertek.com/tertut12.html), [번역](https://copynull.tistory.com/315)
+- [Creating a unique animated sky shader for UT3/UDK](http://cr4zyb4st4rd.co.uk/SkyShader.html) - [Cr4zys_Cloud_Textures.rar](http://cr4zyb4st4rd.co.uk/SkyShader/Cr4zys_Cloud_Textures.rar)
+- [Maya - Skydome Techniques](https://www.youtube.com/watch?v=YwzOMHXYFyw)
+- Unity Assets
+  - <https://assetstore.unity.com/packages/tools/particles-effects/tenkoku-dynamic-sky-34435>
+  - <https://assetstore.unity.com/packages/2d/textures-materials/sky/procedural-sky-builtin-lwrp-urp-jupiter-159992>
+  - <https://assetstore.unity.com/packages/tools/particles-effects/azure-sky-dynamic-skybox-36050>
+- <https://simul.co/>
 
 
 
-https://notburning.tistory.com/category/?page=5
+
 https://timcoster.com/2019/09/03/unity-shadergraph-skybox-quick-tutorial/
-
-https://assetstore.unity.com/packages/tools/particles-effects/tenkoku-dynamic-sky-34435
-https://assetstore.unity.com/packages/2d/textures-materials/sky/procedural-sky-builtin-lwrp-urp-jupiter-159992
-https://assetstore.unity.com/packages/tools/particles-effects/azure-sky-dynamic-skybox-36050
-
 
 - https://www.youtube.com/watch?v=4QOcCGI6xO
 - https://github.com/SebLague/Clouds
   - NoiseGenerator
-
-
-- [EasySky: Breakdown of a Procedural Skybox for UE4](https://80.lv/articles/easysky-breakdown-of-a-procedural-skybox-for-ue4/)
-
-- [GDC2014  - Moving the Heavens: An Artistic and Technical Look at the Skies of The Last of Us](https://www.youtube.com/watch?v=o66p1QDH7aI)
-
-
-https://simul.co/
-
-- [Reaching for the stars - Let’s create a procedural skybox shader with Unity’s Shader Graph!](https://medium.com/@jannik_boysen/procedural-skybox-shader-137f6b0cb77c)
-- [Volumetric Clouds – 体积云的做法](http://walkingfat.com/volumetric-clouds-%e4%bd%93%e7%a7%af%e4%ba%91%e7%9a%84%e5%81%9a%e6%b3%95/)
-
-- Unity ShaderGraph Procedural Skybox Tutorial [pt1](https://timcoster.com/2019/09/03/unity-shadergraph-skybox-quick-tutorial/), [pt2](https://timcoster.com/2020/02/26/unity-shadergraph-procedural-skybox-tutorial-pt-2-day-night-cycle/)
-- [Maya - Skydome Techniques](https://www.youtube.com/watch?v=YwzOMHXYFyw)
-- rastertek
-- http://www.rastertek.com/tertut10.html Tutorial 10: Sky Domes 
-- http://www.rastertek.com/tertut11.html  Tutorial 11: Bitmap Clouds 
-- http://www.rastertek.com/tertut12.html  Tutorial 12: Perturbed Clouds 

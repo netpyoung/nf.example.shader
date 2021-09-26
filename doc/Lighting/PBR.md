@@ -26,7 +26,14 @@ https://blog.selfshadow.com/publications/s2014-shading-course/frostbite/s2014_pb
   - BTDF(Bidirectional Transmission Distribution Function)
   - BSSRDF(Bidirectional Scattering Surface Reflectance Distribution Function)
   - SPDF(Scattering Probability Density Function)
-  
+
+## Custom PBR
+
+TODO
+
+- https://www.slideshare.net/dongminpark71/ndc19-pbr-143928930  
+- [언차티드4 테크아트 파트4 Special Case Materials - Moss & Wetness & Glass](https://www.slideshare.net/DaeHyekKIM/4-4-special-case-materials-moss-wetness-glass)
+- [ 언차티드4 테크아트 파트3 MicroShadowBRDF Term ](https://www.slideshare.net/DaeHyekKIM/4-3-microshadowbrdf-term)
   
 ## Ref
 
