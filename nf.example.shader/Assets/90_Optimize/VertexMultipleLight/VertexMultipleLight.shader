@@ -83,7 +83,7 @@
                     Light additionalLight = GetAdditionalLight(i, positionWS);
                     half3 L_attenuated = additionalLight.direction * additionalLight.distanceAttenuation;
 
-                    OUT.Diffuse_Points += saturate(dot(N, L_attenuated)) * saturate(additionalLight.color);
+                    OUT.Diffuse_Points += saturate(dot(N, L_attenuated)) * additionalLight.color;
                     L_points += L_attenuated;
                 }
                 OUT.H_Points = normalize(L_points) + V;

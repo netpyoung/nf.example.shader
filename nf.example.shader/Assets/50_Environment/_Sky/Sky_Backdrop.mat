@@ -33,7 +33,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 6d18e0f1d82becf4e9671d82baf7c9c6, type: 3}
+        m_Texture: {fileID: 2800000, guid: ec8c2f997787c8b4087be6e480c3afef, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
@@ -41,13 +41,19 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _ControlledDaytime: 0
+    - _Daytime: 0.11
     - _SunDegree: 0.45
     m_Colors:
+    - _ControlledSunColor: {r: 1, g: 0, b: 0, a: 1}
     - _SkyColor_Bottom: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 1}
     - _SkyColor_Day: {r: 0, g: 0.39999998, b: 0.75, a: 1}
+    - _SkyColor_DaytimeBottom: {r: 0.34999996, g: 0.34999996, b: 0.34999996, a: 1}
+    - _SkyColor_DaytimeMiddle: {r: 0, g: 0.7, b: 0.95, a: 1}
+    - _SkyColor_DaytimeTop: {r: 0.476, g: 0.9, b: 0.9, a: 1}
     - _SkyColor_Middle: {r: 0, g: 0.7, b: 0.95, a: 1}
     - _SkyColor_Night: {r: 0.049999982, g: 0.14999998, b: 0.24999997, a: 1}
-    - _SkyColor_Sunset: {r: 0.7830189, g: 0.19509152, b: 0.113759324, a: 1}
+    - _SkyColor_Sunset: {r: 0.9150943, g: 0.258366, b: 0.16747947, a: 1}
     - _SkyColor_Top: {r: 0.7, g: 0.9, b: 0.9, a: 1}
     - _SunColor: {r: 1, g: 1, b: 1, a: 1}
     - _SunPosition: {r: -0.86, g: -8.56, b: 0.73, a: 1}
