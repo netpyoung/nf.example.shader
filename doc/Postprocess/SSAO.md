@@ -265,3 +265,6 @@ void main(void)
 - [SIGGRAPH2009 - Multi-LayerDual-ResolutionScreen-SpaceAmbient Occlusion](https://developer.download.nvidia.com/presentations/2009/SIGGRAPH/Bavoil_MultiLayerDualResolutionSSAO.pdf)
 - [SIGGRAPH2010 - Rendering techniques in Toy Story 3](https://advances.realtimerendering.com/s2010/)
 - [SIGGRAPH2016 - Practical Real-Time Strategies for Accurate Indirect Occlusion](https://blog.selfshadow.com/publications/s2016-shading-course/)
+- 일어
+  - <http://maverickproj.web.fc2.com/d3d11_24.html>
+  - <https://marina.sys.wakayama-u.ac.jp/~tokoi/?date=20101122>

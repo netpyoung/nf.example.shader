@@ -1,4 +1,6 @@
-PBR(Physical based rendering) / PBS(Physical based shader)
+# PBR
+
+- PBR(Physical based rendering) / PBS(Physical based shader)
 
 - https://renderwonk.com/publications/
 - 

@@ -13,9 +13,9 @@
   - 빛의 산란효과 개선(반사/내부산란/투과)
 - Scheuermann - Hair Rendering and Shading  - GDC 2004
 
-![ephere-kajiya](./res/ephere-kajiya.jpg)
+![ephere-kajiya](../res/ephere-kajiya.jpg)
 
-![ephere-marschner](./res/ephere-marschner.jpg)
+![ephere-marschner](../res/ephere-marschner.jpg)
 
 - [【Unite Tokyo 2018】『崩壊3rd』開発者が語るアニメ風レンダリングの極意](https://youtu.be/ZpWsinhPFLM?t=1285)
 - <https://graphics.pixar.com/library/DataDrivenHairScattering/>
@@ -26,7 +26,7 @@
 
 - [blog - Hair Rendering Lighting Model - (Kajiya-Kay)](https://blog.naver.com/sorkelf/40185948507)
 
-![./res/NTBFromUVs.png](./res/NTBFromUVs.png)
+![../res/NTBFromUVs.png](../res/NTBFromUVs.png)
 
 ``` hlsl
 // Sphere
@@ -51,7 +51,7 @@ half specular = pow(sinTH, specularPower);
 - [pdf - Light Scattering from Human Hair Fibers - Stephen R. Marschner, Henrik Wann Jensen, Mike Cammarano](www.cs.cornell.edu/~srm/publications/SG03-hair.pdf)
 - [2020 - Dev Weeks: A3 Still Alive - Technical Art Review](https://youtu.be/ufNYLgE2WGA?t=1952)
 
-![Marschner.png](./res/Marschner.png)
+![Marschner.png](../res/Marschner.png)
 
 |     |      |
 |-----|------|
@@ -72,7 +72,6 @@ half specular = pow(sinTH, specularPower);
 ## 에니메이션
 
 - [버텍스 셰이더로 하는 머리카락 애니메이션](https://www.slideshare.net/jalnaga/ss-61522038)
-
 
 ## Ref
 

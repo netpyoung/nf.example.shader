@@ -23,13 +23,6 @@ void OnWillRenderObject()
 - 셰이더로 한꺼번에 출력
 - <https://blog.naver.com/jinwish/221577786406>
 
-## Chroma subsampling
-
-- 텍스쳐 압축시 품질 손상이 일어나는데 그걸 줄이는 기법 중 하나
-- <https://en.wikipedia.org/wiki/Chroma_subsampling>
-- <https://github.com/keijiro/ChromaPack>
-- YCbCr
-
 ## NPOT 지원안하는 텍스쳐 포맷
 
 - NPOT지원안하는 ETC/PVRTC같은경우 POT로 자르고 셰이더로 붙여주는걸 작성해서 최적화

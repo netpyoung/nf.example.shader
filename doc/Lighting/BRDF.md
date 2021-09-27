@@ -6,7 +6,7 @@
 
 - BRDF Fake라고도 함.
 
-![./res/BRDF_dir.jpg](./res/BRDF_dir.jpg)
+![BRDF_dir.jpg](../res/BRDF_dir.jpg)
 
 ``` hlsl
 half u = dot(L, N) * 0.5 + 0.5;
