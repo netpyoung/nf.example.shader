@@ -30,9 +30,9 @@ public class BRDFLightReceiver : MonoBehaviour
     public int offsetRenderQueue = 0;
     public bool affectChildren = true;
 
-    private Texture2D internallyCreatedTexture;
-    private Renderer[] renderers;
-    private Shader shader;
+    private Texture2D _internallyCreatedTexture;
+    private Renderer[] _renderers;
+    private Shader _shader;
 
 
     // Start is called before the first frame update
@@ -45,7 +45,7 @@ public class BRDFLightReceiver : MonoBehaviour
 
         if (Application.isEditor)
         {
-            shader = Shader.Find("MADFINGER/Characters/BRDFLit  (Supports Backlight)");
+            _shader = Shader.Find("MADFINGER/Characters/BRDFLit  (Supports Backlight)");
             UpdateRenderers();
             if (!lookupTexture)
             {
@@ -59,11 +59,11 @@ public class BRDFLightReceiver : MonoBehaviour
         if (Application.isEditor)
         {
             UpdateRenderers();
-            SetupShader(shader, lookupTexture);
+            SetupShader(_shader, lookupTexture);
 
-            if (internallyCreatedTexture != lookupTexture)
+            if (_internallyCreatedTexture != lookupTexture)
             {
-                DestroyImmediate(internallyCreatedTexture);
+                DestroyImmediate(_internallyCreatedTexture);
             }
         }
     }
@@ -84,11 +84,11 @@ public class BRDFLightReceiver : MonoBehaviour
     {
         if (affectChildren)
         {
-            renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            _renderers = gameObject.GetComponentsInChildren<Renderer>(true);
         }
         else
         {
-            renderers = new Renderer[] { gameObject.GetComponent<Renderer>() };
+            _renderers = new Renderer[] { gameObject.GetComponent<Renderer>() };
         }
     }
 
@@ -96,7 +96,7 @@ public class BRDFLightReceiver : MonoBehaviour
     {
         brdfLookupTex.wrapMode = TextureWrapMode.Clamp;
 
-        foreach (Renderer r in renderers)
+        foreach (Renderer r in _renderers)
         {
             foreach (Material mat in r.sharedMaterials)
             {
@@ -105,21 +105,23 @@ public class BRDFLightReceiver : MonoBehaviour
                     mat.shader = shader;
                 }
 
-                if (brdfLookupTex)
+                if (brdfLookupTex != null)
                 {
                     mat.SetTexture("_BRDFTex", brdfLookupTex);
                 }
 
-                mat.renderQueue = 2000 + offsetRenderQueue; // Background is 1000, Geometry is 2000, Transparent is 3000 and Overlay is 4000
+                // Background is 1000, Geometry is 2000, Transparent is 3000 and Overlay is 4000
+                mat.renderQueue = 2000 + offsetRenderQueue;
             }
         }
     }
 
-    Color PixelFunc(float ndotl, float ndoth)
+    Color PixelFunc(in float NdotL, in float NdotH)
     {
         // pseudo metalic diffuse falloff
-        ndotl *= Mathf.Pow(ndoth, metalic);
-        float modDiffuseIntensity = (1.0f + metalic * 0.25f) * Mathf.Max(0.0f, diffuseIntensity - (1.0f - ndoth) * metalic);
+        float ndotl = NdotL * Mathf.Pow(NdotH, metalic);
+
+        float modDiffuseIntensity = (1.0f + metalic * 0.25f) * Mathf.Max(0.0f, diffuseIntensity - (1.0f - NdotH) * metalic);
 
         // diffuse tri-light
         var t0 = Mathf.Clamp01(Mathf.InverseLerp(-wrapAround, 1.0f, ndotl * 2.0f - 1.0f));
@@ -131,14 +133,14 @@ public class BRDFLightReceiver : MonoBehaviour
         float energyConservationTerm = ((n + 2) * (n + 4)) / (8 * Mathf.PI * (Mathf.Pow(2.0f, -n / 2.0f) + n)); // by ryg
         //var energyConservationTerm : float = (n + 8) / (8 * Mathf.PI); // from Real-Time Rendering
 
-        var specular = specularIntensity * energyConservationTerm * Mathf.Pow(ndoth, n);
+        var specular = specularIntensity * energyConservationTerm * Mathf.Pow(NdotH, n);
 
         // Fresnel reflection (Schlick approximation)
         var fresnelR0 = Mathf.Lerp(0.3f, -1.0f, fresnelSharpness);
-        var fresnelTerm = fresnelIntensity * Mathf.Max(0.0f, fresnelR0 + (1.0f - fresnelR0) * Mathf.Pow(1.0f - ndoth, 5.0f));
+        var fresnelTerm = fresnelIntensity * Mathf.Max(0.0f, fresnelR0 + (1.0f - fresnelR0) * Mathf.Pow(1.0f - NdotH, 5.0f));
 
         // pseudo translucency (view dependent)
-        float t = 0.5f * translucency * Mathf.Clamp01(1.0f - ndoth) * Mathf.Clamp01(1.0f - ndotl);
+        float t = 0.5f * translucency * Mathf.Clamp01(1.0f - NdotH) * Mathf.Clamp01(1.0f - ndotl);
 
         //var c = Color(0,0,0, specular);
         var c = diffuse * intensity + fresnelReflectionColor * fresnelTerm + translucentColor * t + new Color(0, 0, 0, specular);
@@ -148,17 +150,15 @@ public class BRDFLightReceiver : MonoBehaviour
 
     void FillPseudoBRDF(Texture2D tex)
     {
-        for (var y = 0; y < tex.height; ++y)
-        {
-            for (var x = 0; x < tex.width; ++x)
-            {
-                float w = tex.width;
-                float h = tex.height;
-                float vx = x / w;
-                float vy = y / h;
+        float width = tex.width;
+        float height = tex.height;
 
-                float NdotL = vx;
-                float NdotH = vy;
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                float NdotL = x / width;
+                float NdotH = y / height;
 
                 Color c = PixelFunc(NdotL, NdotH);
                 tex.SetPixel(x, y, c);
@@ -169,24 +169,24 @@ public class BRDFLightReceiver : MonoBehaviour
     void UpdateBRDFTexture(int width, int height)
     {
         Texture2D tex;
-        if (lookupTexture == internallyCreatedTexture && lookupTexture && lookupTexture.width == width && lookupTexture.height == height)
+        if (lookupTexture == _internallyCreatedTexture && lookupTexture && lookupTexture.width == width && lookupTexture.height == height)
         {
             tex = lookupTexture;
         }
         else
         {
-            if (lookupTexture == internallyCreatedTexture)
+            if (lookupTexture == _internallyCreatedTexture)
             {
                 DestroyImmediate(lookupTexture);
             }
             tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
-            internallyCreatedTexture = tex;
+            _internallyCreatedTexture = tex;
         }
 
         FillPseudoBRDF(tex);
         tex.Apply();
 
-        SetupShader(shader, tex);
+        SetupShader(_shader, tex);
         lookupTexture = tex;
     }
 }
