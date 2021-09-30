@@ -6,25 +6,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <title>{{ page.title }}</title>
-
-        <link type="text/css" href="https://unpkg.com/image-compare-viewer/dist/image-compare-viewer.min.css">
 		<script src="https://unpkg.com/image-compare-viewer/dist/image-compare-viewer.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://unpkg.com/image-compare-viewer/dist/image-compare-viewer.min.css">
+		<style type="text/css">
+		div.image-compare {
+			 max-width: 900px;
+		}
+		</style>
     </head>
 
     <body class="layout-documentation page-layout">
-	test 1 2 3
-	
-<div id="image-compare">
-  <img src="https://netpyoung.github.io/ImgHosting1/lightshaft_before.jpg" alt="" />
-  <img src="https://netpyoung.github.io/ImgHosting1/lightshaft_after.jpg" alt="" />
-</div>
-
-<div id="image-compare">
-  <img src="../ImgHosting1/lightshaft_before.jpg" alt="" />
-  <img src="../ImgHosting1/lightshaft_after.jpg" alt="" />
-</div>
-
-            <div class="content container is-fluid">
+		</div><!-- /.container -->
+            
+			<div class="content container is-fluid">
                 {{ content }}
             </div><!-- /.content -->
 
@@ -32,5 +26,12 @@
                  </div><!-- /.footer  -->
 
         </div><!-- /.container -->
+		
+		<script>
+		const viewers = document.querySelectorAll(".image-compare");
+		viewers.forEach((element) => {
+			let view = new ImageCompare(element).mount();
+		});
+		</script>
     </body>
 </html>
