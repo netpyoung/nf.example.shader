@@ -143,9 +143,10 @@ OUT.lightmapUV = IN.lightmapUV * unity_LightmapST.xy + unity_LightmapST.zw;
 
 ``` hlsl
 // SH(Spherical Harmonics)
+// 노멀방향의 GI Ambient를 얻어옴
 half3 ambient = SampleSH(IN.normal);
 
-half3 bakedGI = SAMPLE_GI(IN.lightmapUV, 0, N); // 두번째 인자는 VertexSH
+half3 bakedGI = SAMPLE_GI(IN.lightmapUV, vertexSH, N);
 MixRealtimeAndBakedGI(mainLight, N, bakedGI, half4(0, 0, 0, 0));
 
 // Define키워드 확인이 어려울 경우, 직접 구하는거 고려할것

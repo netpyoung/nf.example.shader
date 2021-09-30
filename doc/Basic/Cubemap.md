@@ -143,3 +143,4 @@ public class BakeStaticCubemap : ScriptableWizard
 ## Ref
 
 - <https://developer.arm.com/documentation/102179/0100/Implement-reflections-with-a-local-cubemap>
+- [NDC2011 - PRT(Precomputed Radiance Transfer) 및 SH(Spherical Harmonics) 개괄](https://www.slideshare.net/honestee/choi-jihyun-ndc2011)

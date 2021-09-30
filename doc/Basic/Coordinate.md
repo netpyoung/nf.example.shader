@@ -34,17 +34,26 @@
 
 ## UNITY_MATRIX
 
-| Matrix                    | 설명                                                       |
-| ------------------------- | ---------------------------------------------------------- |
-| UNITY_MATRIX_M            | renderer.localToWorldMatrix                                |
-| UNITY_MATRIX_V            | camera.worldToCameraMatrix                                 |
-| UNITY_MATRIX_P            | GL.GetGPUProjectionMatrix(camera.projectionMatrix, false); |
-| unity_CameraProjection    | float4x4 Camera’s projection matrix. // 스크린 공간 그리기 |
-| unity_CameraInvProjection | float4x4 Inverse of camera’s projection matrix.            |
+| Matrix         | 설명                                                       |
+| -------------- | ---------------------------------------------------------- |
+| UNITY_MATRIX_M | renderer.localToWorldMatrix                                |
+| UNITY_MATRIX_V | camera.worldToCameraMatrix                                 |
+| UNITY_MATRIX_P | GL.GetGPUProjectionMatrix(camera.projectionMatrix, false); |
 
 - localToWorldMatrix
   - 유니티 4까지는 GPU에 넘겨주기전에 스케일을 가공하여
   - renderer.localToWorldMatrix, transform.localToWorldMatrix가 달랐으나 지금은 같음.
+
+| 카메라 관련               | 렌더링(UNITY_MATRIX_)의 뷰 전방은 `-z`. 카메라 행렬은 에디터와 동일하게 `+z`를 앞으로 사용 |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| UNITY_MATRIX_V            | cam.worldToCameraMatrix                                                                    |
+| unity_WorldToCamera       | Matrix4x4(cam.transform.position, cam.transform.rotation, Vector3.one)                     |
+| UNITY_MATRIX_I_V          | cam.cameraToWorldMatrix                                                                    |
+| unity_CameraToWorld       | Matrix4x4(cam.transform.position, cam.transform.rotation, Vector3.one).inverse             |
+| UNITY_MATRIX_P            | GL.GetGPUProjectionMatrix(camera.projectionMatrix, false)                                 |
+| unity_CameraProjection    | cam.projectionMatrix                                                                       |
+| UNITY_MATRIX_I_P          | GL.GetGPUProjectionMatrix(camera.projectionMatrix, false).inverse                          |
+| unity_CameraInvProjection | cam.projectionMatrix.inverse                                                               |
 
 ``` txt
 OS  ----------------------- Object Space

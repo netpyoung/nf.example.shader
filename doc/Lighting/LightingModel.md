@@ -15,7 +15,7 @@ half NdotL = max(0.0, dot(N, L));
 half diffuse = NdotL;
 ```
 
-## Minnaert - 미네르트
+### Minnaert - 미네르트
 
 - 1954 - Marcel Minnaert
 
@@ -28,7 +28,7 @@ half NdotV = max(0.0, dot(N, V));
 half diffuse = NdotL * pow(NdotL * NdotV, _MinnaertDarkness);
 ```
 
-## Phong - 퐁
+### Phong - 퐁
 
 - 1973 - Bui Tuong Phong
 
@@ -38,7 +38,7 @@ half RdotV = max(0.0f, dot(R, V));
 half specular = pow(RdotV, _SpecularPower) * _SpecularNormFactor;
 ```
 
-## Blinn Phong - 블린 퐁
+### Blinn Phong - 블린 퐁
 
 - 1977 - Jim Blinn
 
@@ -49,34 +49,19 @@ half NdotH = max(0.0, dot(N, H));
 half specular = pow(NdotH ,_SpecularPower) * _SpecularNormFactor;
 ```
 
-## Strauss - 스트라우스
+### Strauss - 스트라우스
 
 - 1990 - Paul Strauss
+- <https://blog.naver.com/sorkelf/401550597481>
 
-
-## Gooch - 구치
+### Gooch - 구치
 
 - 1998 - Gooch
 - [SIGGRAPH1998 - A Non-Photorealistic Lighting Model For Automatic Technical Illustration](https://users.cs.northwestern.edu/~ago820/SIG98/abstract.html)
 - [GDC2008 - Stylization with a Purpose: The Illustrative World of TEAM FORTRESS 2](https://www.gdcvault.com/play/279/Stylization-with-a-Purpose-The)
 - 따뜻함과 차가움 영역을 나누어 표시
 
-
-## Lake
-
-- 2000 - Lake
-- [Stylized Rendering Techniques For Scalable Real-Time 3D Animation](http://www.markmark.net/npar/npar2000_lake_et_al.pdf)
-- 룩업텍스쳐 사용
-  - NdotL - LUT Texture(1D)
-
-## BARLA
-
-- BARLA, 2006
-- [X-Toon: An extended toon shader - Pascal Barla, Joëlle Thollot, Lee Markosian](https://maverick.inria.fr/Publications/2006/BTM06a/x-toon.pdf)
-- 룩업텍스쳐 사용
-  - NdotL, Detail - LUT Texture(2D)
-
-## Half Lambert & Wrapped Lambert - 하프 람버트 & 와프드 람버트
+### Half Lambert & Wrapped Lambert - 하프 람버트 & 와프드 람버트
 
 - 2004 Half-Life2 - Valve
 - [SIGGRAPH2006 - Shading In Valve's Source Engine](https://steamcdn-a.akamaihd.net/apps/valve/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf)
@@ -100,6 +85,26 @@ half diffuse = ​pow((dot(N, L) * 0.5) + 0.5, 4)  // Half Lambert + Pow
 ``` hlsl
 half diffuse = max(0, ((dot(L, N) + warp) / (1 + wrap + wrap^2)) ^ (1 + wrap));
 ```
+
+## LUT
+
+- Look Up Texture : 룩업텍스쳐
+- Ramp Texture라고도 함
+  - Ramp : 증감. 경사(gradient)
+
+### Lake
+
+- 2000 - Lake
+- [Stylized Rendering Techniques For Scalable Real-Time 3D Animation](http://www.markmark.net/npar/npar2000_lake_et_al.pdf)
+- 룩업텍스쳐 사용
+  - NdotL - LUT Texture(1D)
+
+### BARLA
+
+- 2006 - BARLA
+- [X-Toon: An extended toon shader - Pascal Barla, Joëlle Thollot, Lee Markosian](https://maverick.inria.fr/Publications/2006/BTM06a/x-toon.pdf)
+- 룩업텍스쳐 사용
+  - NdotL, Detail - LUT Texture(2D)
 
 ## 물리기반
 
@@ -161,17 +166,16 @@ half OrenNayar_Fakey(half3 N, half3 L, half3 V, half roughness)
 {
     half LdotN = dot(L, N);
     half VdotN = dot(V, N);
-	
+
     half result = saturate(LdotN);
     half soft_rim = saturate(1 - VdotN / 2);
-	
-	const half FAKEY_MAGIC = 0.62;
+
+    const half FAKEY_MAGIC = 0.62;
     half fakey = pow(1 - result * soft_rim, 2);
-	fakey = FAKEY_MAGIC - fakey * FAKEY_MAGIC;
+    fakey = FAKEY_MAGIC - fakey * FAKEY_MAGIC;
     return lerp(result, fakey, roughness);
 }
 ```
-
 
 ## Disney - 디즈니
 

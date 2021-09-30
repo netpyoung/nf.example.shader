@@ -31,15 +31,17 @@
 | YPbPr    | analog                                                                                 |
 | YIQ      | YUV 33도 회전, NTSC(National Television System Committee)방식 -한국, 미국 컬러텔레비전 |
 
-ICtCp
-YCgCo
+ICtCp : ICtCp has near constant luminance, which improves chroma subsampling versus YCBCR
+YCgCo : 색평면 사이에 상관성이 매우 낮음
 
 ACES - Academy Color Encoding System 
 https://en.wikipedia.org/wiki/Academy_Color_Encoding_System
 https://github.com/ampas/aces-dev
 https://www.slideshare.net/hpduiker/acescg-a-common-color-encoding-for-visual-effects-applications
 
+CIE RGB
 CIE XYZ
+CIE Lab
 
 | XYZ |           |
 |-----|-----------|
@@ -81,7 +83,6 @@ XYZ.b = Yxy.r * (1 - Yxy.g - Yxy.b) / Yxy.b;
 
 CIE Yxy
 CIE Lab
-
 
 ``` hlsl
 // https://www.ronja-tutorials.com/post/041-hsv-colorspace/
