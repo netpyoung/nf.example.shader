@@ -148,6 +148,11 @@ OUT.positionCS.z = o.positionCS.w - 1.0e-6f;
 #endif
 ```
 
+## TODO
+
+- 구름 그림자
+  - <https://github.com/EntroPi-Games/Unity-Cloud-Shadows/>
+
 ## Ref
 
 - [Unity's built-in Skybox-Procedural.shader](https://github.com/TwoTailsGames/Unity-Built-in-Shaders/blob/master/DefaultResourcesExtra/Skybox-Procedural.shader)

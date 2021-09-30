@@ -1,5 +1,9 @@
 # 셰이더 모델과 플렛폼 관계
 
+- [wiki: OpenGL ES](https://en.wikipedia.org/wiki/OpenGL_ES)
+- [wiki: Metal](https://en.wikipedia.org/wiki/Metal_(API))
+- [wiki: Vulkan](https://en.wikipedia.org/wiki/Vulkan_(API))
+
 ## Shader Model
 
 | model | desc                                                           |

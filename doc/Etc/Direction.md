@@ -8,7 +8,7 @@
 
 ## From Vertex (Unity)
 
-![FromVertex.webp](./res/FromVertex.webp)
+![FromVertex.webp](../res/FromVertex.webp)
 
 ``` hlsl
 // com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl
@@ -54,7 +54,7 @@ RdotV = dot(R, V);
 
 Pope 책에서는 Vertex를 향하도록 코드가 작성이 되어있다.
 
-![ToVertex.jpg](./res/ToVertex.jpg)
+![ToVertex.jpg](../res/ToVertex.jpg)
 
 ``` hlsl
 L = normalize(positionWS - lightPositionWS);

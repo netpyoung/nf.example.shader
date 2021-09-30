@@ -2,6 +2,8 @@
 
 - PBR(Physical based rendering) / PBS(Physical based shader)
 
+Energy = diffuse + specular + transmission
+
 - https://renderwonk.com/publications/
 - 
 [[Ndc13]Ndc 2013 김동석:UDK로 물리기반 셰이더 만들기](https://www.slideshare.net/jalnaga/ndc13ndc-2013-udk-19999169)
@@ -43,3 +45,6 @@ TODO
 - Adobe The PBR Guide
   - <https://substance3d.adobe.com/tutorials/courses/the-pbr-guide-part-1>
   - <https://substance3d.adobe.com/tutorials/courses/the-pbr-guide-part-2>
+
+https://leegoonz.blog/2020/01/05/energy-conserved-specular-blinn-phong/
+https://www.rorydriscoll.com/2009/01/25/energy-conservation-in-games/

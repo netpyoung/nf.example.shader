@@ -18,6 +18,7 @@
 - [2017 - [IGC2017] 펄어비스 개발자가 직접 알려주는 '검은사막의 압도적인 비주얼 노하우'](http://www.inven.co.kr/webzine/news/?news=184847)
 - [2019 - [NDC2019] 모바일에서 사용 가능한 유니티 커스텀 섭스턴스 PBR 셰이더 만들기](https://www.youtube.com/watch?v=hC62O9NGXEw)
 - [2019 - [Unite Seoul 2019] 최재영 류재성 - 일곱개의 대죄 : “애니메이션의 감성을 그대로＂와 “개발 최적화](https://youtu.be/0LwlNVS3FJo)
+  - <https://youtu.be/8iKWEYvozws?t=800>
   - MatCap / Imposter / LookAt
   - ChromaticAberration / Bloom / Noise / RadialBlur / Vignette / InvertColor / ScratchedFilm / ColorGradingLUT
 - [2020 - Dev Weeks: A3 Still Alive - Technical Art Review](https://www.youtube.com/watch?v=ufNYLgE2WGA)
