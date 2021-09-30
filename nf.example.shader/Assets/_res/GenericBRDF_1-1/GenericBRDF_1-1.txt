@@ -1,0 +1,3 @@
+http://www.mentalwarp.com/~brice/brdf.php
+
+license - http://creativecommons.org/licenses/by-sa/3.0/
