@@ -7,55 +7,31 @@
 
         <title>{{ page.title }}</title>
 		
-		<!-- ref: https://github.com/kylewetton/image-compare-viewer -->
-		<script src="https://unpkg.com/image-compare-viewer/dist/image-compare-viewer.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://unpkg.com/image-compare-viewer/dist/image-compare-viewer.min.css">
-		<style type="text/css">
-		div.image-compare {
-			 max-width: 600px;
-		}
-		</style>
+		<!-- ref: https://bulma.io/ -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+
     </head>
 
     <body class="layout-documentation page-layout">
-		</div><!-- /.container -->
+		<div class="container"><!-- /.container -->
             
 			<div class="content container is-fluid">
                 {{ content }}
             </div><!-- /.content -->
 
-            <!-- <div class="footer">
-                 </div><!-- /.footer  -->
-
         </div><!-- /.container -->
 		
-		<script>
-		const viewers = document.querySelectorAll(".image-compare");
-		const option = {
-			controlColor: "#464646",
-			controlShadow: false,
-			smoothing: false,
-			
-			showLabels: false,
-			labelOptions: {
-				before: '',
-				after: '',
-				onHover: false
+		
+		<div class="after_loading">
+			<!-- ref: https://github.com/NUKnightLab/juxtapose -->
+			<script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
+			<link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+			<style type="text/css">
+			a.jx-knightlab{ display:none; }
+			div.juxtapose {
+				max-width: 600px;
 			}
-		};
-		viewers.forEach((element) => {
-			let text_before = element.dataset.text_before;
-			let text_after = element.dataset.text_after;
-			let isShowLabels = text_before && text_after;
-			option.showLabels = isShowLabels;
-			if (isShowLabels)
-			{
-				option.labelOptions.before = text_before;
-				option.labelOptions.after = text_after;
-			}
-				
-			let view = new ImageCompare(element, option).mount();
-		});
-		</script>
+			</style>
+		</div> <!-- /.after_loading -->
     </body>
 </html>
