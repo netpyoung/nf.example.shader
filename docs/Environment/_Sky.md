@@ -183,3 +183,7 @@ OUT.positionCS.z = o.positionCS.w - 1.0e-6f;
 - <https://guildofwriters.org/wiki/Adding_Atmosphere>
 - [Volumetric Clouds – 体积云的做法](http://walkingfat.com/volumetric-clouds-%e4%bd%93%e7%a7%af%e4%ba%91%e7%9a%84%e5%81%9a%e6%b3%95/)
 - 천체리소스 : <https://pngtree.com/so/celestial>
+- ShaderX3 Advanced Rendering with DirectX and OpenGL
+  - 8.4 Volumetric Clouds
+- ShaderX2 Shader Programming Tips and Tricks with DirectX 9
+  - Advanced Sky Dome Rendering

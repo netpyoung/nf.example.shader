@@ -37,30 +37,30 @@ half3 pissTex = SAMPLE_TEXTURE2D(_PissTex, sampler_PissTex, pissUV).rgb;
 
 ``` hlsl
 // local thickness
-half localTicknessTex = SAMPLE_TEXTURE2D(_LocalThicknessTex, sampler_LocalThicknessTex, uv).r;
-half3 H = normalize(L + N * _Distortion);
-half VdotH = pow(saturate(dot(V, -H)), _Power) * _Scale;
-half backLight = _Attenuation * (VdotH + _Ambient) * localTicknessTex;
+half  localTicknessTex = SAMPLE_TEXTURE2D(_LocalThicknessTex, sampler_LocalThicknessTex, uv).r;
+half3 H                = normalize(L + N * _Distortion);
+half  VdotH            = pow(saturate(dot(V, -H)), _Power) * _Scale;
+half  backLight        = _Attenuation * (VdotH + _Ambient) * localTicknessTex;
 ```
 
 ## other Fake/Fast/Approximated SSS
 
 ``` hlsl
-half halfLambert = NdotL * 0.5 + 0.5;
-half3 fakeSSS = (1 - halfLambert) * _SSSColor;
-half3 color = halfLambert + fakeSSS;
+half  halfLambert = NdotL * 0.5 + 0.5;
+half3 fakeSSS     = (1 - halfLambert) * _SSSColor;
+half3 color       = halfLambert + fakeSSS;
 ```
 
 ``` hlsl
-half rim = 1 - NdotL;
+half  rim     = 1 - NdotL;
 // 역광일때만 하려면 VdotL처리
 // rim *= VdotL;
 half3 fakeSSS = pow(rim, _SSSPower) * _SSSMultiplier * _SSSColor;
-half3 color = lambert * fakeSSS;
+half3 color   = lambert * fakeSSS;
 ```
 
 ``` hlsl
-half rim = 1 - NdotL;
+half  rim     = 1 - NdotL;
 half3 fakeSSS = SAMPLE_TEXTURE2D(_SSS_RampTex, sampler_SSS_RampTex, half2(rim, 0)).rgb;
 ```
 

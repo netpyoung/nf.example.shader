@@ -95,3 +95,5 @@ brightnessOffsetY = (h - topBloomHeight) / 2;
 - [2004 - Directx 9 셰이더 프로그래밍 - 타카시 이마기레](https://www.hanbit.co.kr/store/books/look.php?p_code=B9447539340)
 - [GDC2003 - Frame Buffer Postprocessing Effects in DOUBLE-S.T.E.A.L (Wreckless)](www.daionet.gr.jp/~masa/archives/GDC2003_DSTEAL.ppt)
 - [A Steerable Streak Filter - Christopher Oat](www.chrisoat.com/papers/Oat-SteerableStreakFilter.pdf)
+  - ShaderX3 Advanced Rendering with DirectX and OpenGL
+    - 4.1 A Steerable Streak Filter

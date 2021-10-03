@@ -100,3 +100,6 @@ rgbL = rgb * (lumaToned * (1 - s)) / luma + (1.05, 0.97, 1.27) * lumaToned * s;
 - 블로그
   - [canny708 - Eye Adaptation (Automatic Exposure)](https://blog.naver.com/canny708/221892561143)
   - [SuperRealizm - HDR + Bloom](https://superrealizm.tistory.com/entry/HDR-Bloom)
+- <https://placeholderart.wordpress.com/2014/11/21/implementing-a-physically-based-camera-manual-exposure/>
+- ShaderX3 Advanced Rendering with DirectX and OpenGL
+  - 4.2 Adaptive Glare

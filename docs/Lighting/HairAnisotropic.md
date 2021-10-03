@@ -76,3 +76,5 @@ half specular = pow(sinTH, specularPower);
 ## Ref
 
 - [Hair in Tomb Raider](https://www.slideshare.net/WolfgangEngel/hair-intombraider-final)
+- ShaderX3 Advanced Rendering with DirectX and OpenGL
+  - 2.14 Hair Rendering and Shading

@@ -6,6 +6,13 @@
 
 ## Shader Model
 
+- <https://docs.unity3d.com/Manual/SL-ShaderCompileTargets.html>
+- Metal
+  - geometry 지원 여부(일단 5.0까지 지원 안함)
+  - compute에서 GetDimensions 지원 안함
+- es3.1
+  - 4 compute buffer만 보장함.
+
 | model | desc                                                           |
 | ----- | -------------------------------------------------------------- |
 | 2.5   | derivatives                                                    |
@@ -23,7 +30,7 @@
 | 3.5            | es3.0  / Vulkan |                                  |
 | 4.0            |                 | Geometry                         |
 | 4.5            | es3.1           | Compute                          |
-| 4.6            |                 | Tessellation(* Metal은 지원안함) |
+| 4.6            | es3.1+AEP       | Tessellation(* Metal은 지원안함) |
 | 5.0            |                 | RenderTexture.enableRandomWrite  |
 
 ## Deferred support
@@ -61,7 +68,6 @@
 
 ## Ref
 
-- <https://docs.unity3d.com/Manual/SL-ShaderCompileTargets.html>
 - <https://developer.android.com/guide/topics/graphics/opengl?hl=ko>
 - <https://source.android.com/setup/start/build-numbers?hl=ko>
 - <https://developer.android.com/ndk/guides/graphics/getting-started?hl=ko>

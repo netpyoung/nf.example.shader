@@ -164,3 +164,5 @@ color = lerp(mainTex, _MainLightColor.rgb, lightShaftMask);
 - <https://blog.naver.com/sorkelf/40152690614>
 - <https://blog.naver.com/eryners/110127353463>
 - <http://maverickproj.web.fc2.com/pg65.html>
+- ShaderX3 Advanced Rendering with DirectX and OpenGL
+  - 8.1 Light Shaft Rendering

@@ -4,16 +4,18 @@
 
 ## 목록
 
-TODO
+- [Bloom](Bloom.md)
+- [LightStreak](LightStreak.md)
+- [EyeAdaptation](EyeAdaptation.md)
+- [SSAO](SSAO.md)
+- [SSGI](_SSGI.md)
+- [_LightShaft_postprocess](_LightShaft_postprocess.md)
+- [_SSR](_SSR.md)
 
 ## 영역 총합 테이블 (summed area table)
 
 - 1984 - Frank
 - GDC2003 - Simon
-
-## 모자이크
-
-- 축소버퍼나 floor이용
 
 ## Ref
 

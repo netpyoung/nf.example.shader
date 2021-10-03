@@ -49,8 +49,10 @@ SubShader
 
 ## Alpha Cutout / Alpha Testing
 
+- [clip](https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-clip)([texkill](https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/texkill---ps))을 이용
 - 간편. sorting걱정 안해도 됨.
-- 모바일에서는 Blend 보다 성능이 안나오는 경향이 있음.
+- 구형 모바일에서는 AlphaBlend 보다 성능이 안나오는 경향이 있음.
+  - 요즘은 AlphaTesting이 더 낳을지도
   - 모바일(A11(ios), PowerVR 등)은 메모리와 대역폭을 줄이기위해 타일별 렌더링을 하는 TBDR(tile-based deferred rendering)을 이용함.
   - 알파테스팅을 이용할시, 실제 보여지는지 여부를 알파테스팅이 끝날때까지 알 수 없으므로 Deffered 최적화를 방해함.
 - 풀, 나무, 머리카락, 털 등...

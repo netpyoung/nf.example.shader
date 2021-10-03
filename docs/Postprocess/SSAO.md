@@ -4,6 +4,16 @@
 - Ambient : 주변
 - Occlusion : 차폐, 가려짐
 
+<div class="juxtapose" data-animate="false">
+ <img src="/ImgHosting1/SRP/SSAO_blur_before.jpg" data-label="Raw RenderTexture" />
+ <img src="/ImgHosting1/SRP/SSAO_blur_after.jpg" data-label="With Blur" />
+</div>
+
+<div class="juxtapose" data-animate="false">
+ <img src="/ImgHosting1/SRP/SSAO_before.jpg" data-label="before SSAO" />
+ <img src="/ImgHosting1/SRP/SSAO_after.jpg" data-label="after SSAO" />
+</div>
+
 ## 역사
 
 - 2001 : 영화 진주만Pearl Harbor에서 Ambient Occlusion 사용

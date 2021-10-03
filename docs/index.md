@@ -1,10 +1,27 @@
 # index
 
-github : https://github.com/netpyoung/nf.example.shader
-- https://github.com/netpyoung/nf.example.shader/tree/master/nf.example.shader/Assets
-- https://github.com/netpyoung/nf.example.shader/tree/master/nf.example.srp/Assets
+- [github: nf.example.shader](https://github.com/netpyoung/nf.example.shader)
+  - [collections](https://github.com/netpyoung/nf.example.shader/tree/master/nf.example.shader/Assets)
+  - [SRP](https://github.com/netpyoung/nf.example.shader/tree/master/nf.example.srp/Assets)
 
 test 1 2 3
+
+<div class="juxtapose" data-animate="false">
+  <img src="../../ImgHosting1/SRP/Sobel_before.jpg" data-label="" />
+  <img src="../../ImgHosting1/SRP/Sobel_after.jpg" data-label="" />
+</div>
+
+<div class="juxtapose" data-animate="false">
+  <img src=".../ImgHosting1/SRP/Sobel_before.jpg" data-label="" />
+  <img src=".../ImgHosting1/SRP/Sobel_after.jpg" data-label="" />
+</div>
+
+<div class="juxtapose" data-animate="false">
+  <img src="/ImgHosting1/SRP/Sobel_before.jpg" data-label="" />
+  <img src="/ImgHosting1/SRP/Sobel_after.jpg" data-label="" />
+</div>
+
+--------------------------------
 
 <div class="juxtapose" data-animate="false">
   <img src="../ImgHosting1/SRP/Sobel_before.jpg" data-label="" />
@@ -42,6 +59,11 @@ test 1 2 3
 </div>
 
 <div class="juxtapose" data-animate="false">
- <img src="../ImgHosting1/SRP/LightShaft_before.jpg" data-label="" />
- <img src="../ImgHosting1/SRP/LightShaft_after.jpg" data-label="" />
+ <img src="../ImgHosting1/SRP/LightShaft_before.jpg" data-label="Origin" />
+ <img src="../ImgHosting1/SRP/LightShaft_after.jpg" data-label="LightShaft Without Blur" />
+</div>
+
+<div class="juxtapose" data-animate="false">
+  <img src="../ImgHosting1/SRP/FXAA_before.jpg" data-label="" />
+  <img src="../ImgHosting1/SRP/FXAA_after.jpg" data-label="" />
 </div>

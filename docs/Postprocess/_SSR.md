@@ -1,24 +1,120 @@
-# SSR / Screen Space Reflection
+# SSR
 
-TODO 작성중
+- SSR(Screen Space Reflection)
 
-해당 픽셀의 노멀과 뎁스버퍼를 사용하여 리플렉션 벡터를 구합니다. 
+## 주의점
 
-리플렉션 벡터는 계속 직진하여 스크린 스페이스 밖으로 나가거나 어떤 오브젝트와 부딫히게 될 것입니다.
+- 화면 공간이므로, 당연히 화면밖이나 가려져 있는 것을 반사시키진 못한다
+  - 화면 바깥과 가까우면 fadeout
+  - 어느정도 구께일때만 반사적용
+- 3d ray marching 언더샘플링 오버샘플링
+- 모션블러 감소
 
-리플렉션 벡터를 따라서 Ray-Marching합니다.
-Ray-Marching은 ray tracing의 진보된 방법으로써 어떤 오브젝트와 충돌하는 지점만 계산하는 것이 아니라
-공간을 지나면서 변화되었거나 특정 값을 기준으로 step 화 시켜서 나누어 계산하는걸 뜻합니다.
+## TODO
 
-정보가 없는 반사부분을 자연스럽게 fade out시키는 기법이 쓰입니다.
+- SSR 준비물
+  - 색상
+  - 위치(깊이버퍼로부터 얻을 수 있음)
+  - 노말
+  - 반사 마스크
 
-jitter 흐뜨려트림
+| 구할것            | 구하는 법                                                  |
+| ----------------- | ---------------------------------------------------------- |
+| 카메라레이        | uv와 카메라 역행렬을 이용                                  |
+| 반사레이 시작점   | 카메라 레이와 뎁스버퍼를 이용                              |
+| 입사벡터          | 반사레이 시작점을 노말라이즈함. (incident : 입사/투사되는) |
+| 반사레이          | 입사벡터와 노멀을 이용 반사 벡터를 구하고 레이를 쏨        |
+| 반사레이 도착점   | 반사 레이를 쏴서 구함                                      |
+| SSR RenderTexture | 반사 레이 도착점의 색과 반사마스크를 이용                  |
+
+## 반사 레이를 쏘는 방식
+
+- <http://casual-effects.blogspot.com/2014/08/screen-space-ray-tracing.html>
+
+|     |     |
+| --- | --- |
+| 3D  |     |
+| 2D  |     |
+
+
+## 코드 예
+
+``` cs
+_material_SSR.SetMatrix( "_MATRIX_InverseCameraProjection", _camera.projectionMatrix.inverse);
+```
+
+``` hlsl
+// vert =====================
+// 카메라레이
+float4 cameraRay = float4(IN.uv * 2 - 1, 1, 1);
+cameraRay = mul( _CameraInverseProjectionMatrix, cameraRay);
+OUT.cameraRay = cameraRay.xyz / cameraRay.w;
+
+
+
+// frag =====================
+// 반사레이 시작점
+half sceneRawDepth = SampleSceneDepth(IN.uv);
+half scene01Depth  = Linear01Depth(sceneRawDepth, _ZBufferParams);
+half3 reflectRayStartPositionWS = OUT.cameraRay * sceen01Depth;
+
+// 입사벡터
+half3 incidentVec = normalize(reflectRayStartPositionWS);
+
+// 반사레이
+half3 R = normalize(reflect(incidentVec, N));
+
+half3 reflectionColor = 0;
+
+반사레이 도착점 
+```
+
+```
+???
+    float sampleDepth = tex_depth.read(tid).x;
+    float4 samplePosInCS =  float4(((float2(tid)+0.5)/sceneInfo.ViewSize)*2-1.0f, sampleDepth, 1);
+    samplePosInCS.y *= -1;
+```
+
+
+
+incidentVec = normalize(rayStartPositionWS)
+N
+
+half3 reflectionColor = 0;
+if (reflectMask > 0)
+{
+  reflectionColor = 
+}
+
+
+
+
+half3 scaledR = _RayStepScale * R;
+for (_MaxRayStep)
+{
+
+}
+
+## Hi-Z Buffer
+
+- Hierarchical-Z buffer
+- 기존 Z buffer를 축소시키며 계층을 만들며(밉맵)
+  - 셀은 최소 3×3 셀
+- 기존 Z Buffer보다 비교적 적은 샘플 횟수로 교차점을 얻을 수 있다.
+
+![zbuffer_to_hiz.png](../res/zbuffer_to_hiz.jpg)
 
 ## Ref
 
 - <https://www.slideshare.net/xtozero/screen-space-reflection>
+- <http://www.kode80.com/blog/2015/03/11/screen-space-reflections-in-unity-5/>
+  - <https://github.com/kode80/kode80SSR>
+- Screen Space Reflections : Implementation and optimization
+  - [src](https://github.com/leesg213/ssr_optimizing), [pt1](https://sugulee.wordpress.com/2021/01/16/performance-optimizations-for-screen-space-reflections-technique-part-1-linear-tracing-method/), [pt2](https://sugulee.wordpress.com/2021/01/19/screen-space-reflections-implementation-and-optimization-part-2-hi-z-tracing-method/)
+  - [번역1](https://scahp.tistory.com/66), [번역2](https://scahp.tistory.com/67)
+- GPU Pro 5: Hi-Z Screen-Space Cone-Traced Reflections by Yasin Uludag
 - <https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.postprocessing/PostProcessing/Shaders/Builtins/ScreenSpaceReflections.hlsl>
-- <https://github.com/kode80/kode80SSR>
 - [Unity で Screen Space Reflection の実装をしてみた](https://tips.hecomi.com/entry/2016/04/04/022550)
   - <https://github.com/hecomi/UnityScreenSpaceReflection>
 - [GDC2016 - Low Complexity, High Fidelity: The Rendering of INSIDE](https://youtu.be/RdN06E6Xn9E?t=2243)
@@ -31,3 +127,4 @@ jitter 흐뜨려트림
 - <http://roar11.com/2015/07/screen-space-glossy-reflections/>
 - [Screen Space Reflections in The Surge](https://www.slideshare.net/MicheleGiacalone1/screen-space-reflections-in-the-surge)
 - [SIGGRAPH2015 -  Stochastic Screen-Space Reflections](https://www.slideshare.net/DICEStudio/stochastic-screenspace-reflections)
+- <https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html>
