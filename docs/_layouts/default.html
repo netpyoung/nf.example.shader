@@ -10,9 +10,38 @@
 		<link rel="stylesheet" href="{{ site.Paths.webpack }}/main.css" />
         <script src="{{ site.Paths.webpack }}/main.js"></script>
 
-		<!-- ref: https://bulma.io/ -->
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
-
+		<style type="text/css">
+			@import url(//fonts.googleapis.com/css?family=Droid+Sans+Mono);
+			@import url(//fonts.googleapis.com/css?family=Noto+Sans+KR);
+   
+			html, body { height: 100%; }
+   
+			p {
+				margin-bottom: 1em;
+			}
+   
+			html {
+				background-color: #1D1F21;
+			}
+   
+			.flag-icon {
+				box-shadow: 0 0 1px @gray-light, 0 0 1px @gray-light, 0 0 1px @gray-light;
+			}
+   
+			.container {
+				font-family: 'Droid Sans Mono', 'Noto Sans KR';
+				min-height: 100%;
+				max-width: 960px;
+				margin-left: both;
+				margin-right: both;
+				background-color: #FFFFFF;
+			}
+   
+			img {
+				height: auto;
+				max-width: 100%;
+			}
+		   </style>
     </head>
 
     <body class="layout-documentation page-layout">
@@ -32,7 +61,9 @@
 		<style type="text/css">
 			a.jx-knightlab{ display:none; }
 			div.juxtapose {
+				min-height: 400px;
 				max-height: 400px;
+				min-width : 600px;
 				max-width : 600px;
 			}
 		</style>
