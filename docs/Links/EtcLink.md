@@ -1,35 +1,32 @@
+---
+categories: Links
+---
+
 # Link
 
 인덱싱용. 세부적인것 보다는 큰 단위로
 세부적으로 들어가려면 문서 더 파서
 
-- 그래픽 링크 모음집
-  - https://kesen.realtimerendering.com/
-  - http://trowley.org/
-- https://www.gdcvault.com/
-- https://developer.arm.com/solutions/graphics-and-gaming/gaming-engine/unity/presentations
+## 그래픽 링크 모음집
 
-도구
-https://renderdoc.org/
+- <https://kesen.realtimerendering.com/>
+- <http://trowley.org/>
 
-텍스쳐 생성 : https://github.com/mtwoodard/TextureGenerator
+## 리서치
 
-http://research.tri-ace.com/
+- [GDC](https://www.gdcvault.com/)
+- [tri-Ace](http://research.tri-ace.com/)
+- [ARM](https://developer.arm.com/solutions/graphics-and-gaming/gaming-engine/unity/presentations)
 
+## 그래프
 
-그래프
-https://www.geogebra.org/graphing
-https://www.desmos.com/calculator
-https://graphtoy.com/
-http://tobyschachman.com/Shadershop/editor/
+- <https://www.geogebra.org/graphing>
+- <https://www.desmos.com/calculator>
+- <https://graphtoy.com/>
+- <http://tobyschachman.com/Shadershop/editor/>
 
-모델
-https://www.mixamo.com/
-https://www.models-resource.com/
-https://en.wikipedia.org/wiki/List_of_common_3D_test_models
+## 튜토리얼
 
-튜토리얼
- https://www.ronja-tutorials.com/
- https://guru/unity-cpu-performance/mesh-baker-interview-ian-deane/
-
- https://www.gamedevpensieve.com/graphics/3d/3d_lighting
+- <https://www.ronja-tutorials.com/>
+- <https://guru/unity-cpu-performance/mesh-baker-interview-ian-deane/>
+- <https://www.gamedevpensieve.com/graphics/3d/3d_lighting>

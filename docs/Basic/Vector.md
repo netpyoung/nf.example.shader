@@ -1,3 +1,7 @@
+---
+categories: Basic
+---
+
 # Vector
 
 ## [Swizzling](https://en.wikipedia.org/wiki/Swizzling_(computer_graphics))

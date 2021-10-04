@@ -1,3 +1,7 @@
+---
+categories: Basic
+---
+
 # Depth
 
 - LinearEyeDepth : distance from the eye in world units
