@@ -4,8 +4,8 @@
 - 나중에 AA를 적용할 것을 감안하여, SSR같은 곳에서 적절히 디더링만 시켜주고 블러는 안해주는 식으로 흐림 효과를 AA에 맡길 수 있다.
 
 <div class="juxtapose" data-animate="false">
-  <img src="../../ImgHosting1/SRP/FXAA_before.jpg" data-label="" />
-  <img src="../../ImgHosting1/SRP/FXAA_after.jpg" data-label="" />
+  <img src="/ImgHosting1/SRP/FXAA_before.jpg" data-label="" />
+  <img src="/ImgHosting1/SRP/FXAA_after.jpg" data-label="" />
 </div>
 
 ``` txt

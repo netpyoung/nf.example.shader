@@ -102,6 +102,7 @@ VertexPositionInputs GetVertexPositionInputs(float3 positionOS)
 // com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl
 TransformObjectToWorld - UNITY_MATRIX_M
 TransformWorldToView   - UNITY_MATRIX_V
+TransformWViewToHClip  - UNITY_MATRIX_P
 TransformWorldToHClip  - UNITY_MATRIX_VP
 ```
 

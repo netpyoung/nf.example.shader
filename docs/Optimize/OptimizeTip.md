@@ -32,3 +32,10 @@ void OnWillRenderObject()
 
 - Optimizing PBR for Mobile
   - [pdf](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_renaldas_2D00_slides.pdf), [note](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_renaldas_2D00_notes.pdf)
+
+## 밉맵 디테일 올리기
+
+### 샤픈
+
+- <https://blog.popekim.com/ko/2013/06/24/mipmap-quality.html>
+- <https://zhuanlan.zhihu.com/p/413834301>

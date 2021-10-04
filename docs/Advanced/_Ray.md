@@ -1,11 +1,11 @@
 # Ray
 
-|              |                                                                                              |
-| ------------ | -------------------------------------------------------------------------------------------- |
-| Ray Casting  | ray를 쏘고 맞춘놈을 찾음                                                                     |
-| Ray Marching | ray를 쏘고 맞춘놈을 찾음. 찾기위해 기하학적 교차 테스트 SDF(Signed Distance Function)을 이용 |
-| Ray Tracing  | ray를 쏘고 맞춘놈을 찾음. 거기서 편향되게(reflect/refract) 레이를 쏨.                        |
-| Path Tracing | ray를 쏘고 맞춘놈을 찾음. 거기서 고르게(GI) 레이를 쏨.                                       |
+|              |                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| Ray Casting  | ray를 쏘고 맞춘놈을 찾음                                                                         |
+| Ray Marching | ray를 쏘고 맞춘놈을 찾음. 찾기위해 기하학적 교차 테스트(ex SDF(Signed Distance Function))을 이용 |
+| Ray Tracing  | ray를 쏘고 맞춘놈을 찾음. 거기서 편향되게(reflect/refract) 레이를 쏨.                            |
+| Path Tracing | ray를 쏘고 맞춘놈을 찾음. 거기서 고르게(GI) 레이를 쏨.                                           |
 
 ## Ray Marching
 
@@ -25,4 +25,3 @@
 
 - [SDF.md](_SDF.md)
 - [Disney's Practical Guide to Path Tracing](https://www.youtube.com/watch?v=frLwRLS_ZR0)
-

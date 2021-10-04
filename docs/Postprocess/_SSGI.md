@@ -1,5 +1,6 @@
-# SSGI / Screen Space Global Illumination
+# SSGI
 
+- SSGI / Screen Space Global Illumination
 - Illumination : 조명
 
 ## 구현

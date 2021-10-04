@@ -1,5 +1,6 @@
-# SSAO / Screen Space Ambient Occlusion
+# SSAO
 
+- SSAO / Screen Space Ambient Occlusion
 - 주변물체에 의해서 가려지는 곳이 어둡게 되어, 장면의 깊이감을 더함.
 - Ambient : 주변
 - Occlusion : 차폐, 가려짐
