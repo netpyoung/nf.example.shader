@@ -48,7 +48,11 @@
 		<div class="container"><!-- /.container -->
             
 			<div class="content container is-fluid">
-                {{ content }}
+				<p class="meta">{{ page.date | date: "%Y.%m.%d" }}</p>
+				<div class="post">
+					{{ content }}
+				</div><!-- post -->
+				<hr />
             </div><!-- /.content -->
 
         </div><!-- /.container -->
