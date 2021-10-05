@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # Alpha
 
 - 알파쓰면 Testing(discard)이나 Blend가 할 것 없이 성능 잡아먹는다.

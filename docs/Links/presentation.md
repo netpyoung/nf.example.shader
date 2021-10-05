@@ -1,7 +1,3 @@
----
-categories: Links
----
-
 # Presentation
 
 - 년도별 작품 위주 셰이더관련 발표자료 모음.

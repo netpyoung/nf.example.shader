@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # NormalMap
 
 ``` hlsl

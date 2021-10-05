@@ -1,7 +1,3 @@
----
-categories: Links
----
-
 # book & videos
 
 ## Books

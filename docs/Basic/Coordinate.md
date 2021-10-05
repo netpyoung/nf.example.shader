@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # Coordinate
 
 - 좌표공간

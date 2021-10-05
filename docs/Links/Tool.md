@@ -1,7 +1,3 @@
----
-categories: Links
----
-
 # Tool
 
 - [RenderDoc](https://renderdoc.org/)

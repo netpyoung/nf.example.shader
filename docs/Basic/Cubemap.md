@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # Cubemap
 
 - 텍스쳐를 받을 수 있는 Cubemap생성하기 : `Create > Legacy > Cubemap`

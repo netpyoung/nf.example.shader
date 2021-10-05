@@ -1,7 +1,3 @@
----
-categories: Links
----
-
 # Link
 
 인덱싱용. 세부적인것 보다는 큰 단위로

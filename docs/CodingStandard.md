@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # 코딩 스타일
 
 ``` hlsl

@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # CheatSheet
 
 - based on [[built-in] UnityShadersCheatSheet.shader](https://gist.github.com/Split82/d1651403ffb05e912d9c3786f11d6a44)

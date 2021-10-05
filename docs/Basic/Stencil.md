@@ -1,7 +1,3 @@
----
-categories: Basic
----
-
 # Stencil
 
 - vert > Depth Test  > Stencil Test > Render
