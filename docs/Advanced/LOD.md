@@ -1,6 +1,7 @@
 # LOD
 
 - LOD : Level Of Detail
+- [tex2Dlod와 tex2Dbias의 비교연구](https://gamedevforever.com/325)
 
 |           |                       | Level of detail (N은 0부터) |
 | --------- | --------------------- | --------------------------- |

@@ -1,9 +1,6 @@
-# Specular Approximation
+# Specular Pow Approximation
 
 ## 제곱하는 횟수 n을 줄여보자면(m만큼)?
-
-- [A Non-Integer Power Function on the Pixel Shader - by Juan Guardado, Phillippe Beaudoin](https://www.gamasutra.com/view/feature/131381/a_noninteger_power_function_on_.php?page=2)
-- [Fast Specular 계산](https://gamedevforever.com/36)
 
 Specular 구할때 보통 pow쓰는데 이때 제곱되어 지는 횟수를 줄여봐보자
 
@@ -53,3 +50,8 @@ half3 specularColor = pow(max(0, dot(R, V)), 18);
 
 half3 specularColor = n18Approximation(max(0, dot(R, V)));
 ```
+
+## Ref
+
+- [A Non-Integer Power Function on the Pixel Shader - by Juan Guardado, Phillippe Beaudoin](https://www.gamasutra.com/view/feature/131381/a_noninteger_power_function_on_.php?page=2)
+- [Fast Specular 계산](https://gamedevforever.com/36)

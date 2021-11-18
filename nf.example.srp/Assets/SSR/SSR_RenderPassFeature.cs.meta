@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 8377ea11fef772546baa374d2df80b61
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - MaterialBloom: {instanceID: 0}
+  - MaterialDualFilter: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

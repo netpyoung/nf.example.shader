@@ -1,11 +1,4 @@
 
-
-
-## Parallax Refraction  ??
-시차(視差: 관측 위치에 따른 물체의 위치나 방향의 차이)
-
-
-
 ## BRDF(Bidirectional Reflectance Distribution Function)
 - Texture
 Microfacet Theory
@@ -115,20 +108,11 @@ https://www.sysnet.pe.kr/Default.aspx?mode=2&sub=0&pageno=0&detail=1&wid=11636
 dot을 이용 cos 각도값으로 비교하면 성능향상 가능성.
 
 
-parallex shader 평면 원근감
-
-tex2Dlod
-https://developer.download.nvidia.com/cg/tex2Dbias.html
-https://gamedevforever.com/325?category=387045
-
 
 ---------
 텍스쳐 그리기 : https://www.youtube.com/watch?v=hySgDB3AI4o
 Banded Lighting
 
 NDF(Normal Distribution Function)
+gpg3권 4.18 픽셀 당 조명 계산을 위한 참조 테이블로서의 텍스처
 gpg3권 4.19 수작업으로 만든 셰이딩 모형으로 렌더링하기
-https://www.jordanstevenstechart.com/physically-based-rendering
-
-
-https://github.com/wdas/brdf - compiled - https://www.disneyanimation.com/technology/brdf.html

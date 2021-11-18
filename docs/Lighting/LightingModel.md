@@ -185,3 +185,4 @@ half OrenNayar_Fakey(half3 N, half3 L, half3 V, half roughness)
 ## Ref
 
 - <https://www.cnblogs.com/timlly/p/10631718.html>
+- <https://www.jordanstevenstechart.com/physically-based-rendering>

@@ -1,32 +1,38 @@
 # Color Space
 
+- RGB
+- HSL (for hue, saturation, lightness) and HSV (for hue, saturation, value; also known as HSB, for hue, saturation, brightness) 
+- HCL (Hue-Chroma-Luminance)
+- YUV
+- ..
+
 | RGB |       |
-|-----|-------|
+| --- | ----- |
 | R   | Red   |
 | G   | Green |
 | B   | Blue  |
 
 | CMYK |            |
-|------|------------|
+| ---- | ---------- |
 | C    | Cyan       |
 | M    | Magenta    |
 | Y    | Yellow     |
 | K    | Key(black) |
 
-| HSV |                  |
-|-----|------------------|
-| H   | 색상(Hue)        |
-| S   | 채도(Saturation) |
-| V   | 명도(value)      |
+| HSV |                                      |
+| --- | ------------------------------------ |
+| H   | 색상(Hue)                            |
+| S   | 채도(Saturation)                     |
+| V   | 명도(Value / Lightness / Brightness) |
 
 | YUV |             |
-|-----|-------------|
+| --- | ----------- |
 | Y   | 밝기        |
 | U   | 파랑 - 밝기 |
 | V   | 빨강 - 밝기 |
 
 | YUV 종류 |                                                                                        |
-|----------|----------------------------------------------------------------------------------------|
+| -------- | -------------------------------------------------------------------------------------- |
 | YCbCr    | digital                                                                                |
 | YPbPr    | analog                                                                                 |
 | YIQ      | YUV 33도 회전, NTSC(National Television System Committee)방식 -한국, 미국 컬러텔레비전 |
@@ -44,7 +50,7 @@ CIE XYZ
 CIE Lab
 
 | XYZ |           |
-|-----|-----------|
+| --- | --------- |
 | X   | ??        |
 | Y   | 휘도      |
 | Z   | 청색 자극 |

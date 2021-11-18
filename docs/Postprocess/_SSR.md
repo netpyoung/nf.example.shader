@@ -7,6 +7,7 @@
 - 화면 공간이므로, 당연히 화면밖이나 가려져 있는 것을 반사시키진 못한다
   - 화면 바깥과 가까우면 fadeout
   - 어느정도 구께일때만 반사적용
+- 깊이버퍼를 이용함으로, 깊이버퍼를 안쓰는 오브젝트는 반사가 안됨
 - 3d ray marching 언더샘플링 오버샘플링
 - 모션블러 감소
 
@@ -14,7 +15,7 @@
 
 - SSR 준비물
   - 색상
-  - 위치(깊이버퍼로부터 얻을 수 있음)
+  - 깊이(위치를 얻기 위해)
   - 노말
   - 반사 마스크
 
@@ -35,7 +36,6 @@
 | --- | -------------------------------------------------------- |
 | 3D  | 원근법때문에 언더샘플링(가까운거), 오버샘플링(먼것) 이슈 |
 | 2D  | DDA(Digital Differential Analyzer)                       |
-
 
 ## 코드 예
 
@@ -176,3 +176,4 @@ for (_MaxRayStep)
 - [Screen Space Reflections in The Surge](https://www.slideshare.net/MicheleGiacalone1/screen-space-reflections-in-the-surge)
 - [SIGGRAPH2015 -  Stochastic Screen-Space Reflections](https://www.slideshare.net/DICEStudio/stochastic-screenspace-reflections)
 - <https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html>
+- <https://www.gamedeveloper.com/disciplines/screen-space-reflections-in-blightbound>

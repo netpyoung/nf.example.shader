@@ -18,6 +18,11 @@
 
 - <https://github.com/M-Fatah/texture_maker>
 - <http://mebiusbox.github.io/contents/EffectTextureMaker/>
+- BRDF explorer
+  - <https://oduska.com/datahoarder/Walt%20Disney%20Animation%20Studios/BRDF%20Explorer/Website/BRDF%20Explorer.html>
+  - <https://github.com/wdas/brdf/downloads>
+- MERL BRDF Database - <https://www.merl.com/brdf/>
+
 
 ## 모델
 

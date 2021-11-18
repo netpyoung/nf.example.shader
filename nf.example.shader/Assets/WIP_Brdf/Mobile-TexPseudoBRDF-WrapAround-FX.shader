@@ -11,6 +11,8 @@
         _TimeOffs("Time offs", Float) = 0
         _Duration("Duration", Float) = 2
         _Invert("Invert", Float) = 0
+        _GlobalTime("_GlobalTime", Float) = 0
+            
     }
 
     SubShader
@@ -45,13 +47,14 @@
             TEXTURE2D(_BumpMap);        SAMPLER(sampler_BumpMap);
             TEXTURE2D(_NoiseTex);       SAMPLER(sampler_NoiseTex);
 
+            CBUFFER_START(UnityPerMaterial)
             half4 _FXColor;
             float _TimeOffs;
             float _Duration;
             float _LightProbesLightingAmount;
             float _Invert;
             float _GlobalTime;
-
+            CBUFFER_END
 
             struct APPtoVS
             {
