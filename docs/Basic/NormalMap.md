@@ -48,34 +48,44 @@ half4 frag(Varyings IN) : SV_Target
 | `N`ormal   | NORMAL      | z   |    |
 
 ``` shader
-float3 tangentNormal = tex2D(NormalSampler, Input.mUV).xyz;
-tangentNormal = normalize(tangentNormal * 2 - 1);
+N = mul(mat_I_M, normalOS);
+T = mul(tangentOS, mat_M);
+B = mul(binormalOS, mat_M);
+// unity같이 binormalOS를 못어올 경우 N, T를 이용하여 B를 만들 수 있다.
+// B = cross(N, T) * tangentOS.w
 
-// TBN 행렬은 `WorldSpace normal to TangentSpace normal`;
-float3x3 TBN = float3x3(normalize(Input.T), normalize(Input.B), normalize(Input.N));
+======== 월드공간 T / B / N 을 구하고 TBN매트릭스(tangent -> world)를 만든다
+float3x3 TBN_Tangent2World = float3x3(normalize(Input.T), normalize(Input.B), normalize(Input.N));
 | Tx Ty Tz |
 | Bx By Bn |
 | Nx Ny Nz |
 
-// TBN은 직교행렬, 직교행렬의 역행렬은 전치행렬.
-TBN = transpose(TBN); // `WorldSpace to TangentSpace` => `TangentSpace to WorldSpace`;
+mul(tangentNormal, TBN_Tangent2World);   // 왠지 이케 해버리면 앞서 말한 NormalScaleProblem에 걸릴것 같음
+
+
+======== TBN은 직교행렬, 직교행렬의 역행렬은 전치행렬.
+TBN_World2Tangent = transpose(TBN_Tangent2World);
 | Tx Bx Nx |
 | Ty By Ny |
 | Yz Bz Nz |
 
-float3 worldNormal = mul(TBN, tangentNormal);
+mul(TBN_World2Tangent, tangentNormal);   // 이케하면 되겠지?
+
+======== 뇌피셜
+// 위에꺼도 맞긴 맞는데...
+// TBN은 직교행렬, 직교행렬의 역행렬은 전치행렬.
+// traspose(inverse(M)) == M
+mul(tangentNormal, TBN_Tangent2World);  // 따라서 이케해도 문제될꺼 없음? 확인해봐야함
 ```
 
-``` shader
-// `mul(벡터, 메트릭스) =  mul( transpose(메트릭스), 벡터 )` 이므로,
-// 다음과 같은 라인을
-float3x3 TBN = float3x3(normalize(Input.T), normalize(Input.B), normalize(Input.N));
-TBN = transpose(TBN); // TangentSpace to WorldSpace;
-float3 worldNormal = mul(TBN, tangentNormal);
+## normal flatten
 
-// 이렇게 줄여 쓸 수 도 있다.
-float3x3 TBN = float3x3(normalize(Input.T), normalize(Input.B), normalize(Input.N));
-float3 worldNormal = mul(tangentNormal, TBN);
+``` hlsl
+
+//                               T, B, N
+const float3 vec_TBN_UP = float3(0, 0, 1);
+
+normalTS = lerp(normalTS, vec_TBN_UP, _Flatteness);
 ```
 
 ## Block Compression
