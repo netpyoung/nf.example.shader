@@ -51,7 +51,7 @@ public class Feature_PrintDepthMap : ScriptableRendererFeature
                 return;
             }
 
-            Blit(cmd, _currentTarget, _destination.Identifier(), _material);
+            Blit(cmd, ref renderingData, _material);
         }
 
         internal void Setup(RenderTargetIdentifier cameraColorTarget, RenderTargetHandle cameraHandle)
