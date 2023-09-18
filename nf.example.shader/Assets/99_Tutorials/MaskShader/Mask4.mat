@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Mask4
   m_Shader: {fileID: -6465566751694194690, guid: c046ea0775463c2489c8c59bcd673b55, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -17,6 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -37,6 +40,8 @@ Material:
     - Vector1_1e4859c2bbff438db0b02e51f9b5f2b7: 3
     - Vector1_29feba5df73746a79841b204d46d3377: 3
     - Vector1_75ef96a69587460ab233b5ab1aac13d9: 0.5
+    - _QueueControl: 0
+    - _QueueOffset: 0
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &6235320814741142675
@@ -51,4 +56,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 5
+  version: 7
