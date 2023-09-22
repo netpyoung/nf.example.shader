@@ -8,7 +8,8 @@ public class Feature_HelloSRP : ScriptableRendererFeature
     {
         const string RENDER_TAG = nameof(Pass_HelloSRP);
 
-        Material _material;
+        private readonly Material _material;
+        private RTHandle _cameraColorTargetHandle;
 
         public Pass_HelloSRP(Material material)
         {
@@ -22,9 +23,14 @@ public class Feature_HelloSRP : ScriptableRendererFeature
                 return;
             }
             CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-            Blit(cmd, ref renderingData, _material); // ref renderingData: urp12 swap buffer
+            cmd.Blit(renderingData.cameraData.targetTexture, _cameraColorTargetHandle, _material);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
+        }
+
+        internal void Setup(RTHandle cameraColorTargetHandle)
+        {
+            _cameraColorTargetHandle = cameraColorTargetHandle;
         }
     }
 
@@ -40,5 +46,10 @@ public class Feature_HelloSRP : ScriptableRendererFeature
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         renderer.EnqueuePass(_pass);
+    }
+
+    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    {
+        _pass.Setup(renderer.cameraColorTargetHandle);
     }
 }
