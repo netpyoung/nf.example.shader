@@ -28,7 +28,7 @@ public class Feature_HelloSRP : ScriptableRendererFeature
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            var cameraData = renderingData.cameraData;
+            CameraData cameraData = renderingData.cameraData;
             if (cameraData.camera.cameraType != CameraType.Game)
             {
                 return;

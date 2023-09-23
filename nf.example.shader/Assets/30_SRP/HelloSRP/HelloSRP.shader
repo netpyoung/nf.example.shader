@@ -1,10 +1,5 @@
-﻿Shader "HelloSRP"
+﻿Shader "srp/HelloSRP"
 {
-    Properties
-    {
-        [HideInInspector] _MainTex("UI Texture", 2D) = "white" {}
-    }
-
     SubShader
     {
         Pass // 0
