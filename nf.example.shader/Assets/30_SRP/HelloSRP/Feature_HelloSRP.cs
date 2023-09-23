@@ -16,26 +16,38 @@ public class Feature_HelloSRP : ScriptableRendererFeature
             _material = material;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            if (renderingData.cameraData.isSceneViewCamera)
-            {
-                return;
-            }
-            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-            cmd.Blit(renderingData.cameraData.targetTexture, _cameraColorTargetHandle, _material);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
-        }
-
         internal void Setup(RTHandle cameraColorTargetHandle)
         {
             _cameraColorTargetHandle = cameraColorTargetHandle;
         }
+
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            ConfigureTarget(_cameraColorTargetHandle);
+        }
+
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            var cameraData = renderingData.cameraData;
+            if (cameraData.camera.cameraType != CameraType.Game)
+            {
+                return;
+            }
+
+            if (_material == null)
+            {
+                return;
+            }
+
+            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _cameraColorTargetHandle, _material, 0);
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
+        }
     }
 
-    Pass_HelloSRP _pass;
     public Material Material;
+    private Pass_HelloSRP _pass;
 
     public override void Create()
     {
@@ -45,11 +57,18 @@ public class Feature_HelloSRP : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        renderer.EnqueuePass(_pass);
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            renderer.EnqueuePass(_pass);
+        }
     }
 
     public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
     {
-        _pass.Setup(renderer.cameraColorTargetHandle);
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
+            _pass.Setup(renderer.cameraColorTargetHandle);
+        }
     }
 }

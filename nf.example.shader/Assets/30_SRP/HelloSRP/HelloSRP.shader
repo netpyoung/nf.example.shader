@@ -18,44 +18,19 @@
             HLSLPROGRAM
             #pragma target 3.5
 
-            #pragma vertex vert
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+            #pragma vertex Vert
 
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
+            TEXTURE2D_X(_CameraOpaqueTexture);
+            SAMPLER(sampler_CameraOpaqueTexture);
 
-            CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _MainTex_TexelSize;
-            CBUFFER_END
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-
-                return half4(1 - mainTex, 1);
+                float3 colorTex = SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, IN.texcoord).rgb;
+                return half4(1 - colorTex, 1);
             }
             ENDHLSL
         }
