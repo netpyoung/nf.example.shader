@@ -27,7 +27,6 @@ MonoBehaviour:
   m_Name: VolumePrintDepthMap
   m_EditorClassIdentifier: 
   active: 1
-  m_AdvancedMode: 0
   IsEnable:
     m_OverrideState: 0
     m_Value: 0
@@ -44,7 +43,6 @@ MonoBehaviour:
   m_Name: VolumePrintDepthMap
   m_EditorClassIdentifier: 
   active: 1
-  m_AdvancedMode: 0
   IsEnable:
     m_OverrideState: 0
     m_Value: 0
@@ -61,7 +59,6 @@ MonoBehaviour:
   m_Name: VolumePrintDepthMap
   m_EditorClassIdentifier: 
   active: 1
-  m_AdvancedMode: 0
   IsEnable:
     m_OverrideState: 1
     m_Value: 1
