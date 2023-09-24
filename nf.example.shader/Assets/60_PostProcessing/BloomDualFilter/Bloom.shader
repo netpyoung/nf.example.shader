@@ -1,72 +1,38 @@
 ﻿Shader "srp/Bloom"
 {
-    Properties
-    {
-        [HideInInspector] _MainTex("UI Texture", 2D) = "white" {}
-    }
-
     SubShader
     {
+        Cull Back
+        ZWrite Off
+        ZTest Off
+
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
             NAME "BLOOM_THRESHOLD"
 
-            Cull Back
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-
-            CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _MainTex_TexelSize;
-            CBUFFER_END
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                /*float4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-
-                mainTex.rgb -= 1.5;
-                mainTex = max(mainTex, 0) * 3;
-
-                return mainTex;*/
-
+                float3 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
+                /*
+                blitTex.rgb -= 1.5;
+                blitTex = max(blitTex, 0) * 3;
+                return blitTex;*/
                 float4 brightColor = 0;
-                float3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
 
-                float brightness = dot(mainTex, float3(0.2126, 0.7152, 0.0722));
-                if (brightness > 0.9)
+                float brightness = dot(blitTex, float3(0.2126, 0.7152, 0.0722));
+                float threshold = 0.9;
+                if (brightness > threshold)
                 {
-                    brightColor = half4(mainTex, 1);
+                    brightColor = half4(blitTex, 1);
                 }
                 return brightColor;
             }
@@ -77,53 +43,18 @@
         {
             NAME "BLOOM_COMPOSITE"
 
-            Cull Off
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
+            TEXTURE2D(_BloomNonBlurTex);
+            SAMPLER(sampler_BloomNonBlurTex);
+            TEXTURE2D(_BloomBlurTex);
+            SAMPLER(sampler_BloomBlurTex);
 
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_BloomBlurTex);       SAMPLER(sampler_BloomBlurTex);
-
-            CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _MainTex_TexelSize;
-            CBUFFER_END
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                float3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-                float3 bloomBlurTex = SAMPLE_TEXTURE2D(_BloomBlurTex, sampler_BloomBlurTex, IN.uv).rgb;
-                return half4(mainTex + bloomBlurTex, 1);
-
+                float3 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
+                float3 bloomNonBlurTex = SAMPLE_TEXTURE2D(_BloomNonBlurTex, sampler_BloomNonBlurTex, IN.texcoord).rgb;
+                float3 bloomBlurTex = SAMPLE_TEXTURE2D(_BloomBlurTex, sampler_BloomBlurTex, IN.texcoord).rgb;
+                return half4(blitTex + bloomNonBlurTex+ bloomBlurTex, 1);
             }
             ENDHLSL
         }

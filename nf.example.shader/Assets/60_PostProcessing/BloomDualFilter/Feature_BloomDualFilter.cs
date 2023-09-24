@@ -1,11 +1,89 @@
 using System;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 public class Feature_BloomDualFilter : ScriptableRendererFeature
 {
+    class RTCollection : IDisposable
+    {
+        public int _BloomNonBlurTex_Id { get; private set; }
+        public int _BloomBlurTex_Id { get; private set; }
+
+        public RTHandle BloomBrightRT => _bloomBrightRT;
+        public RTHandle[] DualFilterRTs => _dualFilterRTs;
+        public int DualFilterStep { get; private set; }
+
+        private RTHandle _bloomBrightRT;
+        private RTHandle[] _dualFilterRTs;
+        private bool _isInitialized;
+
+        public RTCollection(int desireDualFilterStep)
+        {
+            _BloomNonBlurTex_Id = Shader.PropertyToID("_BloomNonBlurTex");
+            _BloomBlurTex_Id = Shader.PropertyToID("_BloomBlurTex");
+            DualFilterStep = desireDualFilterStep;
+        }
+
+        internal void Setup(RenderTextureDescriptor mainDesc)
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+            _isInitialized = true;
+
+            RenderTextureFormat tf = RenderTextureFormat.ARGB32;
+            RenderTextureDescriptor rtdesc = new RenderTextureDescriptor(mainDesc.width, mainDesc.height, tf, 0);
+
+            RenderingUtils.ReAllocateIfNeeded(ref _bloomBrightRT, rtdesc, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_MyColorTexture");
+
+            int fromDiv = 2;
+            int measureStep = _MeasureStep(mainDesc.width / fromDiv, mainDesc.height / fromDiv);
+            DualFilterStep = Math.Min(measureStep, DualFilterStep);
+            _dualFilterRTs = new RTHandle[DualFilterStep];
+
+            for (int i = 0; i < DualFilterStep; ++i)
+            {
+                int div = 1 << i; // 1, 2, 4, 8 ...
+                div = div * fromDiv; // 8, 16, 32, 64 ...
+                int w = mainDesc.width / div;
+                int h = mainDesc.height / div;
+                RenderTextureDescriptor desc = new RenderTextureDescriptor(w, h, tf, 0);
+                RenderingUtils.ReAllocateIfNeeded(ref _dualFilterRTs[i], desc, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                                name: $"_dualFilterRTs_{i}");
+            }
+        }
+
+        int _MeasureStep(int width, int height)
+        {
+            int min = Math.Min(width, height);
+            int step = 0;
+            while (min > 1)
+            {
+                min >>= 1;
+                step++;
+            }
+            step++;
+            return step;
+        }
+
+        public void Dispose()
+        {
+            if (!_isInitialized)
+            {
+                return;
+            }
+
+            RTHandles.Release(_bloomBrightRT);
+            for (int i = 0; i < DualFilterStep; ++i)
+            {
+                RTHandles.Release(_dualFilterRTs[i]);
+            }
+        }
+    }
+
     class Pass_BloomDualFilter : ScriptableRenderPass
     {
         const string RENDER_TAG = nameof(Pass_BloomDualFilter);
@@ -14,47 +92,52 @@ public class Feature_BloomDualFilter : ScriptableRendererFeature
         const int DUALFILTER_DOWN_PASS = 0;
         const int DUALFILTER_UP_PASS = 1;
 
-        public int downsample = 8;
+        private Material _materialBloom;
+        private Material _materialDualFilter;
 
-        Material _materialBloom;
-        Material _materialDualFilter;
-        
-        RenderTargetIdentifier _currentTarget;
-        RenderTargetIdentifier _destTarget;
-        RenderTargetHandle _destination;
+        private RTHandle _cameraColorTargetHandle;
+        private RTCollection _rtc;
 
-        int _bloomBrightRT_Id;
-        int _dualFilterDownRT_Id;
-        int _dualFilterUpRT_Id;
-        int _dualFilterDownRT_Id1;
-        int _dualFilterUpRT_Id1;
-        int _dualFilterDownRT_Id2;
-        int _dualFilterUpRT_Id2;
-        int _dualFilterDownRT_Id3;
-        int _dualFilterUpRT_Id3;
-
-        RenderTargetIdentifier _bloomBrightRT;
-        RenderTargetIdentifier _dualFilterDownRT;
-        RenderTargetIdentifier _dualFilterUpRT;
-        RenderTargetIdentifier _dualFilterDownRT1;
-        RenderTargetIdentifier _dualFilterUpRT1;
-        RenderTargetIdentifier _dualFilterDownRT2;
-        RenderTargetIdentifier _dualFilterUpRT2;
-        RenderTargetIdentifier _dualFilterDownRT3;
-        RenderTargetIdentifier _dualFilterUpRT3;
-
-        public Pass_BloomDualFilter(Material materialBloom, Material materialDualFilter)
+        public Pass_BloomDualFilter(RTCollection rtCollection, Material materialBloom, Material materialDualFilter)
         {
+            _rtc = rtCollection;
             _materialBloom = materialBloom;
             _materialDualFilter = materialDualFilter;
         }
 
+        internal void Setup(RTHandle cameraColorTargetHandle)
+        {
+            _cameraColorTargetHandle = cameraColorTargetHandle;
+        }
+
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            ConfigureTarget(_cameraColorTargetHandle);
+        }
+
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            CameraData cameraData = renderingData.cameraData;
+            if (cameraData.camera.cameraType != CameraType.Game)
+            {
+                return;
+            }
+
+            if (_materialBloom == null)
+            {
+                return;
+            }
+
+            if (_materialDualFilter == null)
+            {
+                return;
+            }
+
             if (!renderingData.cameraData.postProcessEnabled)
             {
                 return;
             }
+
             CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -63,101 +146,34 @@ public class Feature_BloomDualFilter : ScriptableRendererFeature
 
         void Render(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            if (renderingData.cameraData.isSceneViewCamera)
+            if (_rtc.DualFilterStep < 1)
             {
                 return;
             }
 
-            cmd.Blit(_currentTarget, _bloomBrightRT, _materialBloom, BLOOM_THRESHOLD_PASS);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _rtc.BloomBrightRT, _materialBloom, BLOOM_THRESHOLD_PASS);
+            Blitter.BlitCameraTexture(cmd, _rtc.BloomBrightRT, _rtc.DualFilterRTs[0], _materialDualFilter, DUALFILTER_DOWN_PASS);
 
-            //cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter, DUALFILTER_DOWN_PASS);
-            cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter);
-            cmd.Blit(_dualFilterDownRT, _dualFilterDownRT1, _materialDualFilter, DUALFILTER_DOWN_PASS);
-            cmd.Blit(_dualFilterDownRT1, _dualFilterDownRT2, _materialDualFilter, DUALFILTER_DOWN_PASS);
-            cmd.Blit(_dualFilterDownRT2, _dualFilterDownRT3, _materialDualFilter, DUALFILTER_DOWN_PASS);
+            for (int i = 0; i < _rtc.DualFilterStep / 2 - 1; ++i)
+            {
+                Blitter.BlitCameraTexture(cmd, _rtc.DualFilterRTs[i], _rtc.DualFilterRTs[i + 1], _materialDualFilter, DUALFILTER_DOWN_PASS);
+            }
+            for (int i = _rtc.DualFilterStep / 2 - 1; i > 0; --i)
+            {
+                Blitter.BlitCameraTexture(cmd, _rtc.DualFilterRTs[i], _rtc.DualFilterRTs[i - 1], _materialDualFilter, DUALFILTER_UP_PASS);
+            }
 
-            //cmd.Blit(_dualFilterDownRT2, _dualFilterUpRT2, _materialDualFilter, DUALFILTER_UP_PASS);
+            //Blitter.BlitCameraTexture(cmd, _bloomBrightRT, _dualFilterDownRT, _materialDualFilter, DUALFILTER_DOWN_PASS);
+            //Blitter.BlitCameraTexture(cmd, _dualFilterDownRT, _dualFilterUpRT, _materialDualFilter, DUALFILTER_UP_PASS);
 
-            cmd.Blit(_dualFilterDownRT3, _dualFilterUpRT3, _materialDualFilter, DUALFILTER_UP_PASS);
-            cmd.Blit(_dualFilterUpRT3, _dualFilterUpRT2, _materialDualFilter, DUALFILTER_UP_PASS);
-            cmd.Blit(_dualFilterUpRT2, _dualFilterUpRT1, _materialDualFilter, DUALFILTER_UP_PASS);
-            cmd.Blit(_dualFilterUpRT1, _dualFilterUpRT, _materialDualFilter);
-            //cmd.Blit(_dualFilterUpRT1, _dualFilterUpRT, _materialDualFilter, DUALFILTER_UP_PASS);
+            cmd.SetGlobalTexture(_rtc._BloomNonBlurTex_Id, _rtc.BloomBrightRT);
+            cmd.SetGlobalTexture(_rtc._BloomBlurTex_Id, _rtc.DualFilterRTs[0]);
 
-            //cmd.Blit(_bloomBrightRT, _dualFilterDownRT, _materialDualFilter, DUALFILTER_DOWN_PASS);
-            //cmd.Blit(_dualFilterDownRT, _dualFilterUpRT, _materialDualFilter, DUALFILTER_UP_PASS);
-
-            cmd.SetGlobalTexture(_bloomBrightRT_Id, _bloomBrightRT);
-            cmd.SetGlobalTexture(_dualFilterUpRT_Id, _dualFilterUpRT);
-
-            cmd.Blit(_currentTarget, _destTarget, _materialBloom, BLOOM_COMBINE_PASS);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _cameraColorTargetHandle, _materialBloom, BLOOM_COMBINE_PASS);
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            var width = cameraTextureDescriptor.width;
-            var height = cameraTextureDescriptor.height;
-
-            _bloomBrightRT_Id = Shader.PropertyToID("_BloomNonBlurTex");
-
-            _dualFilterDownRT_Id = Shader.PropertyToID("_dualFilterDownRT");
-            _dualFilterDownRT_Id1 = Shader.PropertyToID("_dualFilterDownRT1");
-            _dualFilterDownRT_Id2 = Shader.PropertyToID("_dualFilterDownRT2");
-            _dualFilterDownRT_Id3 = Shader.PropertyToID("_dualFilterDownRT3");
-            _dualFilterUpRT_Id3 = Shader.PropertyToID("_BloomBlurTex3");
-            _dualFilterUpRT_Id2 = Shader.PropertyToID("_BloomBlurTex2");
-            _dualFilterUpRT_Id1 = Shader.PropertyToID("_BloomBlurTex1");
-            _dualFilterUpRT_Id = Shader.PropertyToID("_BloomBlurTex");
-
-
-            RenderTextureFormat tf = RenderTextureFormat.ARGB32;
-            
-            cmd.GetTemporaryRT(_bloomBrightRT_Id, width / 4, height / 4, 0, FilterMode.Bilinear, tf);
-
-            cmd.GetTemporaryRT(_dualFilterDownRT_Id, width / 8, height / 8, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterDownRT_Id1, width / 16, height / 16, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterDownRT_Id2, width / 32, height / 32, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterDownRT_Id3, width / 64, height / 64, 0, FilterMode.Bilinear, tf);
-
-            cmd.GetTemporaryRT(_dualFilterUpRT_Id3, width / 32, height / 32, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterUpRT_Id2, width / 16, height / 16, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterUpRT_Id1, width / 8, height / 8, 0, FilterMode.Bilinear, tf);
-            cmd.GetTemporaryRT(_dualFilterUpRT_Id, width / 4, height / 4, 0, FilterMode.Bilinear, tf);
-
-
-
-            //cmd.GetTemporaryRT(_bloomBrightRT_Id, width / 8, height / 8, 0, FilterMode.Point, RenderTextureFormat.ARGB32);
-            //cmd.GetTemporaryRT(_dualFilterDownRT_Id, width / 16, height / 16, 0, FilterMode.Point, RenderTextureFormat.ARGB32);
-            //cmd.GetTemporaryRT(_dualFilterUpRT_Id, width / 8, height / 8, 0, FilterMode.Bilinear, RenderTextureFormat.ARGB32);
-
-
-            _bloomBrightRT = new RenderTargetIdentifier(_bloomBrightRT_Id);
-            _dualFilterDownRT = new RenderTargetIdentifier(_dualFilterDownRT_Id);
-            _dualFilterDownRT1 = new RenderTargetIdentifier(_dualFilterDownRT_Id1);
-            _dualFilterDownRT2 = new RenderTargetIdentifier(_dualFilterDownRT_Id2);
-            _dualFilterDownRT3 = new RenderTargetIdentifier(_dualFilterDownRT_Id3);
-            _dualFilterUpRT3 = new RenderTargetIdentifier(_dualFilterUpRT_Id3);
-            _dualFilterUpRT2 = new RenderTargetIdentifier(_dualFilterUpRT_Id2);
-            _dualFilterUpRT1 = new RenderTargetIdentifier(_dualFilterUpRT_Id1);
-            _dualFilterUpRT = new RenderTargetIdentifier(_dualFilterUpRT_Id);
-
-
-            ConfigureTarget(_bloomBrightRT);
-            ConfigureTarget(_dualFilterDownRT);
-            ConfigureTarget(_dualFilterUpRT);
-            ConfigureTarget(_dualFilterDownRT1);
-            ConfigureTarget(_dualFilterUpRT1);
-            ConfigureTarget(_dualFilterDownRT2);
-            ConfigureTarget(_dualFilterUpRT2);
-            ConfigureTarget(_dualFilterDownRT3);
-            ConfigureTarget(_dualFilterUpRT3);
-        }
-
-        internal void Setup(RenderTargetIdentifier cameraColorTarget, RenderTargetHandle cameraHandle)
-        {
-            this._currentTarget = cameraColorTarget;
-            this._destination = cameraHandle;
-            this._destTarget = _destination.Identifier();
         }
 
         public override void FrameCleanup(CommandBuffer cmd)
@@ -173,20 +189,37 @@ public class Feature_BloomDualFilter : ScriptableRendererFeature
         }
     }
 
-    Pass_BloomDualFilter _pass;
+    private Pass_BloomDualFilter _pass;
     public Material MaterialBloom;
     public Material MaterialDualFilter;
+    public int DualFilterStep;
+
+    private RTCollection _rtCollection;
 
     public override void Create()
     {
-        _pass = new Pass_BloomDualFilter(MaterialBloom, MaterialDualFilter);
-        _pass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+        DualFilterStep = Math.Max(DualFilterStep, 0);
+
+        _rtCollection = new RTCollection(DualFilterStep);
+        _pass = new Pass_BloomDualFilter(_rtCollection, MaterialBloom, MaterialDualFilter);
+        _pass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        RenderTargetHandle cameraHandle = RenderTargetHandle.CameraTarget;
-        _pass.Setup(renderer.cameraColorTarget, cameraHandle);
-        renderer.EnqueuePass(_pass);
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _rtCollection.Setup(renderingData.cameraData.cameraTargetDescriptor);
+            renderer.EnqueuePass(_pass);
+        }
+    }
+
+    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
+            _pass.Setup(renderer.cameraColorTargetHandle);
+        }
     }
 }
