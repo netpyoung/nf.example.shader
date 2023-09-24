@@ -15,7 +15,7 @@ MonoBehaviour:
   m_Active: 1
   MaterialBloom: {fileID: 2100000, guid: bc26bc8b4574e4741a378091ce4548fa, type: 2}
   MaterialDualFilter: {fileID: 2100000, guid: d96f5d86746a9d9478b244390534441d, type: 2}
-  DualFilterStep: 11
+  DualFilterStep: 93
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

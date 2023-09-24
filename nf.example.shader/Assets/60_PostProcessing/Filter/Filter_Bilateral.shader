@@ -3,6 +3,7 @@
     Properties
     {
         [NoScaleOffset] _MainTex("texture", 2D) = "white" {}
+        _TexelScale("_TexelScale", Range(1, 10)) = 1
         _Sigma("_Sigma", Range(0.001, 2.0)) = 0.7
         [Toggle(IS_BLUR)]_IsBlur("Apply Blur?", Float) = 1
 
@@ -36,9 +37,10 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-            
+
             CBUFFER_START(UnityPerMaterial)
             float2 _MainTex_TexelSize;
+            half _TexelScale;
             half _Sigma;
             CBUFFER_END
 
@@ -73,15 +75,16 @@
             half4 frag(VStoFS IN) : SV_Target
             {
                 #if IS_BLUR
+                    half2 texel = _MainTex_TexelSize.xy * _TexelScale;
                     half3 accColor = half3(0.0, 0.0, 0.0);
                     half accWeight = 0;
                     for (int y = -1; y <= 1; ++y)
                     {
                         for (int x = -1; x <= 1; ++x)
                         {
-                            half2 uv = IN.uv + _MainTex_TexelSize.xy * half2(x, y);
+                            half2 uv = IN.uv + texel * half2(x, y);
                             half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).rgb;
-                            half weight = Gauss(length((IN.uv - uv) / _MainTex_TexelSize.xy), _Sigma);
+                            half weight = Gauss(length((IN.uv - uv) / texel), _Sigma);
                             accColor += mainTex * weight;
                             accWeight += weight;
                         }

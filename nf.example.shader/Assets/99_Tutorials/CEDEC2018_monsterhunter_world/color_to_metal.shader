@@ -82,8 +82,8 @@
 
             float ColorToMetal(float3 basecolor, float3 pickColor)
             {
-                float hueA = RGBtoHSV(pickColor.xyz).x;
-                float hueB = RGBtoHSV(basecolor.xyz).x;
+                float hueA = RGBtoHSV(basecolor).r;
+                float hueB = RGBtoHSV(pickColor).r;
                 if (hueA > 0.5)
                 {
                     hueA = 1 - hueA;
@@ -93,6 +93,7 @@
                     hueB = 1 - hueB;
                 }
                 float mask = abs(hueA - hueB);
+                //return mask;
                 mask = smoothstep(0.3, 0.7, mask);
                 return mask;
             }
@@ -100,10 +101,10 @@
             half4 frag(VStoFS IN) : SV_Target
             {
                 half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-                half3 color = ColorToMetal(mainTex, _PickColor);
-                return half4(color, 1);
+                float metal = ColorToMetal(mainTex, _PickColor);
+                return half4(metal.rrr, 1);
 
-                return half4(mainTex + color, 1);
+                return half4(mainTex + metal, 1);
             }
             ENDHLSL
         }
