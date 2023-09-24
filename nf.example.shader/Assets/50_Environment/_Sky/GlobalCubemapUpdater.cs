@@ -12,7 +12,8 @@ public class GlobalCubemapUpdater : MonoBehaviour
         {
             _cubemap = new Cubemap(128, GraphicsFormat.R32G32B32A32_SFloat, TextureCreationFlags.MipChain, 3);
         }
-        RenderSettings.customReflection = _cubemap;
+
+        RenderSettings.customReflectionTexture = _cubemap;
         _camera.RenderToCubemap(_cubemap);
     }
 }
