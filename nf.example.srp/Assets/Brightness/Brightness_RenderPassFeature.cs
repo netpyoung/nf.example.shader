@@ -6,7 +6,34 @@ using UnityEngine.Rendering.Universal;
 
 public class Brightness_RenderPassFeature : ScriptableRendererFeature
 {
+    [SerializeField]
+    Brightness_RenderPassSettings _settings = new Brightness_RenderPassSettings();
+    Brightness_RenderPass _pass;
 
+    public override void Create()
+    {
+        _pass = new Brightness_RenderPass(_settings);
+        _pass.renderPassEvent = RenderPassEvent.AfterRendering;
+    }
+
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            renderer.EnqueuePass(_pass);
+        }
+    }
+
+    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
+            _pass.Setup(renderer.cameraColorTargetHandle, renderingData.cameraData.cameraTargetDescriptor);
+        }
+    }
+    // ====================================================================
+    // ====================================================================
     [Serializable]
     public struct Brightness_RenderPassSettings
     {
@@ -14,70 +41,76 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         public float _Key;
     }
 
-    class Brightness_RenderPass : ScriptableRenderPass
+    // ====================================================================
+    // ====================================================================
+    class RTCollection : IDisposable
     {
-        Brightness_RenderPassSettings _settings;
-        readonly static int _TmpCurrMipmapRT = Shader.PropertyToID("_TmpCurrMipmapTex");
-        readonly static int _TmpCopyRT = Shader.PropertyToID("_TmpCopyTex");
-        readonly static int _LumaCurrTex = Shader.PropertyToID("_LumaCurrTex");
-        readonly static int _LumaAdaptPrevTex = Shader.PropertyToID("_LumaAdaptPrevTex");
-        readonly static int _LumaAdaptCurrTex = Shader.PropertyToID("_LumaAdaptCurrTex");
+        public readonly int _TmpCurrMipmapTex = Shader.PropertyToID("_TmpCurrMipmapTex");
+        public readonly int _TmpCopyTex = Shader.PropertyToID("_TmpCopyTex");
+        public readonly int _LumaCurrTex = Shader.PropertyToID("_LumaCurrTex");
+        public readonly int _LumaAdaptPrevTex = Shader.PropertyToID("_LumaAdaptPrevTex");
+        public readonly int _LumaAdaptCurrTex = Shader.PropertyToID("_LumaAdaptCurrTex");
 
-        const int PASS_Brightness_CalcuateLuma = 0;
-        const int PASS_Brightness_CopyLuma = 1;
-        const int PASS_Brightness_AdaptedFilter = 2;
-        const int PASS_EyeAdaptation_ToneMapping = 0;
+        private RTHandle _lumaPrevRT;
+        public RTHandle _LumaPrevRT => _lumaPrevRT;
+        private RTHandle _lumaCurrRT;
+        public RTHandle _LumaCurrRT => _lumaCurrRT;
+        private RTHandle _lumaAdaptCurrRT;
+        public RTHandle _LumaAdaptCurrRT => _lumaAdaptCurrRT;
+        private RTHandle _tmpCurrMipmapRT;
+        public RTHandle _TmpCurrMipmapRT => _tmpCurrMipmapRT;
+        private RTHandle _tmpCopyRT;
+        public RTHandle _TmpCopyRT => _tmpCopyRT;
 
-        RenderTargetIdentifier _source;
-        Material _mat_Brightness;
-        Material _mat_EyeAdaptation;
-        RenderTexture _LumaPrevRT;
-        RenderTexture _LumaCurrRT;
-        RenderTexture _LumaAdaptCurrRT;
-        RenderTextureDescriptor _TmpCurrMipmapRTD;
+        private bool _isInitialized;
 
-        public Brightness_RenderPass(Brightness_RenderPassSettings settings)
+        internal void Setup(RenderTextureDescriptor mainDesc)
         {
-            _settings = settings;
-            if (_mat_Brightness == null)
+            if (_isInitialized)
             {
-
-                _mat_Brightness = CoreUtils.CreateEngineMaterial("Hidden/Brightness");
+                return;
             }
-            if (_mat_EyeAdaptation == null)
-            {
-                _mat_EyeAdaptation = CoreUtils.CreateEngineMaterial("Hidden/EyeAdaptation");
-            }
+            _isInitialized = true;
 
-            _mat_Brightness.SetFloat("_AdaptionConstant", settings._AdaptionConstant);
-            _mat_EyeAdaptation.SetFloat("_Key", settings._Key);
+            RenderTextureDescriptor rtdesc = new RenderTextureDescriptor(1, 1, GraphicsFormat.R16G16_SFloat, 0, 0);
+            RenderingUtils.ReAllocateIfNeeded(ref _lumaPrevRT, rtdesc, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_lumaPrevRT");
+            RenderingUtils.ReAllocateIfNeeded(ref _lumaCurrRT, rtdesc, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_lumaCurrRT");
+            RenderingUtils.ReAllocateIfNeeded(ref _lumaAdaptCurrRT, rtdesc, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_lumaAdaptCurrRT");
 
-            _LumaPrevRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
+            int w = mainDesc.width;
+            int h = mainDesc.height;
+            w = ToPow2RoundUp(w / 2);
+            h = ToPow2RoundUp(h / 2);
+            RenderTextureDescriptor rtdesc2 = new RenderTextureDescriptor(w, h, GraphicsFormat.R16G16_SFloat, 0)
             {
-                useMipMap = false,
-                autoGenerateMips = false,
+                autoGenerateMips = true,
+                useMipMap = true
             };
-            _LumaCurrRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
-            {
-                useMipMap = false,
-                autoGenerateMips = false,
-            };
-            _LumaAdaptCurrRT = new RenderTexture(1, 1, 0, GraphicsFormat.R16G16_SFloat, 0)
-            {
-                useMipMap = false,
-                autoGenerateMips = false,
-            };
-            _LumaPrevRT.Create();
-            _LumaCurrRT.Create();
-            _LumaAdaptCurrRT.Create();
+            RenderingUtils.ReAllocateIfNeeded(ref _tmpCurrMipmapRT, rtdesc2, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_tmpCurrMipmapRT");
+
+            RenderTextureDescriptor rtdesc3 = new RenderTextureDescriptor(mainDesc.width, mainDesc.height, GraphicsFormat.R32G32B32A32_SFloat, 0);
+            RenderingUtils.ReAllocateIfNeeded(ref _tmpCopyRT, rtdesc3, FilterMode.Bilinear, TextureWrapMode.Clamp,
+                name: "_tmpCopyRT");
         }
 
-        ~Brightness_RenderPass()
+        public void Dispose()
         {
-            _LumaPrevRT.Release();
-            _LumaCurrRT.Release();
-            _LumaAdaptCurrRT.Release();
+            if (!_isInitialized)
+            {
+                return;
+            }
+
+            RTHandles.Release(_lumaPrevRT);
+            RTHandles.Release(_lumaCurrRT);
+            RTHandles.Release(_lumaAdaptCurrRT);
+            RTHandles.Release(_tmpCurrMipmapRT);
+            RTHandles.Release(_tmpCopyRT);
         }
+
 
         public static int ToPow2RoundUp(int x)
         {
@@ -97,72 +130,77 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
             x |= x >> 16;
             return x;
         }
+    }
 
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+    // ====================================================================
+    // ====================================================================
+    class Brightness_RenderPass : ScriptableRenderPass
+    {
+        private Brightness_RenderPassSettings _settings;
+
+        const int PASS_Brightness_CalcuateLuma = 0;
+        const int PASS_Brightness_CopyLuma = 1;
+        const int PASS_Brightness_AdaptedFilter = 2;
+        const int PASS_EyeAdaptation_ToneMapping = 0;
+
+        private RTHandle _cameraColorTargetHandle;
+        private Material _mat_Brightness;
+        private Material _mat_EyeAdaptation;
+        private RTCollection _rtc = new RTCollection();
+
+        public Brightness_RenderPass(Brightness_RenderPassSettings settings)
         {
-            _source = renderingData.cameraData.renderer.cameraColorTarget;
-
-            int w = renderingData.cameraData.camera.pixelWidth;
-            int h = renderingData.cameraData.camera.pixelHeight;
-            w = ToPow2RoundUp(w / 2);
-            h = ToPow2RoundUp(h / 2);
-            _TmpCurrMipmapRTD = new RenderTextureDescriptor(w, h, GraphicsFormat.R16G16_SFloat, 0)
+            _settings = settings;
+            if (_mat_Brightness == null)
             {
-                autoGenerateMips = true,
-                useMipMap = true
-            };
+                _mat_Brightness = CoreUtils.CreateEngineMaterial("Hidden/Brightness");
+            }
+            if (_mat_EyeAdaptation == null)
+            {
+                _mat_EyeAdaptation = CoreUtils.CreateEngineMaterial("Hidden/EyeAdaptation");
+            }
+            _mat_Brightness.SetFloat("_AdaptionConstant", settings._AdaptionConstant);
+            _mat_EyeAdaptation.SetFloat("_Key", settings._Key);
+        }
+
+        internal void Setup(RTHandle cameraColorTargetHandle, RenderTextureDescriptor rtd)
+        {
+            _rtc.Setup(rtd);
+            _cameraColorTargetHandle = cameraColorTargetHandle;
+        }
+
+        ~Brightness_RenderPass()
+        {
+            _rtc.Dispose();
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (renderingData.cameraData.isSceneViewCamera)
+            CameraData cameraData = renderingData.cameraData;
+            if (cameraData.camera.cameraType != CameraType.Game)
             {
                 return;
             }
-            
+
             CommandBuffer cmd = CommandBufferPool.Get(nameof(Brightness_RenderPass));
-            cmd.SetGlobalTexture(_LumaAdaptPrevTex, _LumaPrevRT);
-            cmd.SetGlobalTexture(_LumaCurrTex, _LumaCurrRT);
-            cmd.SetGlobalTexture(_LumaAdaptCurrTex, _LumaAdaptCurrRT);
+            cmd.SetGlobalTexture(_rtc._LumaAdaptPrevTex, _rtc._LumaPrevRT);
+            cmd.SetGlobalTexture(_rtc._LumaCurrTex, _rtc._LumaCurrRT);
+            cmd.SetGlobalTexture(_rtc._LumaAdaptCurrTex, _rtc._LumaAdaptCurrRT);
+            cmd.SetGlobalTexture(_rtc._TmpCurrMipmapTex, _rtc._TmpCurrMipmapRT);
 
-            cmd.GetTemporaryRT(_TmpCopyRT, renderingData.cameraData.cameraTargetDescriptor, FilterMode.Bilinear);
-            Blit(cmd, _source, _TmpCopyRT);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _rtc._TmpCopyRT);
 
-            cmd.GetTemporaryRT(_TmpCurrMipmapRT, _TmpCurrMipmapRTD, FilterMode.Bilinear);
-            cmd.SetGlobalTexture("_TmpCurrMipmapTex", _TmpCurrMipmapRT);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _rtc._TmpCurrMipmapRT, _mat_Brightness, PASS_Brightness_CalcuateLuma);
+            Blitter.BlitCameraTexture(cmd, _rtc._TmpCurrMipmapRT, _rtc._LumaCurrRT, _mat_Brightness, PASS_Brightness_CopyLuma);
 
-            Blit(cmd, _source, _TmpCurrMipmapRT, _mat_Brightness, PASS_Brightness_CalcuateLuma);
-            Blit(cmd, _TmpCurrMipmapRT, _LumaCurrRT, _mat_Brightness, PASS_Brightness_CopyLuma);
-            cmd.ReleaseTemporaryRT(_TmpCurrMipmapRT);
+            Blitter.BlitCameraTexture(cmd, _rtc._LumaCurrRT, _rtc._LumaAdaptCurrRT, _mat_Brightness, PASS_Brightness_AdaptedFilter);
+            Blitter.BlitCameraTexture(cmd, _rtc._TmpCopyRT, _cameraColorTargetHandle, _mat_EyeAdaptation, PASS_EyeAdaptation_ToneMapping);
 
-            Blit(cmd, _LumaCurrRT, _LumaAdaptCurrRT, _mat_Brightness, PASS_Brightness_AdaptedFilter);
-            Blit(cmd, _TmpCopyRT, _source, _mat_EyeAdaptation, PASS_EyeAdaptation_ToneMapping);
-            cmd.ReleaseTemporaryRT(_TmpCopyRT);
+            Blitter.BlitCameraTexture(cmd, _rtc._LumaAdaptCurrRT, _rtc._LumaPrevRT);
 
-            Blit(cmd, _LumaAdaptCurrRT, _LumaPrevRT);
             context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
             CommandBufferPool.Release(cmd);
         }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-        }
-    }
-
-    [SerializeField]
-    Brightness_RenderPassSettings _settings = new Brightness_RenderPassSettings();
-    Brightness_RenderPass _pass;
-
-    public override void Create()
-    {
-        _pass = new Brightness_RenderPass(_settings);
-        _pass.renderPassEvent = RenderPassEvent.AfterRendering;
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(_pass);
     }
 }
 

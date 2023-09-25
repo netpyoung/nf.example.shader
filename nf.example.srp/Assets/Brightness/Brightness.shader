@@ -1,53 +1,32 @@
 ﻿Shader "Hidden/Brightness"
 {
-    HLSLINCLUDE
-    ENDHLSL
-
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _AdaptionConstant("_AdaptionConstant", Float) = 1
     }
 
     SubShader
     {
+        Cull Back
+        ZWrite Off
+        ZTest Off
+
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
-            Cull Off
-            ZWrite Off
-            ZTest Always
+            NAME "BRIGHTNESS_LUMA"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
+                half3 mainTex = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
 
                 const half3 W = half3(0.2125, 0.7154, 0.0721);
                 half luma = dot(mainTex, W);
@@ -59,41 +38,12 @@
 
         Pass // 1
         {
-            Cull Off
-            ZWrite Off
-            ZTest Always
+            NAME "BRIGHTNESS_SPLIT"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                half2 mainTex = SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, IN.uv, 10).rg;
+                half2 mainTex = SAMPLE_TEXTURE2D_LOD(_BlitTexture, sampler_PointClamp, IN.texcoord, 10).rg;
                 return half4(mainTex.r, mainTex.g, 0, 0);
             }
             ENDHLSL
@@ -101,46 +51,22 @@
 
         Pass // 2
         {
-            Cull Off
-            ZWrite Off
-            ZTest Always
+            NAME "BRIGHTNESS_ADAPT"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_LumaAdaptPrevTex);   SAMPLER(sampler_LumaAdaptPrevTex);
+            TEXTURE2D(_LumaAdaptPrevTex);
+            SAMPLER(sampler_LumaAdaptPrevTex);
 
             float _AdaptionConstant;
-
-            struct APPtoVS
-            {
-                float4 positionOS   : POSITION;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                return OUT;
-            }
 
             float SensitivityOfRod(float y)
             {
                 return 0.04 / (0.04 + y);
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                half lumaAverageCurr = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, float2(0, 0)).r;
+                half lumaAverageCurr = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, float2(0, 0)).r;
                 half lumaAdaptPrev = SAMPLE_TEXTURE2D(_LumaAdaptPrevTex, sampler_LumaAdaptPrevTex, float2(0, 0)).r;
                 
                 half _DeltaTime = unity_DeltaTime.x;

@@ -1,57 +1,35 @@
 ﻿Shader "Hidden/EyeAdaptation"
 {
-
-    HLSLINCLUDE
-    ENDHLSL
-
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _Key("_Key", Float) = 1
     }
 
     SubShader
     {
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
-            Cull Off
-            ZWrite Off
-            ZTest Always
+            NAME "EYEADAPTATION"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            TEXTURE2D(_LumaAdaptCurrTex);
+            SAMPLER(sampler_LumaAdaptCurrTex);
 
-            TEXTURE2D(_MainTex);        SAMPLER(sampler_MainTex);
-            TEXTURE2D(_LumaAdaptCurrTex);   SAMPLER(sampler_LumaAdaptCurrTex);
-            TEXTURE2D(_LumaCurrTex);    SAMPLER(sampler_LumaCurrTex);
+            TEXTURE2D(_LumaCurrTex);
+            SAMPLER(sampler_LumaCurrTex);
             
             // for debug
             // TEXTURE2D(_TmpCurrMipmapTex);    SAMPLER(sampler_TmpCurrMipmapTex);
             
             float _Key;
-
-            struct APPtoVS
-            {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
 
             half AutoKey(half avgLum)
             {
@@ -64,13 +42,13 @@
                 return numerator / (1.0f + v);
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
                 // for debug
                 // return SAMPLE_TEXTURE2D_LOD(_TmpCurrMipmapTex, sampler_TmpCurrMipmapTex, IN.uv, 5).rrrr;
                 // return exp(SAMPLE_TEXTURE2D_LOD(_TmpCurrMipmapTex, sampler_TmpCurrMipmapTex, IN.uv, 5).gggg);
 
-                half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
+                half3 mainTex = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
                 half lumaAverageCurr = SAMPLE_TEXTURE2D(_LumaCurrTex, sampler_LumaCurrTex, float2(0, 0)).r;
                 half lumaAdaptCurr = SAMPLE_TEXTURE2D(_LumaAdaptCurrTex, sampler_LumaAdaptCurrTex, float2(0, 0)).r;
 
