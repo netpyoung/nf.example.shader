@@ -44,10 +44,12 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
         }
     }
 
+    // ====================================================================
+    // ====================================================================
     class RTCollection : IDisposable
     {
-        public int _BloomNonBlurTex_Id { get; private set; }
-        public int _BloomBlurTex_Id { get; private set; }
+        public readonly int _BloomNonBlurTex_Id = Shader.PropertyToID("_BloomNonBlurTex");
+        public readonly int _BloomBlurTex_Id = Shader.PropertyToID("_BloomBlurTex");
 
         public RTHandle BloomBrightRT => _bloomBrightRT;
         public RTHandle[] DualFilterRTs => _dualFilterRTs;
@@ -59,8 +61,6 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
 
         public RTCollection(int desireDualFilterStep)
         {
-            _BloomNonBlurTex_Id = Shader.PropertyToID("_BloomNonBlurTex");
-            _BloomBlurTex_Id = Shader.PropertyToID("_BloomBlurTex");
             DualFilterStep = desireDualFilterStep;
         }
 
@@ -123,6 +123,8 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
         }
     }
 
+    // ====================================================================
+    // ====================================================================
     class Pass_BloomDualFilter : ScriptableRenderPass
     {
         const string RENDER_TAG = nameof(Pass_BloomDualFilter);

@@ -2,6 +2,11 @@
 {
     // ref: [SIGGRAPH2015 - Bandwidth-efficient Graphics](https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_marius_2D00_notes.pdf)
 
+    Properties
+    {
+        _Offset ("_Offset", Float) = 1
+    }
+
     SubShader
     {
         Cull Back
@@ -15,6 +20,7 @@
         #pragma vertex Vert
         #pragma fragment frag
         float4 _BlitTexture_TexelSize;
+        float _Offset;
 
         ENDHLSL
 
@@ -27,6 +33,7 @@
             {
                 float2 res = _BlitTexture_TexelSize.xy;
                 float i = 0.5; // scatter
+                i *= _Offset;
 
                 half3 color;
                 color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb * 4.0;
@@ -50,7 +57,8 @@
             {
                 float2 res = _BlitTexture_TexelSize.xy;
                 float i = 0.5;
-                
+                i *= _Offset;
+
                 half3 color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord + float2(i * 2, 0) * res).rgb;
                 color += SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord + float2(-i * 2, 0) * res).rgb;
                 color += SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord + float2(0, i * 2) * res).rgb;
