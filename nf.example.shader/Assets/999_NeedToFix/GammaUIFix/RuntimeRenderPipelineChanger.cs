@@ -8,7 +8,6 @@ public class RuntimeRenderPipelineChanger : MonoBehaviour
     public Camera UICamera;
     public RenderPipelineAsset renderPipelineAsset;
 
-
     void Awake()
     {
         GraphicsSettings.renderPipelineAsset = renderPipelineAsset;

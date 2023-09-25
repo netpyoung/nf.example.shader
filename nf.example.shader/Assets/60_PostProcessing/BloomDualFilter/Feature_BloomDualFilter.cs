@@ -196,6 +196,11 @@ public class Feature_BloomDualFilter : ScriptableRendererFeature
 
     private RTCollection _rtCollection;
 
+    protected override void Dispose(bool disposing)
+    {
+        _rtCollection.Dispose();
+    }
+
     public override void Create()
     {
         DualFilterStep = Math.Max(DualFilterStep, 0);
