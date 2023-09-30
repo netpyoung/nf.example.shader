@@ -32,6 +32,7 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
             _pass.Setup(renderer.cameraColorTargetHandle);
         }
     }
+
     // ====================================================================
     // ====================================================================
     [Serializable]

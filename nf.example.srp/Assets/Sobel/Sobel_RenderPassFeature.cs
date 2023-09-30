@@ -87,8 +87,7 @@ public class Sobel_RenderPassFeature : ScriptableRendererFeature
 
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-                    RTHandles.Release(_SobelRT);
-
+            RTHandles.Release(_SobelRT);
         }
     }
 }

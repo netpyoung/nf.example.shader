@@ -99,11 +99,11 @@
 
             half4 frag(Varyings IN) : SV_Target
             {
-                half4 mainTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+                half4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
                 float ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.texcoord).r;
-                // mainTex *= (1 - ambientOcclusionTex);
-                mainTex *= ambientOcclusionTex;
-                return mainTex;
+                // blitTex *= (1 - ambientOcclusionTex);
+                blitTex *= ambientOcclusionTex;
+                return blitTex;
             }
             ENDHLSL
         }

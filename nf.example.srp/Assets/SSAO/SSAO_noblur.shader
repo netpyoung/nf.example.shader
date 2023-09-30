@@ -2,12 +2,25 @@
 {
     Properties
     {
-        [HideInInspector] _MainTex("UI Texture", 2D) = "white" {}
         _RandTex("_RandTex", 2D) = "white" {}
     }
 
     SubShader
     {
+        Cull Back
+        ZWrite Off
+        ZTest Off
+
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
             // [(X) SSAO (Screen Space Ambient Occlusion) 처리 기법(소스포함)](http://eppengine.com/zbxe/programmig/2982)
@@ -15,44 +28,11 @@
             
             NAME "PASS_SSAO_CALCUATE_OCULUSSION"
 
-            Cull Back
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-            TEXTURE2D(_RandTex);    SAMPLER(sampler_RandTex);
+            TEXTURE2D(_RandTex);
+            SAMPLER(sampler_RandTex);
     
             float4 _CameraDepthTexture_TexelSize;
-
-            struct APPtoVS
-            {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
 
             inline float2 Random(in float2 uv)
             {
@@ -114,10 +94,10 @@
                 return temp1;
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                float srcDepth = ReadDepth(IN.uv); // depth center
-                float2 random = Random(IN.uv).xy;
+                float srcDepth = ReadDepth(IN.texcoord); // depth center
+                float2 random = Random(IN.texcoord).xy;
                 float pw = _CameraDepthTexture_TexelSize.x * 0.5;
                 float ph = _CameraDepthTexture_TexelSize.y * 0.5;
 
@@ -127,15 +107,15 @@
                 for (int i = 0; i < 4; ++i)
                 {
                     // 4번 루프(for) - 8번 계산(CalculateAO)
-                    AO += CalculateAO(IN.uv, srcDepth, pw, ph);
-                    AO += CalculateAO(IN.uv, srcDepth, pw, -ph);
-                    AO += CalculateAO(IN.uv, srcDepth, -pw, ph);
-                    AO += CalculateAO(IN.uv, srcDepth, -pw, -ph);
+                    AO += CalculateAO(IN.texcoord, srcDepth, pw, ph);
+                    AO += CalculateAO(IN.texcoord, srcDepth, pw, -ph);
+                    AO += CalculateAO(IN.texcoord, srcDepth, -pw, ph);
+                    AO += CalculateAO(IN.texcoord, srcDepth, -pw, -ph);
 
-                    AO += CalculateAO(IN.uv, srcDepth, pw * 1.2, 0);
-                    AO += CalculateAO(IN.uv, srcDepth, -pw * 1.2, 0);
-                    AO += CalculateAO(IN.uv, srcDepth, 0, ph * 1.2);
-                    AO += CalculateAO(IN.uv, srcDepth, 0, -ph * 1.2);
+                    AO += CalculateAO(IN.texcoord, srcDepth, pw * 1.2, 0);
+                    AO += CalculateAO(IN.texcoord, srcDepth, -pw * 1.2, 0);
+                    AO += CalculateAO(IN.texcoord, srcDepth, 0, ph * 1.2);
+                    AO += CalculateAO(IN.texcoord, srcDepth, 0, -ph * 1.2);
 
                     //sample jittering:
                     pw += random.x * 0.0007;
@@ -160,49 +140,17 @@
         {
             NAME "PASS_SSAO_COMBINE"
 
-            Cull Off
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
+            TEXTURE2D(_AmbientOcclusionTex);
+            SAMPLER(sampler_AmbientOcclusionTex);
 
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_AmbientOcclusionTex);       SAMPLER(sampler_AmbientOcclusionTex);
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                float ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.uv).r;
-                // mainTex *= (1 - ambientOcclusionTex);
-                mainTex *= ambientOcclusionTex;
-                return mainTex;
+                half4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+                float ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.texcoord).r;
+                // blitTex *= (1 - ambientOcclusionTex);
+                blitTex *= ambientOcclusionTex;
+                return blitTex;
             }
             ENDHLSL
         }
