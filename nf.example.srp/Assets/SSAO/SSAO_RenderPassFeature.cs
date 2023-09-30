@@ -15,6 +15,35 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         AO_FINAL_WITH_BLUR,
     }
 
+    [SerializeField]
+    SSAO_RenderPassSettings _settings = null;
+    SSAO_RenderPass _pass;
+
+    public override void Create()
+    {
+        _pass = new SSAO_RenderPass(_settings);
+        _pass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+    }
+
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            renderer.EnqueuePass(_pass);
+        }
+    }
+
+    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
+            _pass.Setup(renderer.cameraColorTargetHandle);
+        }
+    }
+
+    // ====================================================================
+    // ====================================================================
     [Serializable]
     public class SSAO_RenderPassSettings
     {
@@ -23,27 +52,27 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         public E_DEBUG DebugMode;
     }
 
+    // ====================================================================
+    // ====================================================================
     class SSAO_RenderPass : ScriptableRenderPass
     {
         const string RENDER_TAG = nameof(SSAO_RenderPass);
-        
+
         const int PASS_SSAO_CALCUATE_OCULUSSION = 0;
         const int PASS_SSAO_COMBINE = 1;
 
         const int PASS_DUALFILTER_DOWN = 0;
         const int PASS_DUALFILTER_UP = 1;
 
-        readonly static int _TmpCopyTex = Shader.PropertyToID("_TmpCopyTex");
-        readonly static int _AmbientOcclusionTex = Shader.PropertyToID("_AmbientOcclusionTex");
-        readonly static int[] _DualFilterTexs = new int[2]{
-            Shader.PropertyToID("_DualFilterTex0"),
-            Shader.PropertyToID("_DualFilterTex1"),
-        };
+        private readonly int _AmbientOcclusionTex = Shader.PropertyToID("_AmbientOcclusionTex");
+        private RTHandle _TmpCopyRT;
+        private RTHandle _AmbientOcclusionRT;
+        private RTHandle[] _DualFilterRTs = new RTHandle[2];
 
         SSAO_RenderPassSettings _settings;
         Material _materialAmbientOcclusion;
         Material _materialDualFilter;
-        RenderTargetIdentifier _source;
+        private RTHandle _cameraColorTargetHandle;
 
 
         public SSAO_RenderPass(SSAO_RenderPassSettings settings)
@@ -55,6 +84,12 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             _materialDualFilter = settings.MaterialDualFilter;
         }
 
+
+        internal void Setup(RTHandle cameraColorTargetHandle)
+        {
+            _cameraColorTargetHandle = cameraColorTargetHandle;
+        }
+
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
             ConfigureInput(ScriptableRenderPassInput.Normal);
@@ -62,22 +97,25 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            this._source = renderingData.cameraData.renderer.cameraColorTarget;
+            CameraData cameraData = renderingData.cameraData;
+            Camera camera = renderingData.cameraData.camera;
+            int width = camera.pixelWidth;
+            int height = camera.pixelHeight;
+            RenderTextureDescriptor rtd1 = new RenderTextureDescriptor(width, height, GraphicsFormat.R32G32B32A32_SFloat, 0);
 
-            var description = renderingData.cameraData.cameraTargetDescriptor;
-            var width = description.width;
-            var height = description.height;
-
-            cmd.GetTemporaryRT(_TmpCopyTex, description);
+            RenderingUtils.ReAllocateIfNeeded(ref _TmpCopyRT, rtd1);
             // cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
-            cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
+            RenderTextureDescriptor rtd2 = new RenderTextureDescriptor(width / 4, height / 4, GraphicsFormat.R16G16B16A16_SFloat, 0);
+            RenderingUtils.ReAllocateIfNeeded(ref _AmbientOcclusionRT, rtd1, FilterMode.Bilinear);
+
 
             int dualFilterW = width / 8;
             int dualFilterH = height / 8;
-            for (int i = 0; i < _DualFilterTexs.Length; ++i)
+            RenderTextureDescriptor rtd3 = new RenderTextureDescriptor(dualFilterW, dualFilterH, GraphicsFormat.R16G16B16A16_SFloat, 0);
+            for (int i = 0; i < _DualFilterRTs.Length; ++i)
             {
                 // cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
-                cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
+                RenderingUtils.ReAllocateIfNeeded(ref _DualFilterRTs[i], rtd3, FilterMode.Bilinear);
                 dualFilterW /= 2;
                 dualFilterH /= 2;
             }
@@ -85,11 +123,11 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
 
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            cmd.ReleaseTemporaryRT(_AmbientOcclusionTex);
-            cmd.ReleaseTemporaryRT(_TmpCopyTex);
-            for (int i = 0; i < _DualFilterTexs.Length; ++i)
+            RTHandles.Release(_AmbientOcclusionRT);
+            RTHandles.Release(_TmpCopyRT);
+            for (int i = 0; i < _DualFilterRTs.Length; ++i)
             {
-                cmd.ReleaseTemporaryRT(_DualFilterTexs[i]);
+                RTHandles.Release(_DualFilterRTs[i]);
             }
         }
 
@@ -106,59 +144,45 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             }
 
             CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _TmpCopyRT);
 
-            cmd.CopyTexture(_source, _TmpCopyTex);
-            cmd.Blit(_source, _AmbientOcclusionTex, _materialAmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _AmbientOcclusionRT, _materialAmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
+            cmd.SetGlobalTexture(_AmbientOcclusionTex, _AmbientOcclusionRT);
 
             if (_settings.DebugMode == E_DEBUG.AO_ONLY)
             {
-                cmd.Blit(_AmbientOcclusionTex, _source);
+                Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _cameraColorTargetHandle);
             }
             else if (_settings.DebugMode == E_DEBUG.AO_BLUR_ONLY || _settings.DebugMode == E_DEBUG.AO_FINAL_WITH_BLUR)
             {
 
-                cmd.Blit(_AmbientOcclusionTex, _DualFilterTexs[0], _materialDualFilter, PASS_DUALFILTER_DOWN);
-                for (int i = 0; i < _DualFilterTexs.Length - 1; ++i)
+                Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _DualFilterRTs[0], _materialDualFilter, PASS_DUALFILTER_DOWN);
+                for (int i = 0; i < _DualFilterRTs.Length - 1; ++i)
                 {
-                    cmd.Blit(_DualFilterTexs[i], _DualFilterTexs[i + 1], _materialDualFilter, PASS_DUALFILTER_DOWN);
+                    Blitter.BlitCameraTexture(cmd, _DualFilterRTs[i], _DualFilterRTs[i + 1], _materialDualFilter, PASS_DUALFILTER_DOWN);
                 }
-                for (int i = _DualFilterTexs.Length - 1; i > 0; --i)
+                for (int i = _DualFilterRTs.Length - 1; i > 0; --i)
                 {
-                    cmd.Blit(_DualFilterTexs[i], _DualFilterTexs[i - 1], _materialDualFilter, PASS_DUALFILTER_UP);
+                    Blitter.BlitCameraTexture(cmd, _DualFilterRTs[i], _DualFilterRTs[i - 1], _materialDualFilter, PASS_DUALFILTER_UP);
                 }
-                cmd.Blit(_DualFilterTexs[0], _AmbientOcclusionTex, _materialDualFilter, PASS_DUALFILTER_UP);
+                Blitter.BlitCameraTexture(cmd, _DualFilterRTs[0], _AmbientOcclusionRT, _materialDualFilter, PASS_DUALFILTER_UP);
 
                 if (_settings.DebugMode == E_DEBUG.AO_BLUR_ONLY)
                 {
-                    cmd.Blit(_AmbientOcclusionTex, _source);
+                    Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _cameraColorTargetHandle);
                 }
                 else
                 {
-                    cmd.Blit(_TmpCopyTex, _source, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
+                    Blitter.BlitCameraTexture(cmd, _TmpCopyRT, _cameraColorTargetHandle, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
                 }
             }
             else if (_settings.DebugMode == E_DEBUG.AO_FINAL_WITHOUT_BLUR)
             {
-                cmd.Blit(_TmpCopyTex, _source, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
+                Blitter.BlitCameraTexture(cmd, _TmpCopyRT, _cameraColorTargetHandle, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
             }
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
-    }
-
-    [SerializeField]
-    SSAO_RenderPassSettings _settings = null;
-    SSAO_RenderPass _pass;
-    
-    public override void Create()
-    {
-        _pass = new SSAO_RenderPass(_settings);
-        _pass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(_pass);
     }
 }
