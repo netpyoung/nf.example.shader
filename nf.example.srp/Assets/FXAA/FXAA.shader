@@ -6,22 +6,8 @@
     // - http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
     //   - 번역 : https://scahp.tistory.com/68
 
-    HLSLINCLUDE
-    inline float FxaaLuma(float3 rgb)
-    {
-        return rgb.g * (0.587 / 0.299) + rgb.r;
-    }
-
-    inline float Luma(float4 rgba)
-    {
-        return rgba.a;
-    }
-    ENDHLSL
-
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-
         // Trims the algorithm from processing darks.
         //   0.0833 - upper limit (default, the start of visible unfiltered edges)
         //   0.0625 - high quality (faster)
@@ -51,43 +37,33 @@
 
     SubShader
     {
+        Cull Back
+        ZWrite Off
+        ZTest Off
+
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
             NAME "PASS_FXAA_LUMINANCE_CONVERSION"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-
-            struct APPtoVS
+            inline float FxaaLuma(float3 rgb)
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
+                return rgb.g * (0.587 / 0.299) + rgb.r;
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                mainTex.a = FxaaLuma(saturate(mainTex.rgb));
-                return mainTex;
+                float4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+                blitTex.a = FxaaLuma(saturate(blitTex.rgb));
+                return blitTex;
             }
             ENDHLSL
         }
@@ -97,46 +73,24 @@
             NAME "PASS_FXAA_APPLY"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-            
-            float4 _MainTex_TexelSize;
+            float4 _BlitTexture_TexelSize;
             float _ContrastThreshold;
             float _RelativeThreshold;
             float _SubpixelBlending;
 
-            struct APPtoVS
+            inline float Luma(float4 rgba)
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
+                return rgba.a;
             }
-            
+
             float SampleLuminance(float2 uv)
             {
-                return Luma(SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, uv, 0));
+                return Luma(SAMPLE_TEXTURE2D_LOD(_BlitTexture, sampler_PointClamp, uv, 0));
             }
 
             float SampleLuminance(float2 uv, float2 uvOffset)
             {
-                return Luma(SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, uv + _MainTex_TexelSize.xy * uvOffset, 0));
+                return Luma(SAMPLE_TEXTURE2D_LOD(_BlitTexture, sampler_PointClamp, uv + _BlitTexture_TexelSize.xy * uvOffset, 0));
             }
 
             struct LuminanceData
@@ -204,7 +158,7 @@
                 float nGradient = abs(nLuminance - l.c);
 
                 EdgeData e;
-                e.pixelStep = isHorizontal ? _MainTex_TexelSize.y : _MainTex_TexelSize.x;
+                e.pixelStep = isHorizontal ? _BlitTexture_TexelSize.y : _BlitTexture_TexelSize.x;
                 if (pGradient < nGradient)
                 {
                     e.pixelStep = -e.pixelStep;
@@ -244,12 +198,12 @@
                 if (isHorizontal)
                 {
                     uvEdge.y += e.pixelStep * 0.5;
-                    edgeStep.x = _MainTex_TexelSize.x;
+                    edgeStep.x = _BlitTexture_TexelSize.x;
                 }
                 else
                 {
                     uvEdge.x += e.pixelStep * 0.5;
-                    edgeStep.y = _MainTex_TexelSize.y;
+                    edgeStep.y = _BlitTexture_TexelSize.y;
                 }
 
                 float2 puv = uvEdge + edgeStep * edgeSteps[0];
@@ -303,7 +257,6 @@
                 {
                     return 0;
                 }
-
                 return 0.5 - shortestDistance / (pDistance + nDistance);
             }
 
@@ -322,33 +275,37 @@
                 return blendFactor * blendFactor * subpixelBlending;
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                
+                float4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+
                 // Local Contrast Check
                 LuminanceData l = (LuminanceData) 0;
-                l.c = Luma(mainTex);
-                FillDirectionalLuminance(l, IN.uv);
+                l.c = Luma(blitTex);
+
+                FillDirectionalLuminance(l, IN.texcoord);
                 FillContrastLuminance(l);
                 if (IsFailLocalContrastCheck(l, _ContrastThreshold, _RelativeThreshold))
                 {
-                    return half4(mainTex.rgb, 1);
+                    return half4(blitTex.rgb, 1);
                 }
 
                 // Vertical/Horizontal Edge Test
-                FillDiagonalLuminance(l, IN.uv);
+                FillDiagonalLuminance(l, IN.texcoord);
                 bool isHorizontal = IsHorizontalEdge(l);
 
                 // End-of-edge Search
                 EdgeData e = GetEdgeData(l, isHorizontal);
 
                 // Blending
-                float edgeBlend = GetEdgeBlend(l, e, IN.uv, isHorizontal);
+                float edgeBlend = GetEdgeBlend(l, e, IN.texcoord, isHorizontal);
                 float pixelBlend = GetPixelBlend(l, _SubpixelBlending);
                 float finalBlend = max(pixelBlend, edgeBlend);
+                // return edgeBlend;
+                // return pixelBlend;
+                // return finalBlend;
                 
-                float2 uv = IN.uv;
+                float2 uv = IN.texcoord;
                 if (isHorizontal)
                 {
                     uv.y += e.pixelStep * finalBlend;
@@ -357,7 +314,10 @@
                 {
                     uv.x += e.pixelStep * finalBlend;;
                 }
-                return SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, uv, 0);
+                // return finalBlend;
+                // return e.pixelStep;
+                float4 tex = SAMPLE_TEXTURE2D_LOD(_BlitTexture, sampler_PointClamp, uv, 0);
+                return tex;
             }
             ENDHLSL
         }
