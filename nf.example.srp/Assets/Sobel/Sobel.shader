@@ -1,30 +1,31 @@
 ﻿Shader "Hidden/Sobel"
 {
-    HLSLINCLUDE
-    ENDHLSL
-
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _LineThickness("_LineThickness", Range(0.0005, 0.0025)) = 0.002
     }
 
     SubShader
     {
+        Cull Back
+        ZWrite Off
+        ZTest Off
+
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
-            Cull Off
-            ZWrite Off
-            ZTest Always
+            NAME "SOBEL"
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-
             CBUFFER_START(UnityPerMaterial)
             float _LineThickness;
             CBUFFER_END
@@ -95,11 +96,11 @@
                 return G;
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                float s = pow(1 - saturate(Sobel(IN.uv, _LineThickness)), 1);
-                half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                return mainTex * s;
+                float s = pow(1 - saturate(Sobel(IN.texcoord, _LineThickness)), 1);
+                half4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+                return blitTex * s;
             }
             ENDHLSL
         }
