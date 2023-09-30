@@ -1,11 +1,39 @@
 using System;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 public class Uber_RenderPassFeature : ScriptableRendererFeature
 {
+    [SerializeField]
+    Uber_RenderPassSettings _settings = null;
+    Uber_RenderPass _pass;
 
+    public override void Create()
+    {
+        _pass = new Uber_RenderPass(_settings);
+        _pass.renderPassEvent = RenderPassEvent.AfterRendering;
+    }
+
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            renderer.EnqueuePass(_pass);
+        }
+    }
+
+    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    {
+        if (renderingData.cameraData.cameraType == CameraType.Game)
+        {
+            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
+            _pass.Setup(renderer.cameraColorTargetHandle);
+        }
+    }
+    // ====================================================================
+    // ====================================================================
     [Serializable]
     public class Uber_RenderPassSettings
     {
@@ -13,14 +41,18 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
         public bool _UBER_B;
     }
 
+    // ====================================================================
+    // ====================================================================
     class Uber_RenderPass : ScriptableRenderPass
     {
         Uber_RenderPassSettings _settings;
-        readonly static int _TempRT = Shader.PropertyToID("_TempRT");
         const int PASS_SobelFilter = 0;
 
         RenderTargetIdentifier _colorBuffer;
         Material _mat_uber;
+        private RTHandle _TempRT;
+        private RTHandle _cameraColorTargetHandle;
+
         public Uber_RenderPass(Uber_RenderPassSettings settings)
         {
             _settings = settings;
@@ -48,40 +80,34 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
             }
         }
 
+        internal void Setup(RTHandle cameraColorTargetHandle)
+        {
+            _cameraColorTargetHandle = cameraColorTargetHandle;
+        }
+
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            _colorBuffer = renderingData.cameraData.renderer.cameraColorTarget;
-            cmd.GetTemporaryRT(_TempRT, renderingData.cameraData.cameraTargetDescriptor);
+            CameraData cameraData = renderingData.cameraData;
+            Camera camera = cameraData.camera;
+            int w = camera.pixelWidth;
+            int h = camera.pixelHeight;
+            RenderTextureDescriptor rtd = new RenderTextureDescriptor(w, h, GraphicsFormat.R32G32B32A32_SFloat, 0);
+            RenderingUtils.ReAllocateIfNeeded(ref _TempRT, rtd, FilterMode.Bilinear);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             CommandBuffer cmd = CommandBufferPool.Get(nameof(Uber_RenderPass));
-            Blit(cmd, _colorBuffer, _TempRT, _mat_uber, PASS_SobelFilter);
-            Blit(cmd, _TempRT, _colorBuffer);
+            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _TempRT, _mat_uber, PASS_SobelFilter);
+            Blitter.BlitCameraTexture(cmd, _TempRT, _cameraColorTargetHandle);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
 
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            cmd.ReleaseTemporaryRT(_TempRT);
+            RTHandles.Release(_TempRT);
         }
-    }
-
-    [SerializeField]
-    Uber_RenderPassSettings _settings = null;
-    Uber_RenderPass _pass;
-
-    public override void Create()
-    {
-        _pass = new Uber_RenderPass(_settings);
-        _pass.renderPassEvent = RenderPassEvent.AfterRendering;
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(_pass);
     }
 }
 
