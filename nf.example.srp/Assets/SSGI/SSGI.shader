@@ -2,12 +2,21 @@
 {
     Properties
     {
-        [HideInInspector] _MainTex("UI Texture", 2D) = "white" {}
         _RandTex("_RandTex", 2D) = "white" {}
     }
 
     SubShader
     {
+        HLSLINCLUDE
+        #pragma target 3.5
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
+        #pragma vertex Vert
+        #pragma fragment frag
+        ENDHLSL
+
         Pass // 0
         {
             // [(X) SSGI 관련 정리 (소스 포함)](http://eppengine.com/zbxe/programmig/2985)
@@ -15,44 +24,12 @@
             
             NAME "PASS_SSGI_CALCUATE_OCULUSSION"
 
-            Cull Back
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-
-            TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
-            TEXTURE2D(_RandTex);    SAMPLER(sampler_RandTex);
+            TEXTURE2D(_RandTex);
+            SAMPLER(sampler_RandTex);
     
-            float4 _MainTex_TexelSize;
+            float4 _blitTex_TexelSize;
 
-            struct APPtoVS
-            {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
 
             inline float2 Random(in float2 uv)
             {
@@ -68,7 +45,8 @@
 
             float3 ReadColor(in float2 uv)
             {
-                return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv).rgb;
+                half3 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, uv).rgb;
+                return blitTex;
             }
 
             float CompareDepth(in float depth1, in float depth2)
@@ -105,12 +83,12 @@
                 return temp * bleed;
             }
 
-            half4 frag(VStoFS IN) : SV_Target
+            half4 frag(Varyings IN) : SV_Target
             {
-                float srcDepth = ReadDepth(IN.uv);
-                float2 random = Random(IN.uv).xy;
-                float pw = _MainTex_TexelSize.x * 0.5;
-                float ph = _MainTex_TexelSize.y * 0.5;
+                float srcDepth = ReadDepth(IN.texcoord);
+                float2 random = Random(IN.texcoord).xy;
+                float pw = _blitTex_TexelSize.x * 0.5;
+                float ph = _blitTex_TexelSize.y * 0.5;
 
                 float AO = 0;
                 float3 GI = 0;
@@ -118,10 +96,10 @@
                 for (int i = 0; i < 8; ++i)
                 {
                     // 8번 루프(for) - 4번 계산(CalculateGI)
-                    GI += CalculateGI(IN.uv, srcDepth, pw, ph, AO);
-                    GI += CalculateGI(IN.uv, srcDepth, pw, -ph, AO);
-                    GI += CalculateGI(IN.uv, srcDepth, -pw, ph, AO);
-                    GI += CalculateGI(IN.uv, srcDepth, -pw, -ph, AO);
+                    GI += CalculateGI(IN.texcoord, srcDepth, pw, ph, AO);
+                    GI += CalculateGI(IN.texcoord, srcDepth, pw, -ph, AO);
+                    GI += CalculateGI(IN.texcoord, srcDepth, -pw, ph, AO);
+                    GI += CalculateGI(IN.texcoord, srcDepth, -pw, -ph, AO);
 
                     //sample jittering:
                     pw += random.x * 0.0005;
@@ -138,8 +116,6 @@
                 GI /= SAMPLE_COUNT;
                 GI *= 0.6;
 
-                float3 mainTex = ReadColor(IN.uv);
-
                 return half4(GI, AO);
             }
             ENDHLSL
@@ -149,49 +125,17 @@
         {
             NAME "PASS_SSGI_COMBINE"
 
-            Cull Off
-            ZWrite Off
-            ZTest Off
-
             HLSLPROGRAM
-            #pragma target 3.5
+            TEXTURE2D(_AmbientOcclusionTex);
+            SAMPLER(sampler_AmbientOcclusionTex);
 
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_AmbientOcclusionTex);       SAMPLER(sampler_AmbientOcclusionTex);
-
-            struct APPtoVS
+            half4 frag(Varyings IN) : SV_Target
             {
-                float4 positionOS   : POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            struct VStoFS
-            {
-                float4 positionCS   : SV_POSITION;
-                float2 uv           : TEXCOORD0;
-            };
-
-            VStoFS vert(APPtoVS IN)
-            {
-                VStoFS OUT;
-                ZERO_INITIALIZE(VStoFS, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
-                return OUT;
-            }
-
-            half4 frag(VStoFS IN) : SV_Target
-            {
-                half3 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).rgb;
-                float4 ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.uv).rgba;
-                mainTex *= ambientOcclusionTex.a;
-                mainTex += ambientOcclusionTex.rgb;
-                return half4(mainTex, 1);
+                half3 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
+                float4 ambientOcclusionTex = SAMPLE_TEXTURE2D(_AmbientOcclusionTex, sampler_AmbientOcclusionTex, IN.texcoord).rgba;
+                blitTex *= ambientOcclusionTex.a;
+                blitTex += ambientOcclusionTex.rgb;
+                return half4(blitTex, 1);
             }
             ENDHLSL
         }
