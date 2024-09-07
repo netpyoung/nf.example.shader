@@ -23,7 +23,7 @@
             NAME "CROSSFILTER_GAUSSIAN_VERT"
 
             HLSLPROGRAM
-            float4 _BlitTexture_TexelSize;
+            //float4 _BlitTexture_TexelSize;
             const static float weight[3] = { 0.38774, 0.24477, 0.06136 };
             // const static float weight[5] = { 227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
 
@@ -46,7 +46,7 @@
             NAME "CROSSFILTER_GAUSSIAN_HORIZ"
 
             HLSLPROGRAM
-            float4 _BlitTexture_TexelSize;
+            //float4 _BlitTexture_TexelSize;
 
             const static float weight[3] = { 0.38774, 0.24477, 0.06136 };
             // const static float weight[5] = { 227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };

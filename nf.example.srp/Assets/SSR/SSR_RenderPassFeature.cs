@@ -75,7 +75,7 @@ public class SSR_RenderPassFeature : ScriptableRendererFeature
         {
             ref CameraData cameraData = ref renderingData.cameraData;
 
-            this._source = cameraData.renderer.cameraColorTarget;
+            this._source = cameraData.renderer.cameraColorTargetHandle;
 
             var description = cameraData.cameraTargetDescriptor;
             var width = description.width;

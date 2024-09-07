@@ -7,6 +7,6 @@ public class RuntimeRenderPipelineChanger : MonoBehaviour
 
     void Awake()
     {
-        GraphicsSettings.renderPipelineAsset = renderPipelineAsset;
+        GraphicsSettings.defaultRenderPipeline = renderPipelineAsset;
     }
 }

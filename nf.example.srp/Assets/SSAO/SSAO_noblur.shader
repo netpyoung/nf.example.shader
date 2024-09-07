@@ -32,7 +32,7 @@
             TEXTURE2D(_RandTex);
             SAMPLER(sampler_RandTex);
     
-            float4 _CameraDepthTexture_TexelSize;
+            //float4 _CameraDepthTexture_TexelSize;
 
             inline float2 Random(in float2 uv)
             {

@@ -19,7 +19,7 @@
         #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
         #pragma vertex Vert
         #pragma fragment frag
-        float4 _BlitTexture_TexelSize;
+        //float4 _BlitTexture_TexelSize;
         float _Offset;
 
         ENDHLSL

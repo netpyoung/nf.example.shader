@@ -67,7 +67,7 @@ public class LightShaft_RenderPassFeature : ScriptableRendererFeature
             int w = cameraData.camera.scaledPixelWidth / 4;
             int h = cameraData.camera.scaledPixelHeight / 4;
 
-            _colorBuffer = cameraData.renderer.cameraColorTarget;
+            _colorBuffer = cameraData.renderer.cameraColorTargetHandle;
             _materia_LightShaft.SetVector("_CameraPositionWS", camera.transform.position);
             _materia_LightShaft.SetMatrix("_Matrix_CameraFrustum", FrustumCorners(camera));
 

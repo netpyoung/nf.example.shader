@@ -73,7 +73,7 @@
             NAME "PASS_FXAA_APPLY"
 
             HLSLPROGRAM
-            float4 _BlitTexture_TexelSize;
+            //float4 _BlitTexture_TexelSize;
             float _ContrastThreshold;
             float _RelativeThreshold;
             float _SubpixelBlending;
