@@ -10,7 +10,7 @@ public class RuntimeRenderPipelineChanger : MonoBehaviour
 
     void Awake()
     {
-        GraphicsSettings.renderPipelineAsset = renderPipelineAsset;
+        GraphicsSettings.defaultRenderPipeline = renderPipelineAsset;
         UICamera.GetComponent<UniversalAdditionalCameraData>().SetRenderer(1);
         MainCamera.GetComponent<UniversalAdditionalCameraData>().SetRenderer(0);
     }
