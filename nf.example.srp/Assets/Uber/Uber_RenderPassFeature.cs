@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule.Util;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class Uber_RenderPassFeature : ScriptableRendererFeature
@@ -29,7 +31,6 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
         if (renderingData.cameraData.cameraType == CameraType.Game)
         {
             _pass.ConfigureInput(ScriptableRenderPassInput.Color);
-            _pass.Setup(renderer.cameraColorTargetHandle);
         }
     }
 
@@ -51,8 +52,6 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
 
         RenderTargetIdentifier _colorBuffer;
         Material _mat_uber;
-        private RTHandle _TempRT;
-        private RTHandle _cameraColorTargetHandle;
 
         public Uber_RenderPass(Uber_RenderPassSettings settings)
         {
@@ -81,33 +80,20 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
             }
         }
 
-        internal void Setup(RTHandle cameraColorTargetHandle)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            _cameraColorTargetHandle = cameraColorTargetHandle;
-        }
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        {
-            CameraData cameraData = renderingData.cameraData;
-            Camera camera = cameraData.camera;
-            int w = camera.pixelWidth;
-            int h = camera.pixelHeight;
-            RenderTextureDescriptor rtd = new RenderTextureDescriptor(w, h, GraphicsFormat.R32G32B32A32_SFloat, 0);
-            RenderingUtils.ReAllocateIfNeeded(ref _TempRT, rtd, FilterMode.Bilinear);
-        }
+            TextureHandle source = resourceData.activeColorTexture;
+            TextureDesc destinationDesc = renderGraph.GetTextureDesc(source);
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            CommandBuffer cmd = CommandBufferPool.Get(nameof(Uber_RenderPass));
-            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _TempRT, _mat_uber, PASS_SobelFilter);
-            Blitter.BlitCameraTexture(cmd, _TempRT, _cameraColorTargetHandle);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
-        }
+            destinationDesc.name = $"CameraColor-{passName}";
+            destinationDesc.clearBuffer = false;
 
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            RTHandles.Release(_TempRT);
+            TextureHandle destination = renderGraph.CreateTexture(destinationDesc);
+            RenderGraphUtils.BlitMaterialParameters para = new RenderGraphUtils.BlitMaterialParameters(source, destination, _mat_uber, 0);
+            renderGraph.AddBlitPass(para, passName: passName);
+            resourceData.cameraColor = destination;
         }
     }
 }
