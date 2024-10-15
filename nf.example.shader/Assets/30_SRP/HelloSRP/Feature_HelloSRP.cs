@@ -1,51 +1,53 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
 
-public class Feature_HelloSRP : ScriptableRendererFeature
+public sealed class Feature_HelloSRP : ScriptableRendererFeature
 {
-    class Pass_HelloSRP : ScriptableRenderPass
+    sealed class Pass_HelloSRP : ScriptableRenderPass
     {
-        const string RENDER_TAG = nameof(Pass_HelloSRP);
+        private const string PASS_NAME = "HELLO_SRP";
 
         private readonly Material _material;
-        private RTHandle _cameraColorTargetHandle;
 
         public Pass_HelloSRP(Material material)
         {
             _material = material;
         }
 
-        internal void Setup(RTHandle cameraColorTargetHandle)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            _cameraColorTargetHandle = cameraColorTargetHandle;
-        }
-
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        {
-            ConfigureTarget(_cameraColorTargetHandle);
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            CameraData cameraData = renderingData.cameraData;
-            if (cameraData.camera.cameraType != CameraType.Game)
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+            if (resourceData.isActiveTargetBackBuffer)
             {
                 return;
             }
 
-            if (_material == null)
+            TextureHandle srcCamColor = resourceData.activeColorTexture;
+            if (!srcCamColor.IsValid())
             {
                 return;
             }
 
-            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _cameraColorTargetHandle, _material, 0);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
-        }
-    }
+            TextureDesc destinationDesc = renderGraph.GetTextureDesc(srcCamColor);
+            destinationDesc.name = $"CameraColor-{PASS_NAME}";
+            destinationDesc.clearBuffer = false;
 
+            TextureHandle dst = renderGraph.CreateTexture(destinationDesc);
+            if (!dst.IsValid())
+            {
+                return;
+            }
+
+            RenderGraphUtils.BlitMaterialParameters paraVertical = new(srcCamColor, dst, _material, 0);
+            renderGraph.AddBlitPass(paraVertical, PASS_NAME);
+            resourceData.cameraColor = dst;
+        }
+    } // Pass_HelloSRP
+
+    [SerializeField]
     public Material Material;
     private Pass_HelloSRP _pass;
 
@@ -68,7 +70,6 @@ public class Feature_HelloSRP : ScriptableRendererFeature
         if (renderingData.cameraData.cameraType == CameraType.Game)
         {
             _pass.ConfigureInput(ScriptableRenderPassInput.Color);
-            _pass.Setup(renderer.cameraColorTargetHandle);
         }
     }
-}
+} // Feature_HelloSRP
