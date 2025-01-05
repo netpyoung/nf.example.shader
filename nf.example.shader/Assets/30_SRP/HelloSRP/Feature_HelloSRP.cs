@@ -6,6 +6,11 @@ using UnityEngine.Rendering.Universal;
 
 public sealed class Feature_HelloSRP : ScriptableRendererFeature
 {
+    class PassData
+    {
+        internal TextureHandle copySourceTexture;
+    }
+
     sealed class Pass_HelloSRP : ScriptableRenderPass
     {
         private const string PASS_NAME = "HELLO_SRP";
@@ -14,6 +19,7 @@ public sealed class Feature_HelloSRP : ScriptableRendererFeature
 
         public Pass_HelloSRP(Material material)
         {
+            this.requiresIntermediateTexture = false;
             _material = material;
         }
 
@@ -31,19 +37,21 @@ public sealed class Feature_HelloSRP : ScriptableRendererFeature
                 return;
             }
 
-            TextureDesc destinationDesc = renderGraph.GetTextureDesc(srcCamColor);
-            destinationDesc.name = $"CameraColor-{PASS_NAME}";
-            destinationDesc.clearBuffer = false;
-
-            TextureHandle dst = renderGraph.CreateTexture(destinationDesc);
-            if (!dst.IsValid())
+            TextureHandle srcHandle = resourceData.activeColorTexture;
+            TextureHandle dstHandle;
             {
-                return;
+                TextureDesc destinationDesc = renderGraph.GetTextureDesc(srcHandle);
+                destinationDesc.name = $"CameraColor-{PASS_NAME}";
+                destinationDesc.clearBuffer = false;
+                dstHandle = renderGraph.CreateTexture(destinationDesc);
             }
 
-            RenderGraphUtils.BlitMaterialParameters paraVertical = new(srcCamColor, dst, _material, 0);
-            renderGraph.AddBlitPass(paraVertical, PASS_NAME);
-            resourceData.cameraColor = dst;
+
+            RenderGraphUtils.BlitMaterialParameters blitParam = new RenderGraphUtils.BlitMaterialParameters(srcHandle, dstHandle, _material, shaderPass: 0);
+            renderGraph.AddBlitPass(blitParam, passName: PASS_NAME);
+
+
+            resourceData.cameraColor = dstHandle;
         }
     } // Pass_HelloSRP
 
