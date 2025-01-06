@@ -51,12 +51,13 @@
                 half3 mainTex = SAMPLE_TEXTURE2D(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
                 half lumaAverageCurr = SAMPLE_TEXTURE2D(_LumaCurrTex, sampler_LumaCurrTex, float2(0, 0)).r;
                 half lumaAdaptCurr = SAMPLE_TEXTURE2D(_LumaAdaptCurrTex, sampler_LumaAdaptCurrTex, float2(0, 0)).r;
-
-                // return lumaAdaptCurr;
+                
+                // return lumaAverageCurr;
 
                 _Key = AutoKey(lumaAverageCurr);
 
                 half3 color = mainTex * (_Key / (lumaAdaptCurr + 0.0001));
+                // return half4(lumaAdaptCurr.xxx, 1);
                 color = Reinhard_extended(color, 1);
                 return half4(color, 1);
             }
