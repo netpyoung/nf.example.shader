@@ -6,11 +6,6 @@ using UnityEngine.Rendering.Universal;
 
 public sealed class Feature_HelloSRP : ScriptableRendererFeature
 {
-    class PassData
-    {
-        internal TextureHandle copySourceTexture;
-    }
-
     sealed class Pass_HelloSRP : ScriptableRenderPass
     {
         private const string PASS_NAME = "HELLO_SRP";
