@@ -64,7 +64,6 @@
                 float3 srcPos = GetWorldSpacePosition(IN.texcoord);
                 float3 srcNormal = GetNormal(IN.texcoord);
 
-
                 const int SAMPLE_COUNT = 32;
                 float AO = 0;
 

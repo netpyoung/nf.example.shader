@@ -2,22 +2,14 @@ using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class SSAO_RenderPassFeature : ScriptableRendererFeature
 {
-    public enum E_DEBUG
-    {
-        NONE,
-        AO_ONLY,
-        AO_BLUR_ONLY,
-        AO_FINAL_WITHOUT_BLUR,
-        AO_FINAL_WITH_BLUR,
-    }
-
     [SerializeField]
-    SSAO_RenderPassSettings _settings = null;
-    SSAO_RenderPass _pass;
+    private SSAO_RenderPassSettings _settings = null;
+    private SSAO_RenderPass _pass;
 
     public override void Create()
     {
@@ -27,23 +19,15 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
+        if (renderingData.cameraData.cameraType != CameraType.Game)
         {
-            renderer.EnqueuePass(_pass);
+            return;
         }
+        renderer.EnqueuePass(_pass);
     }
 
-    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
-    {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
-        {
-            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
-            _pass.Setup(renderer.cameraColorTargetHandle);
-        }
-    }
 
-    // ====================================================================
-    // ====================================================================
+    // ========================================================================================================================================
     [Serializable]
     public class SSAO_RenderPassSettings
     {
@@ -52,27 +36,46 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         public E_DEBUG DebugMode;
     }
 
-    // ====================================================================
-    // ====================================================================
-    class SSAO_RenderPass : ScriptableRenderPass
+    public enum E_DEBUG
     {
-        const string RENDER_TAG = nameof(SSAO_RenderPass);
+        NONE,
+        AO_ONLY,
+        AO_BLUR_ONLY,
+        AO_FINAL_WITHOUT_BLUR,
+        AO_FINAL_WITH_BLUR,
+    }
 
-        const int PASS_SSAO_CALCUATE_OCULUSSION = 0;
-        const int PASS_SSAO_COMBINE = 1;
 
-        const int PASS_DUALFILTER_DOWN = 0;
-        const int PASS_DUALFILTER_UP = 1;
+    // ========================================================================================================================================
+    private class PassData
+    {
+        public TextureHandle Tex_ActivateColor;
+        public TextureHandle Tex_Normal;
+        public TextureHandle Tex_TmpCopy;
+        public TextureHandle Tex_AmbientOcclusion;
+        public TextureHandle[] Tex_DualFilters;
+        public Material Mat_DualFilter;
+        public Material Mat_AmbientOcclusion;
+        public SSAO_RenderPassSettings Settings;
 
-        private readonly int _AmbientOcclusionTex = Shader.PropertyToID("_AmbientOcclusionTex");
-        private RTHandle _TmpCopyRT;
-        private RTHandle _AmbientOcclusionRT;
-        private RTHandle[] _DualFilterRTs = new RTHandle[2];
+    }
 
-        SSAO_RenderPassSettings _settings;
-        Material _materialAmbientOcclusion;
-        Material _materialDualFilter;
-        private RTHandle _cameraColorTargetHandle;
+    // ========================================================================================================================================
+    private class SSAO_RenderPass : ScriptableRenderPass
+    {
+        private const string RENDER_TAG = nameof(SSAO_RenderPass);
+
+        private const int PASS_SSAO_CALCUATE_OCULUSSION = 0;
+        private const int PASS_SSAO_COMBINE = 1;
+
+        private const int PASS_DUALFILTER_DOWN = 0;
+        private const int PASS_DUALFILTER_UP = 1;
+
+        private static readonly int _AmbientOcclusionTex = Shader.PropertyToID("_AmbientOcclusionTex");
+
+        private SSAO_RenderPassSettings _settings;
+        private Material _materialAmbientOcclusion;
+        private Material _materialDualFilter;
 
 
         public SSAO_RenderPass(SSAO_RenderPassSettings settings)
@@ -84,105 +87,113 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             _materialDualFilter = settings.MaterialDualFilter;
         }
 
-
-        internal void Setup(RTHandle cameraColorTargetHandle)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            _cameraColorTargetHandle = cameraColorTargetHandle;
-        }
-
-        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
-        {
-            ConfigureInput(ScriptableRenderPassInput.Normal);
-        }
-
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        {
-            CameraData cameraData = renderingData.cameraData;
-            Camera camera = renderingData.cameraData.camera;
-            int width = camera.pixelWidth;
-            int height = camera.pixelHeight;
-            RenderTextureDescriptor rtd1 = new RenderTextureDescriptor(width, height, GraphicsFormat.R32G32B32A32_SFloat, 0);
-
-            RenderingUtils.ReAllocateIfNeeded(ref _TmpCopyRT, rtd1);
-            // cmd.GetTemporaryRT(_AmbientOcclusionTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
-            RenderTextureDescriptor rtd2 = new RenderTextureDescriptor(width / 4, height / 4, GraphicsFormat.R16G16B16A16_SFloat, 0);
-            RenderingUtils.ReAllocateIfNeeded(ref _AmbientOcclusionRT, rtd1, FilterMode.Bilinear);
-
-
-            int dualFilterW = width / 8;
-            int dualFilterH = height / 8;
-            RenderTextureDescriptor rtd3 = new RenderTextureDescriptor(dualFilterW, dualFilterH, GraphicsFormat.R16G16B16A16_SFloat, 0);
-            for (int i = 0; i < _DualFilterRTs.Length; ++i)
-            {
-                // cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16_SFloat);
-                RenderingUtils.ReAllocateIfNeeded(ref _DualFilterRTs[i], rtd3, FilterMode.Bilinear);
-                dualFilterW /= 2;
-                dualFilterH /= 2;
-            }
-        }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            RTHandles.Release(_AmbientOcclusionRT);
-            RTHandles.Release(_TmpCopyRT);
-            for (int i = 0; i < _DualFilterRTs.Length; ++i)
-            {
-                RTHandles.Release(_DualFilterRTs[i]);
-            }
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            if (renderingData.cameraData.isSceneViewCamera)
-            {
-                return;
-            }
-
             if (_settings.DebugMode == E_DEBUG.NONE)
             {
                 return;
             }
 
-            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _TmpCopyRT);
+            string passName = "Unsafe Pass";
 
-            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _AmbientOcclusionRT, _materialAmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
-            cmd.SetGlobalTexture(_AmbientOcclusionTex, _AmbientOcclusionRT);
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            if (_settings.DebugMode == E_DEBUG.AO_ONLY)
+            using (IUnsafeRenderGraphBuilder builder = renderGraph.AddUnsafePass(passName, out PassData passData))
             {
-                Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _cameraColorTargetHandle);
+                ConfigureInput(ScriptableRenderPassInput.Normal);
+
+                SetupPassData(renderGraph, frameData, passData);
+
+                builder.UseTexture(passData.Tex_ActivateColor, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_TmpCopy, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_AmbientOcclusion, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_Normal);
+                for (int i = 0; i < passData.Tex_DualFilters.Length; ++i)
+                {
+                    builder.UseTexture(passData.Tex_DualFilters[i], AccessFlags.ReadWrite);
+                }
+                builder.AllowPassCulling(value: false);
+                builder.SetRenderFunc<PassData>(ExecutePass);
             }
-            else if (_settings.DebugMode == E_DEBUG.AO_BLUR_ONLY || _settings.DebugMode == E_DEBUG.AO_FINAL_WITH_BLUR)
+        }
+
+        private void SetupPassData(RenderGraph renderGraph, ContextContainer frameData, PassData passData)
+        {
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+
+            TextureDesc td1 = renderGraph.GetTextureDesc(resourceData.activeColorTexture);
+            passData.Tex_ActivateColor = resourceData.activeColorTexture;
+            passData.Tex_Normal = resourceData.cameraNormalsTexture;
+            passData.Tex_TmpCopy = renderGraph.CreateTexture(td1);
+
+            TextureDesc td2 = td1;
+            td2.width /= 4;
+            td2.height /= 4;
+            td2.format = GraphicsFormat.R16G16B16A16_SFloat;
+            td2.filterMode = FilterMode.Bilinear;
+            passData.Tex_AmbientOcclusion = renderGraph.CreateTexture(td2);
+
+
+            TextureDesc td3 = td1;
+            td3.width /= 8;
+            td3.height /= 8;
+            td3.format = GraphicsFormat.R16G16B16A16_SFloat;
+            TextureHandle[] Tex_DualFilters = new TextureHandle[2];
+            for (int i = 0; i < Tex_DualFilters.Length; ++i)
             {
+                Tex_DualFilters[i] = renderGraph.CreateTexture(td3);
+                td3.width /= 2;
+                td3.height /= 2;
+            }
+            passData.Tex_DualFilters = Tex_DualFilters;
+            passData.Mat_AmbientOcclusion = _materialAmbientOcclusion;
+            passData.Mat_DualFilter = _materialDualFilter;
+            passData.Settings = _settings;
+        }
 
-                Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _DualFilterRTs[0], _materialDualFilter, PASS_DUALFILTER_DOWN);
-                for (int i = 0; i < _DualFilterRTs.Length - 1; ++i)
-                {
-                    Blitter.BlitCameraTexture(cmd, _DualFilterRTs[i], _DualFilterRTs[i + 1], _materialDualFilter, PASS_DUALFILTER_DOWN);
-                }
-                for (int i = _DualFilterRTs.Length - 1; i > 0; --i)
-                {
-                    Blitter.BlitCameraTexture(cmd, _DualFilterRTs[i], _DualFilterRTs[i - 1], _materialDualFilter, PASS_DUALFILTER_UP);
-                }
-                Blitter.BlitCameraTexture(cmd, _DualFilterRTs[0], _AmbientOcclusionRT, _materialDualFilter, PASS_DUALFILTER_UP);
 
-                if (_settings.DebugMode == E_DEBUG.AO_BLUR_ONLY)
+        private static void ExecutePass(PassData data, UnsafeGraphContext context)
+        {
+            UnsafeCommandBuffer cmd = context.cmd;
+            CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(cmd);
+
+            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_TmpCopy);
+
+            nativeCmd.SetGlobalTexture("_CameraNormalsTexture", data.Tex_Normal);
+            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_AmbientOcclusion, data.Mat_AmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
+            nativeCmd.SetGlobalTexture(_AmbientOcclusionTex, data.Tex_AmbientOcclusion);
+
+            if (data.Settings.DebugMode == E_DEBUG.AO_ONLY)
+            {
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_AmbientOcclusion, data.Tex_ActivateColor);
+            }
+            else if (data.Settings.DebugMode == E_DEBUG.AO_BLUR_ONLY || data.Settings.DebugMode == E_DEBUG.AO_FINAL_WITH_BLUR)
+            {
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_AmbientOcclusion, data.Tex_DualFilters[0], data.Mat_DualFilter, PASS_DUALFILTER_DOWN);
+                for (int i = 0; i < data.Tex_DualFilters.Length - 1; ++i)
                 {
-                    Blitter.BlitCameraTexture(cmd, _AmbientOcclusionRT, _cameraColorTargetHandle);
+                    Blitter.BlitCameraTexture(nativeCmd, data.Tex_DualFilters[i], data.Tex_DualFilters[i + 1], data.Mat_DualFilter, PASS_DUALFILTER_DOWN);
+                }
+                for (int i = data.Tex_DualFilters.Length - 1; i > 0; --i)
+                {
+                    Blitter.BlitCameraTexture(nativeCmd, data.Tex_DualFilters[i], data.Tex_DualFilters[i - 1], data.Mat_DualFilter, PASS_DUALFILTER_UP);
+                }
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_DualFilters[0], data.Tex_AmbientOcclusion, data.Mat_DualFilter, PASS_DUALFILTER_UP);
+
+                if (data.Settings.DebugMode == E_DEBUG.AO_BLUR_ONLY)
+                {
+                    Blitter.BlitCameraTexture(nativeCmd, data.Tex_AmbientOcclusion, data.Tex_ActivateColor);
                 }
                 else
                 {
-                    Blitter.BlitCameraTexture(cmd, _TmpCopyRT, _cameraColorTargetHandle, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
+                    Blitter.BlitCameraTexture(nativeCmd, data.Tex_TmpCopy, data.Tex_ActivateColor, data.Mat_AmbientOcclusion, PASS_SSAO_COMBINE);
                 }
             }
-            else if (_settings.DebugMode == E_DEBUG.AO_FINAL_WITHOUT_BLUR)
+            else if (data.Settings.DebugMode == E_DEBUG.AO_FINAL_WITHOUT_BLUR)
             {
-                Blitter.BlitCameraTexture(cmd, _TmpCopyRT, _cameraColorTargetHandle, _materialAmbientOcclusion, PASS_SSAO_COMBINE);
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_TmpCopy, data.Tex_ActivateColor, data.Mat_AmbientOcclusion, PASS_SSAO_COMBINE);
             }
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
         }
     }
 }
