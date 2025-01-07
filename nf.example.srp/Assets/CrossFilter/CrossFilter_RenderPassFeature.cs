@@ -2,11 +2,11 @@
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
 {
-
     [SerializeField]
     private CrossFilter_RenderPassSettings settings;
     private CrossFilter_RenderPass _pass;
@@ -19,31 +19,28 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
+        if (renderingData.cameraData.cameraType != CameraType.Game)
         {
-            renderer.EnqueuePass(_pass);
+            return;
         }
+        _pass.Setup(renderingData.cameraData.cameraTargetDescriptor);
+        renderer.EnqueuePass(_pass);
     }
 
-    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+    protected override void Dispose(bool disposing)
     {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
-        {
-            _pass.ConfigureInput(ScriptableRenderPassInput.Color);
-            _pass.Setup(renderer.cameraColorTargetHandle);
-        }
+        _pass.Dispose();
     }
 
-    // ====================================================================
-    // ====================================================================
+    // ========================================================================================================================================
     [Serializable]
     public struct CrossFilter_RenderPassSettings
     {
     }
 
-    // ====================================================================
-    // ====================================================================
-    class RTCollection
+
+    // ========================================================================================================================================
+    private sealed class RTCollection : IDisposable
     {
         public const int PASS_BLOOM_THRESHOLD = 0;
         public const int PASS_BLOOM_COMPOSITE = 1;
@@ -57,7 +54,7 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
         public readonly int _BrightTex = Shader.PropertyToID("_BrightTex");
         public readonly int _BaseStarBlurredTex1 = Shader.PropertyToID("_BaseStarBlurredTex1");
         public readonly int _BaseStarBlurredTex2 = Shader.PropertyToID("_BaseStarBlurredTex2");
-        public readonly int[] _StarTexs = new int[8] {
+        public static readonly int[] _StarTexs = new int[8] {
             Shader.PropertyToID("_StarTex0"),
             Shader.PropertyToID("_StarTex1"),
             Shader.PropertyToID("_StarTex2"),
@@ -69,26 +66,28 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
         };
 
         private RTHandle _scaledRT;
-        public RTHandle _ScaledRT => _scaledRT;
         private RTHandle _brightRT;
-        public RTHandle _BrightRT => _brightRT;
         private RTHandle _baseStarBlurredRT1;
-        public RTHandle _BaseStarBlurredRT1 => _baseStarBlurredRT1;
         private RTHandle _baseStarBlurredRT2;
-        public RTHandle _BaseStarBlurredRT2 => _baseStarBlurredRT2;
         private RTHandle[] _starRTs = new RTHandle[8];
+
+        public RTHandle _ScaledRT => _scaledRT;
+        public RTHandle _BrightRT => _brightRT;
+        public RTHandle _BaseStarBlurredRT1 => _baseStarBlurredRT1;
+        public RTHandle _BaseStarBlurredRT2 => _baseStarBlurredRT2;
         public RTHandle[] _StarRTs => _starRTs;
 
-        public  RenderTextureDescriptor _brightRTD { get; private set; }
+        public RenderTextureDescriptor _brightRTD { get; private set; }
+
         private int _w = 0;
         private int _h = 0;
-        readonly Color[] meshColors = new Color[4] { Color.white, Color.white, Color.white, Color.white };
-        readonly Vector2[] meshUVS = new Vector2[4] { Vector2.zero, Vector2.up, Vector2.one, Vector2.right };
-        readonly int[] meshIndices = new int[4] { 0, 1, 2, 3 };
-        public Mesh _brightnessExtractionMesh = new Mesh();
-        public MaterialPropertyBlock _PropertyBlock = new MaterialPropertyBlock();
+        private readonly Color[] meshColors = new Color[4] { Color.white, Color.white, Color.white, Color.white };
+        private readonly Vector2[] meshUVS = new Vector2[4] { Vector2.zero, Vector2.up, Vector2.one, Vector2.right };
+        private readonly int[] meshIndices = new int[4] { 0, 1, 2, 3 };
 
-        internal void Setup(RenderTextureDescriptor rtd)
+        public Mesh _brightnessExtractionMesh = new Mesh();
+
+        public void Setup(RenderTextureDescriptor rtd)
         {
             int width = rtd.width;
             int height = rtd.height;
@@ -98,43 +97,38 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             int brightW = scaledW + 2;
             int brightH = scaledH + 2;
 
-
             RenderTextureDescriptor scaleRTD = new RenderTextureDescriptor(scaledW, scaledH, GraphicsFormat.R16G16B16A16_SFloat, 0);
             _brightRTD = new RenderTextureDescriptor(brightW, brightH, GraphicsFormat.R8G8B8A8_SNorm, depthBufferBits: 0);
+
+            RenderingUtils.ReAllocateHandleIfNeeded(ref _scaledRT, scaleRTD, name: nameof(_scaledRT));
+            RenderingUtils.ReAllocateHandleIfNeeded(ref _brightRT, _brightRTD, FilterMode.Bilinear, name: nameof(_brightRT));
+            RenderingUtils.ReAllocateHandleIfNeeded(ref _baseStarBlurredRT1, _brightRTD, name: nameof(_baseStarBlurredRT1));
+            RenderingUtils.ReAllocateHandleIfNeeded(ref _baseStarBlurredRT2, _brightRTD, name: nameof(_baseStarBlurredRT2));
+            for (int i = 0; i < _starRTs.Length; ++i)
+            {
+                RenderingUtils.ReAllocateHandleIfNeeded(ref _starRTs[i], scaleRTD, name: $"{nameof(_starRTs)}[{i}]");
+            }
 
             if (_IsResolutionChanged(width, height))
             {
                 _UpdateMesh(_brightnessExtractionMesh, scaledW, scaledH, 2, 2);
             }
-
-            RenderingUtils.ReAllocateIfNeeded(ref _scaledRT, scaleRTD);
-            RenderingUtils.ReAllocateIfNeeded(ref _brightRT, _brightRTD, FilterMode.Bilinear);
-            RenderingUtils.ReAllocateIfNeeded(ref _baseStarBlurredRT1, _brightRTD);
-            RenderingUtils.ReAllocateIfNeeded(ref _baseStarBlurredRT2, _brightRTD);
-
-            for (int i = 0; i < _starRTs.Length; ++i)
-            {
-                RenderingUtils.ReAllocateIfNeeded(ref _starRTs[i], scaleRTD);
-            }
-
-            // 
             _brightnessExtractionMesh.MarkDynamic();
         }
 
-        public void Cleanup()
+        public void Dispose()
         {
             RTHandles.Release(_scaledRT);
             RTHandles.Release(_brightRT);
             RTHandles.Release(_baseStarBlurredRT1);
             RTHandles.Release(_baseStarBlurredRT2);
-
             for (int i = 0; i < _starRTs.Length; ++i)
             {
                 RTHandles.Release(_starRTs[i]);
             }
         }
 
-        bool _IsResolutionChanged(int w, int h)
+        private bool _IsResolutionChanged(int w, int h)
         {
             if (w != _w)
             {
@@ -182,20 +176,35 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
         }
     }
 
-    // ====================================================================
-    // ====================================================================
-    private class CrossFilter_RenderPass : ScriptableRenderPass
+
+    // ========================================================================================================================================
+    private class PassData
+    {
+        public TextureHandle TexHandle_SrcColor;
+        public TextureHandle TexHandle_Scaled;
+        public TextureHandle TexHandle_Bright;
+        public TextureHandle TexHandle_BaseStarBlurred1;
+        public TextureHandle TexHandle_BaseStarBlurred2;
+        public TextureHandle[] TexHandle_Stars;
+        public Material Mat_Bloom;
+        public Material Mat_DualFilter;
+        public float BrightRTD_Width;
+        public float BrightRTD_Height;
+    }
+
+    // ========================================================================================================================================
+    private class CrossFilter_RenderPass : ScriptableRenderPass, IDisposable
     {
         private CrossFilter_RenderPassSettings _settings;
 
-        const string RENDER_TAG = nameof(CrossFilter_RenderPass);
+        private const string RENDER_TAG = nameof(CrossFilter_RenderPass);
 
-        const int RAY_MAX_PASSES = 3;
-        const int RAY_SAMPLES = 8;
-        readonly Matrix4x4 P = Matrix4x4.Ortho(0, 1, 0, 1, 0, 1);
-        readonly Matrix4x4 V = Matrix4x4.identity;
-        readonly Color COLOR_WHITE = new Color(0.63f, 0.63f, 0.63f, 0);
-        readonly Color[] COLOR_ChromaticAberration = new Color[8] {
+        private const int RAY_MAX_PASSES = 3;
+        private const int RAY_SAMPLES = 8;
+        private readonly Matrix4x4 P = Matrix4x4.Ortho(0, 1, 0, 1, 0, 1);
+        private readonly Matrix4x4 V = Matrix4x4.identity;
+        private readonly Color COLOR_WHITE = new Color(0.63f, 0.63f, 0.63f, 0);
+        private readonly Color[] COLOR_ChromaticAberration = new Color[8] {
             new(0.5f, 0.5f, 0.5f, 0),
             new(0.8f, 0.3f, 0.3f, 0),
             new(1.0f, 0.2f, 0.2f, 0),
@@ -205,16 +214,15 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             new(0.2f, 0.6f, 0.2f, 0),
             new(0.3f, 0.5f, 0.3f, 0),
         };
-        readonly ProfilingSampler PS_ExtractBright = new ProfilingSampler(nameof(PS_ExtractBright));
-        readonly ProfilingSampler PS_BlurBright = new ProfilingSampler(nameof(PS_BlurBright));
-        readonly ProfilingSampler PS_MakeStarRay = new ProfilingSampler(nameof(PS_MakeStarRay));
-        readonly ProfilingSampler PS_CombineBloom = new ProfilingSampler(nameof(PS_CombineBloom));
+        private static readonly ProfilingSampler PS_ExtractBright = new ProfilingSampler(nameof(PS_ExtractBright));
+        private static readonly ProfilingSampler PS_BlurBright = new ProfilingSampler(nameof(PS_BlurBright));
+        private static readonly ProfilingSampler PS_MakeStarRay = new ProfilingSampler(nameof(PS_MakeStarRay));
+        private static readonly ProfilingSampler PS_CombineBloom = new ProfilingSampler(nameof(PS_CombineBloom));
 
-        private Color[,] _rayColors = new Color[RAY_MAX_PASSES, RAY_SAMPLES];
+        private static Color[,] _rayColors = new Color[RAY_MAX_PASSES, RAY_SAMPLES];
 
         private Material _materialBloom;
         private Material _materialDualFilter;
-        private RTHandle _cameraColorTargetHandle;
         private RTCollection _rtc = new RTCollection();
 
         public CrossFilter_RenderPass(CrossFilter_RenderPassSettings settings)
@@ -230,25 +238,17 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             }
 
             _FillStarRayColors(_rayColors);
+            requiresIntermediateTexture = true;
         }
 
-        ~CrossFilter_RenderPass()
+        public void Dispose()
         {
+            _rtc.Dispose();
         }
 
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        internal void Setup(RenderTextureDescriptor desc)
         {
-            _rtc.Setup(renderingData.cameraData.cameraTargetDescriptor);
-        }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            _rtc.Cleanup();
-        }
-
-        internal void Setup(RTHandle cameraColorTargetHandle)
-        {
-            _cameraColorTargetHandle = cameraColorTargetHandle;
+            _rtc.Setup(desc);
         }
 
         private void _FillStarRayColors(Color[,] rayColors)
@@ -264,10 +264,102 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
             }
         }
 
-        RTHandle _MakeStarRayTex(CommandBuffer cmd, RTHandle baseStarBlurredRT)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            float srcW = _rtc._brightRTD.width;
-            float srcH = _rtc._brightRTD.height;
+            string passName = "Unsafe Pass";
+
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            if (cameraData.camera.cameraType != CameraType.Game)
+            {
+                return;
+            }
+
+            using (IUnsafeRenderGraphBuilder builder = renderGraph.AddUnsafePass(passName, out PassData passData))
+            {
+                UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+
+                passData.TexHandle_SrcColor = resourceData.activeColorTexture;
+                passData.TexHandle_Scaled = renderGraph.ImportTexture(_rtc._ScaledRT);
+                passData.TexHandle_Bright = renderGraph.ImportTexture(_rtc._BrightRT);
+                passData.TexHandle_BaseStarBlurred1 = renderGraph.ImportTexture(_rtc._BaseStarBlurredRT1);
+                passData.TexHandle_BaseStarBlurred2 = renderGraph.ImportTexture(_rtc._BaseStarBlurredRT2);
+                passData.TexHandle_Stars = new TextureHandle[8];
+                for (int i = 0; i < 8; i++)
+                {
+                    passData.TexHandle_Stars[i] = renderGraph.ImportTexture(_rtc._StarRTs[i]);
+                }
+                passData.Mat_Bloom = _materialBloom;
+                passData.Mat_DualFilter = _materialDualFilter;
+                passData.BrightRTD_Width = _rtc._brightRTD.width;
+                passData.BrightRTD_Height = _rtc._brightRTD.height;
+
+
+                builder.UseTexture(passData.TexHandle_SrcColor);
+                builder.UseTexture(passData.TexHandle_Scaled, AccessFlags.Write);
+                builder.UseTexture(passData.TexHandle_Bright, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.TexHandle_BaseStarBlurred1, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.TexHandle_BaseStarBlurred2, AccessFlags.ReadWrite);
+                for (int i = 0; i < 8; ++i)
+                {
+                    builder.UseTexture(passData.TexHandle_Stars[i], AccessFlags.ReadWrite);
+                }
+                builder.AllowPassCulling(value: false);
+                builder.SetRenderFunc<PassData>(ExecutePass);
+            }
+        }
+
+        private static void ExecutePass(PassData passData, UnsafeGraphContext context)
+        {
+            Vector4 scaleBias = new Vector4(1, 1, 0, 0);
+
+            UnsafeCommandBuffer cmd = context.cmd;
+            CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+
+            cmd.SetRenderTarget(passData.TexHandle_Scaled);
+            Blitter.BlitTexture(nativeCmd, passData.TexHandle_SrcColor, scaleBias, mipLevel: 0, bilinear: false);
+
+
+            using (new ProfilingScope(cmd, PS_ExtractBright))
+            {
+                // cmd.SetProjectionMatrix(P);
+                // cmd.SetViewMatrix(V);
+                // cmd.SetRenderTarget(_rtc._BrightRT);
+                // cmd.SetGlobalTexture(_rtc._BlitTexture, _rtc._ScaledRT);
+                // cmd.DrawMesh(_rtc._brightnessExtractionMesh, Matrix4x4.identity, _materialBloom, 0, RTCollection.PASS_BLOOM_THRESHOLD);
+
+                Blitter.BlitTexture(nativeCmd, passData.TexHandle_SrcColor, passData.TexHandle_Bright, passData.Mat_Bloom, RTCollection.PASS_BLOOM_THRESHOLD);
+            }
+
+            // Blitter.BlitCameraTexture(cmd, _rtc._BrightRT, _cameraColorTargetHandle); // test blit
+
+            using (new ProfilingScope(cmd, PS_BlurBright))
+            {
+                Blitter.BlitTexture(nativeCmd, passData.TexHandle_Bright, passData.TexHandle_BaseStarBlurred1, passData.Mat_DualFilter, RTCollection.PASS_CROSSFILTER_GAUSSIAN_VERT);
+                Blitter.BlitTexture(nativeCmd, passData.TexHandle_BaseStarBlurred1, passData.TexHandle_BaseStarBlurred2, passData.Mat_DualFilter, RTCollection.PASS_CROSSFILTER_GAUSSIAN_HORIZ);
+            }
+
+            TextureHandle _BloomBlurRT;
+            using (new ProfilingScope(cmd, PS_MakeStarRay))
+            {
+                _BloomBlurRT = _MakeStarRayTex(nativeCmd, passData);
+            }
+            // Blitter.BlitCameraTexture(cmd, _BloomBlurRT, _cameraColorTargetHandle); // test blit
+
+            using (new ProfilingScope(cmd, PS_CombineBloom))
+            {
+                cmd.SetRenderTarget(passData.TexHandle_SrcColor);
+                cmd.SetGlobalTexture("_BloomBlurTex", _BloomBlurRT);
+                Blitter.BlitTexture(nativeCmd, passData.TexHandle_Scaled, scaleBias, passData.Mat_Bloom, RTCollection.PASS_BLOOM_COMPOSITE);
+            }
+        }
+
+        private static TextureHandle _MakeStarRayTex(CommandBuffer nativeCmd, PassData data)
+        {
+            Vector4 scaleBias = new Vector4(1, 1, 0, 0);
+            TextureHandle baseStarBlurredRT = data.TexHandle_BaseStarBlurred2;
+
+            float srcW = data.BrightRTD_Width;
+            float srcH = data.BrightRTD_Height;
             float worldRotY = Mathf.PI / 2;
             float radOffset = worldRotY / 5;
 
@@ -275,7 +367,7 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
 
             for (int d = 0; d < starRayCount; d++)
             {
-                RTHandle srcRT = baseStarBlurredRT;
+                TextureHandle srcRT = baseStarBlurredRT;
                 float rad = radOffset + 2 * Mathf.PI * ((float)d / starRayCount);
                 float sin = Mathf.Sin(rad);
                 float cos = Mathf.Cos(rad);
@@ -285,14 +377,14 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
                 int workingTexureIndex = 0;
                 for (int p = 0; p < RAY_MAX_PASSES; p++)
                 {
-                    RTHandle destRT;
+                    TextureHandle destRT;
                     if (p == RAY_MAX_PASSES - 1)
                     {
-                        destRT = _rtc._StarRTs[d + 2];
+                        destRT = data.TexHandle_Stars[d + 2];
                     }
                     else
                     {
-                        destRT = _rtc._StarRTs[workingTexureIndex];
+                        destRT = data.TexHandle_Stars[workingTexureIndex];
                     }
 
                     Vector4[] avSampleWeights = new Vector4[RAY_SAMPLES]; // xyzw
@@ -314,78 +406,28 @@ public class CrossFilter_RenderPassFeature : ScriptableRendererFeature
                         }
                     }
 
-                    cmd.SetGlobalVectorArray("_avSampleOffsets", avSampleOffsets);
-                    cmd.SetGlobalVectorArray("_avSampleWeights", avSampleWeights);
-                    cmd.SetGlobalTexture(_rtc._BlitTexture, srcRT);
-                    Blitter.BlitCameraTexture(cmd, srcRT, destRT, _materialDualFilter, RTCollection.PASS_CROSSFILTER_STAR_RAY);
+                    nativeCmd.SetGlobalVectorArray("_avSampleOffsets", avSampleOffsets);
+                    nativeCmd.SetGlobalVectorArray("_avSampleWeights", avSampleWeights);
+                    Blitter.BlitTexture(nativeCmd, srcRT, destRT, data.Mat_DualFilter, RTCollection.PASS_CROSSFILTER_STAR_RAY);
+
 
                     stepUV *= RAY_SAMPLES;
                     attnPowScale *= RAY_SAMPLES;
-                    srcRT = _rtc._StarRTs[workingTexureIndex];
+                    srcRT = data.TexHandle_Stars[workingTexureIndex];
                     workingTexureIndex ^= 1;
                 }
             }
 
             // 합성.
-            cmd.SetGlobalTexture(_rtc._StarTexs[0 + 2], _rtc._StarRTs[0 + 2]);
-            cmd.SetGlobalTexture(_rtc._StarTexs[1 + 2], _rtc._StarRTs[1 + 2]);
-            cmd.SetGlobalTexture(_rtc._StarTexs[2 + 2], _rtc._StarRTs[2 + 2]);
-            cmd.SetGlobalTexture(_rtc._StarTexs[3 + 2], _rtc._StarRTs[3 + 2]);
-            cmd.SetGlobalTexture(_rtc._StarTexs[4 + 2], _rtc._StarRTs[4 + 2]);
-            cmd.SetGlobalTexture(_rtc._StarTexs[5 + 2], _rtc._StarRTs[5 + 2]);
-            Blitter.BlitCameraTexture(cmd, _rtc._StarRTs[1], _rtc._StarRTs[0], _materialDualFilter, RTCollection.PASS_CROSSFILTER_MERGE_STAR);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[0 + 2], data.TexHandle_Stars[0 + 2]);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[1 + 2], data.TexHandle_Stars[1 + 2]);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[2 + 2], data.TexHandle_Stars[2 + 2]);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[3 + 2], data.TexHandle_Stars[3 + 2]);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[4 + 2], data.TexHandle_Stars[4 + 2]);
+            nativeCmd.SetGlobalTexture(RTCollection._StarTexs[5 + 2], data.TexHandle_Stars[5 + 2]);
+            Blitter.BlitCameraTexture(nativeCmd, data.TexHandle_Stars[1], data.TexHandle_Stars[0], data.Mat_DualFilter, RTCollection.PASS_CROSSFILTER_MERGE_STAR);
 
-            return _rtc._StarRTs[0];
-        }
-
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            CameraData cameraData = renderingData.cameraData;
-            if (cameraData.camera.cameraType != CameraType.Game)
-            {
-                return;
-            }
-
-            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-            Blitter.BlitCameraTexture(cmd, _cameraColorTargetHandle, _rtc._ScaledRT);
-
-            using (new ProfilingScope(cmd, PS_ExtractBright))
-            {
-                // cmd.SetProjectionMatrix(P);
-                // cmd.SetViewMatrix(V);
-                // cmd.SetRenderTarget(_rtc._BrightRT);
-                // cmd.SetGlobalTexture(_rtc._BlitTexture, _rtc._ScaledRT);
-                // cmd.DrawMesh(_rtc._brightnessExtractionMesh, Matrix4x4.identity, _materialBloom, 0, RTCollection.PASS_BLOOM_THRESHOLD);
-                Blitter.BlitCameraTexture(cmd, _rtc._ScaledRT, _rtc._BrightRT, _materialBloom, RTCollection.PASS_BLOOM_THRESHOLD);
-            }
-
-            // Blitter.BlitCameraTexture(cmd, _rtc._BrightRT, _cameraColorTargetHandle); // test blit
-
-            using (new ProfilingScope(cmd, PS_BlurBright))
-            {
-                cmd.SetGlobalTexture(_rtc._BlitTexture, _rtc._BrightRT);
-                Blitter.BlitCameraTexture(cmd, _rtc._BrightRT, _rtc._BaseStarBlurredRT1, _materialDualFilter, RTCollection.PASS_CROSSFILTER_GAUSSIAN_VERT);
-
-                cmd.SetGlobalTexture(_rtc._BlitTexture, _rtc._BaseStarBlurredRT1);
-                Blitter.BlitCameraTexture(cmd, _rtc._BaseStarBlurredRT1, _rtc._BaseStarBlurredRT2, _materialDualFilter, RTCollection.PASS_CROSSFILTER_GAUSSIAN_HORIZ);
-            }
-
-            RTHandle _BloomBlurRT;
-            using (new ProfilingScope(cmd, PS_MakeStarRay))
-            {
-                _BloomBlurRT = _MakeStarRayTex(cmd, _rtc._BaseStarBlurredRT2);
-            }
-            // Blitter.BlitCameraTexture(cmd, _BloomBlurRT, _cameraColorTargetHandle); // test blit
-
-            using (new ProfilingScope(cmd, PS_CombineBloom))
-            {
-                cmd.SetGlobalTexture(_rtc._BlitTexture, _rtc._ScaledRT);
-                cmd.SetGlobalTexture("_BloomBlurTex", _BloomBlurRT);
-                Blitter.BlitCameraTexture(cmd, _rtc._ScaledRT, _cameraColorTargetHandle, _materialBloom, RTCollection.PASS_BLOOM_COMPOSITE);
-            }
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+            return data.TexHandle_Stars[0];
         }
     }
 }
