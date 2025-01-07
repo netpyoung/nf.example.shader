@@ -278,6 +278,7 @@
             half4 frag(Varyings IN) : SV_Target
             {
                 float4 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
+                // return blitTex.a;
 
                 // Local Contrast Check
                 LuminanceData l = (LuminanceData) 0;
