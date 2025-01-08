@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule.Util;
 using UnityEngine.Rendering.Universal;
 
 public class Uber_RenderPassFeature : ScriptableRendererFeature
@@ -34,8 +33,8 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
         }
     }
 
-    // ====================================================================
-    // ====================================================================
+
+    // ========================================================================================================================================
     [Serializable]
     public class Uber_RenderPassSettings
     {
@@ -43,19 +42,14 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
         public bool _UBER_B;
     }
 
-    // ====================================================================
-    // ====================================================================
+
+    // ========================================================================================================================================
     class Uber_RenderPass : ScriptableRenderPass
     {
-        Uber_RenderPassSettings _settings;
-        const int PASS_SobelFilter = 0;
-
-        RenderTargetIdentifier _colorBuffer;
         Material _mat_uber;
 
         public Uber_RenderPass(Uber_RenderPassSettings settings)
         {
-            _settings = settings;
             if (_mat_uber == null)
             {
                 _mat_uber = CoreUtils.CreateEngineMaterial("Hidden/Uber");
@@ -91,11 +85,9 @@ public class Uber_RenderPassFeature : ScriptableRendererFeature
             destinationDesc.clearBuffer = false;
 
             TextureHandle destination = renderGraph.CreateTexture(destinationDesc);
-            RenderGraphUtils.BlitMaterialParameters para = new RenderGraphUtils.BlitMaterialParameters(source, destination, _mat_uber, 0);
+            RenderGraphUtils.BlitMaterialParameters para = new RenderGraphUtils.BlitMaterialParameters(source, destination, _mat_uber, shaderPass: 0);
             renderGraph.AddBlitPass(para, passName: passName);
             resourceData.cameraColor = destination;
         }
     }
 }
-
-

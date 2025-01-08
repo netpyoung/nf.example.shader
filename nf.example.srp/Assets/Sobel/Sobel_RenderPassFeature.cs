@@ -8,8 +8,8 @@ using UnityEngine.Rendering.Universal;
 public class Sobel_RenderPassFeature : ScriptableRendererFeature
 {
     [SerializeField]
-    Sobel_RenderPassSettings _settings = null;
-    Sobel_RenderPass _pass;
+    private Sobel_RenderPassSettings _settings = null;
+    private Sobel_RenderPass _pass;
 
     public override void Create()
     {
@@ -36,17 +36,17 @@ public class Sobel_RenderPassFeature : ScriptableRendererFeature
 
 
     // ========================================================================================================================================
-    class Sobel_RenderPass : ScriptableRenderPass
+    private class Sobel_RenderPass : ScriptableRenderPass
     {
-        const int PASS_SobelFilter = 0;
+        private const int PASS_SobelFilter = 0;
 
-        Material _sobel_material;
+        private Material _sobel_material;
 
         public Sobel_RenderPass(Sobel_RenderPassSettings settings)
         {
             if (_sobel_material == null)
             {
-                _sobel_material = CoreUtils.CreateEngineMaterial("Hidden/Sobel");
+                _sobel_material = CoreUtils.CreateEngineMaterial("srp/Sobel");
             }
             _sobel_material.SetFloat("_LineThickness", settings._LineThickness);
         }
@@ -68,5 +68,3 @@ public class Sobel_RenderPassFeature : ScriptableRendererFeature
         }
     }
 }
-
-

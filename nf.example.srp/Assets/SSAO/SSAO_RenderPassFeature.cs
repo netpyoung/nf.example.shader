@@ -57,7 +57,6 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
         public Material Mat_DualFilter;
         public Material Mat_AmbientOcclusion;
         public SSAO_RenderPassSettings Settings;
-
     }
 
     // ========================================================================================================================================
@@ -89,11 +88,6 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if (_settings.DebugMode == E_DEBUG.NONE)
-            {
-                return;
-            }
-
             string passName = "Unsafe Pass";
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
@@ -152,17 +146,21 @@ public class SSAO_RenderPassFeature : ScriptableRendererFeature
             passData.Settings = _settings;
         }
 
-
         private static void ExecutePass(PassData data, UnsafeGraphContext context)
         {
+            if (data.Settings.DebugMode == E_DEBUG.NONE)
+            {
+                return;
+            }
+
             UnsafeCommandBuffer cmd = context.cmd;
             CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(cmd);
 
             Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_TmpCopy);
 
             nativeCmd.SetGlobalTexture("_CameraNormalsTexture", data.Tex_Normal);
-            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_AmbientOcclusion, data.Mat_AmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
             nativeCmd.SetGlobalTexture(_AmbientOcclusionTex, data.Tex_AmbientOcclusion);
+            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_AmbientOcclusion, data.Mat_AmbientOcclusion, PASS_SSAO_CALCUATE_OCULUSSION);
 
             if (data.Settings.DebugMode == E_DEBUG.AO_ONLY)
             {

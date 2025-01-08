@@ -38,7 +38,7 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
     }
 
 
-    // ====================================================================
+    // ========================================================================================================================================
     public class PassData
     {
         public TextureHandle srcColor;
@@ -53,7 +53,7 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
     }
 
 
-    // ====================================================================
+    // ========================================================================================================================================
     class Pass_BloomDualFilter : ScriptableRenderPass
     {
         const string RENDER_TAG = nameof(Pass_BloomDualFilter);
@@ -62,19 +62,17 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
         const int DUALFILTER_DOWN_PASS = 0;
         const int DUALFILTER_UP_PASS = 1;
 
+        private int _dualFilterStep;
         private Material _materialBloom;
         private Material _materialDualFilter;
-        private int _BloomNonBlurTex_Id;
-        private int _BloomBlurTex_Id;
-        private int _dualFilterStep;
+        private readonly int _BloomNonBlurTex_Id = Shader.PropertyToID("_BloomNonBlurTex");
+        private readonly int _BloomBlurTex_Id = Shader.PropertyToID("_BloomBlurTex");
 
         public Pass_BloomDualFilter(int dualFilterStep, Material materialBloom, Material materialDualFilter)
         {
             _dualFilterStep = dualFilterStep;
             _materialBloom = materialBloom;
             _materialDualFilter = materialDualFilter;
-            _BloomNonBlurTex_Id = Shader.PropertyToID("_BloomNonBlurTex");
-            _BloomBlurTex_Id = Shader.PropertyToID("_BloomBlurTex");
         }
 
         private int _MeasureStep(int width, int height)
@@ -179,36 +177,36 @@ public class BloomDualFilter_RenderPassFeature : ScriptableRendererFeature
 
         static void ExecutePass(PassData data, UnsafeGraphContext context)
         {
-            CommandBuffer unsafeCmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
+            CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
 
             Vector4 scaleBias = new Vector4(1, 1, 0, 0);
 
             context.cmd.SetRenderTarget(data.Destination);
-            Blitter.BlitTexture(unsafeCmd, data.srcColor, scaleBias, mipLevel: 0, bilinear: false);
+            Blitter.BlitTexture(nativeCmd, data.srcColor, scaleBias, mipLevel: 0, bilinear: false);
 
             context.cmd.SetRenderTarget(data.BloomBrightHandle);
-            Blitter.BlitTexture(unsafeCmd, data.Destination, scaleBias, material: data.MaterialBloom, pass: BLOOM_THRESHOLD_PASS);
+            Blitter.BlitTexture(nativeCmd, data.Destination, scaleBias, material: data.MaterialBloom, pass: BLOOM_THRESHOLD_PASS);
 
             context.cmd.SetRenderTarget(data.DualFilterHandles[0]);
-            Blitter.BlitTexture(unsafeCmd, data.BloomBrightHandle, scaleBias, material: data.MaterialBloom, pass: BLOOM_THRESHOLD_PASS);
+            Blitter.BlitTexture(nativeCmd, data.BloomBrightHandle, scaleBias, material: data.MaterialBloom, pass: BLOOM_THRESHOLD_PASS);
 
 
             for (int i = 0; i < data.DualFilterStep / 2 - 1; ++i)
             {
                 context.cmd.SetRenderTarget(data.DualFilterHandles[i + 1]);
-                Blitter.BlitTexture(unsafeCmd, data.DualFilterHandles[i], scaleBias, material: data.MaterialDualFilter, pass: DUALFILTER_DOWN_PASS);
+                Blitter.BlitTexture(nativeCmd, data.DualFilterHandles[i], scaleBias, material: data.MaterialDualFilter, pass: DUALFILTER_DOWN_PASS);
             }
 
             for (int i = data.DualFilterStep / 2 - 1; i > 0; --i)
             {
                 context.cmd.SetRenderTarget(data.DualFilterHandles[i - 1]);
-                Blitter.BlitTexture(unsafeCmd, data.DualFilterHandles[i], scaleBias, material: data.MaterialDualFilter, pass: DUALFILTER_UP_PASS);
+                Blitter.BlitTexture(nativeCmd, data.DualFilterHandles[i], scaleBias, material: data.MaterialDualFilter, pass: DUALFILTER_UP_PASS);
             }
 
             context.cmd.SetGlobalTexture(data.BloomNonBlurTex_Id, data.BloomBrightHandle);
             context.cmd.SetGlobalTexture(data.BloomBlurTex_Id, data.DualFilterHandles[0]);
             context.cmd.SetRenderTarget(data.srcColor);
-            Blitter.BlitTexture(unsafeCmd, data.Destination, scaleBias, material: data.MaterialBloom, pass: BLOOM_COMBINE_PASS);
+            Blitter.BlitTexture(nativeCmd, data.Destination, scaleBias, material: data.MaterialBloom, pass: BLOOM_COMBINE_PASS);
         }
     }
 }

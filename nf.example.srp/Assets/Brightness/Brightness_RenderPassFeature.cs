@@ -33,17 +33,8 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         renderer.EnqueuePass(_pass);
     }
 
-    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
-    {
-        if (renderingData.cameraData.cameraType != CameraType.Game)
-        {
-            return;
-        }
-        _pass.ConfigureInput(ScriptableRenderPassInput.Color);
-    }
 
-
-    // ====================================================================
+    // ========================================================================================================================================
     [Serializable]
     public struct Brightness_RenderPassSettings
     {
@@ -52,7 +43,7 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
     }
 
 
-    // ====================================================================
+    // ========================================================================================================================================
     class PassData
     {
         public TextureHandle SrcTexHandle;
@@ -65,7 +56,7 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         public Material Mat_EyeAdaptation;
     }
 
-    // ====================================================================
+    // ========================================================================================================================================
 
     class RTCollection : IDisposable
     {
@@ -137,7 +128,7 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
     }
 
 
-    // ====================================================================
+    // ========================================================================================================================================
     class Brightness_RenderPass : ScriptableRenderPass, IDisposable
     {
         const int PASS_Brightness_CalcuateLuma = 0;
@@ -233,5 +224,3 @@ public class Brightness_RenderPassFeature : ScriptableRendererFeature
         }
     }
 }
-
-

@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Sobel"
+﻿Shader "srp/Sobel"
 {
     Properties
     {
