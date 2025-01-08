@@ -1,21 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8941212035899374995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2706389b3681744a8c1d32758c6d495, type: 3}
-  m_Name: NewFeatureKawase
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  MaterialBloom: {fileID: 2100000, guid: bc26bc8b4574e4741a378091ce4548fa, type: 2}
-  MaterialDualFilter: {fileID: 2100000, guid: d96f5d86746a9d9478b244390534441d, type: 2}
-  DualFilterStep: 12
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
-  m_Name: URPRenderer_print_depth
+  m_Name: New Custom Universal Renderer Data
   m_EditorClassIdentifier: 
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
@@ -41,11 +25,10 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
-  - {fileID: -8941212035899374995}
-  - {fileID: 2090739970326896724}
-  m_RendererFeatureMap: 6d42c5a2066fea8354a00b01edcc031d
+  - {fileID: 7571454151089118758}
+  m_RendererFeatureMap: 26ded2646f351369
   m_UseNativeRenderPass: 0
-  xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
+  xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   m_AssetVersion: 2
   m_OpaqueLayerMask:
@@ -61,15 +44,15 @@ MonoBehaviour:
     passOperation: 2
     failOperation: 0
     zFailOperation: 0
-  m_ShadowTransparentReceive: 1
+  m_ShadowTransparentReceive: 0
   m_RenderingMode: 0
   m_DepthPrimingMode: 0
-  m_CopyDepthMode: 1
+  m_CopyDepthMode: 0
   m_DepthAttachmentFormat: 0
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &2090739970326896724
+--- !u!114 &7571454151089118758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -78,7 +61,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3bfdac9be62de0478c6aee44076cd95, type: 3}
-  m_Name: UnsafePassRenderFeature
+  m_Script: {fileID: 11500000, guid: 5d62d3a58a1be1b4e99aa3c189c83fac, type: 3}
+  m_Name: Feature_GammaUIFix
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
+  Material: {fileID: 2100000, guid: e27d6e2a8d4f4024f840e75ba29f22a8, type: 2}

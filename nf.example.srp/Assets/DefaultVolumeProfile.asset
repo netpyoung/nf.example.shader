@@ -114,6 +114,22 @@ MonoBehaviour:
   chromaticAbberationIntensity:
     m_OverrideState: 1
     m_Value: 0.5
+--- !u!114 &-5333226258163277568
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9058404d0c098459468c6a49b09daf, type: 3}
+  m_Name: Volume_PrintDepthMap
+  m_EditorClassIdentifier: 
+  active: 1
+  IsEnable:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &-4969483353327244881
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -397,6 +413,7 @@ MonoBehaviour:
   - {fileID: -7609279783020876739}
   - {fileID: 3145991953550692626}
   - {fileID: 293944034070241438}
+  - {fileID: -5333226258163277568}
 --- !u!114 &293944034070241438
 MonoBehaviour:
   m_ObjectHideFlags: 3
