@@ -1,17 +1,28 @@
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class LightShaft_RenderPassFeature : ScriptableRendererFeature
 {
-    public enum E_DEBUG
+    [SerializeField]
+    private LightShaft_RenderPassSettings _settings = null;
+    private LightShaft_RenderPass _pass;
+
+    public override void Create()
     {
-        NONE,
-        SHAFT_ONLY,
-        SHAFT_FINAL,
+        _pass = new LightShaft_RenderPass(_settings);
+        _pass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
     }
 
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        renderer.EnqueuePass(_pass);
+    }
+
+
+    // ========================================================================================================================================
     [Serializable]
     public class LightShaft_RenderPassSettings
     {
@@ -24,34 +35,44 @@ public class LightShaft_RenderPassFeature : ScriptableRendererFeature
         public E_DEBUG DebugMode;
     }
 
-    class LightShaft_RenderPass : ScriptableRenderPass
+    public enum E_DEBUG
     {
-        LightShaft_RenderPassSettings _settings;
+        NONE,
+        SHAFT_ONLY,
+        SHAFT_FINAL,
+    }
 
-        readonly static int _LightShaftMaskTex = Shader.PropertyToID("_LightShaftMaskTex");
-        readonly static int _TmpCopyRT = Shader.PropertyToID("_TmpCopyTex");
 
-        const int PASS_LIGHTSHAFT_GRADIENTFOG = 0;
-        const int PASS_LIGHTSHAFT_COMBINE = 1;
-        
-        const int PASS_DUALFILTER_DOWN = 0;
-        const int PASS_DUALFILTER_UP = 1;
+    // ========================================================================================================================================
+    private class PassData
+    {
+        public TextureHandle Tex_ActivateColor;
+        public TextureHandle Tex_TmpCopy;
+        public TextureHandle Tex_LightShaftMask;
+        public Material Mat_LightShaft;
+        public LightShaft_RenderPassSettings Settings;
+    }
 
-        RenderTargetIdentifier _colorBuffer;
-        Material _materia_LightShaft;
-        Material _materia_DualFilter;
+
+    // ========================================================================================================================================
+    private class LightShaft_RenderPass : ScriptableRenderPass
+    {
+        private LightShaft_RenderPassSettings _settings;
+
+        private readonly static int _LightShaftMaskTex = Shader.PropertyToID("_LightShaftMaskTex");
+
+        private const int PASS_LIGHTSHAFT_GRADIENTFOG = 0;
+        private const int PASS_LIGHTSHAFT_COMBINE = 1;
+
+        private Material _materia_LightShaft;
+
         public LightShaft_RenderPass(LightShaft_RenderPassSettings settings)
         {
             _settings = settings;
             if (_materia_LightShaft == null)
             {
-                _materia_LightShaft = CoreUtils.CreateEngineMaterial("Hidden/LightShaft");
+                _materia_LightShaft = CoreUtils.CreateEngineMaterial("srp/LightShaft");
             }
-            if (_materia_DualFilter == null)
-            {
-                _materia_DualFilter = CoreUtils.CreateEngineMaterial("srp/DualFilter");
-            }
-            
             _materia_LightShaft.SetFloat("_MaxIteration", settings._MaxIteration);
             _materia_LightShaft.SetFloat("_MinDistance", settings._MinDistance);
             _materia_LightShaft.SetFloat("_MaxDistance", settings._MaxDistance);
@@ -60,53 +81,68 @@ public class LightShaft_RenderPassFeature : ScriptableRendererFeature
             _materia_LightShaft.SetFloat("_DepthOutsideDecreaseSpeed", settings._DepthOutsideDecreaseSpeed);
         }
 
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            ref CameraData cameraData = ref renderingData.cameraData;
-            Camera camera = cameraData.camera;
-            int w = cameraData.camera.scaledPixelWidth / 4;
-            int h = cameraData.camera.scaledPixelHeight / 4;
+            string passName = "Unsafe Pass";
 
-            _colorBuffer = cameraData.renderer.cameraColorTargetHandle;
-            _materia_LightShaft.SetVector("_CameraPositionWS", camera.transform.position);
-            _materia_LightShaft.SetMatrix("_Matrix_CameraFrustum", FrustumCorners(camera));
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            cmd.GetTemporaryRT(_LightShaftMaskTex, w, h, 0, FilterMode.Bilinear);
-            cmd.GetTemporaryRT(_TmpCopyRT, cameraData.cameraTargetDescriptor, FilterMode.Bilinear);
+            using (IUnsafeRenderGraphBuilder builder = renderGraph.AddUnsafePass(passName, out PassData passData))
+            {
+                SetupPassData(renderGraph, frameData, passData);
+
+                builder.UseTexture(passData.Tex_ActivateColor, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_TmpCopy, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_LightShaftMask, AccessFlags.ReadWrite);
+                builder.AllowPassCulling(value: false);
+                builder.SetRenderFunc<PassData>(ExecutePass);
+            }
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        private void SetupPassData(RenderGraph renderGraph, ContextContainer frameData, PassData passData)
         {
-            if (renderingData.cameraData.isSceneViewCamera)
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+
+            passData.Tex_ActivateColor = resourceData.activeColorTexture;
+
+            TextureDesc td1 = renderGraph.GetTextureDesc(resourceData.activeColorTexture);
+            passData.Tex_TmpCopy = renderGraph.CreateTexture(td1);
+
+            TextureDesc td2 = td1;
+            td2.width /= 4;
+            td2.height /= 4;
+            passData.Tex_LightShaftMask = renderGraph.CreateTexture(td2);
+
+            Camera camera = cameraData.camera;
+            _materia_LightShaft.SetVector("_CameraPositionWS", camera.transform.position);
+            _materia_LightShaft.SetMatrix("_Matrix_CameraFrustum", FrustumCorners(camera));
+            passData.Mat_LightShaft = _materia_LightShaft;
+            passData.Settings = _settings;
+        }
+
+        private static void ExecutePass(PassData data, UnsafeGraphContext context)
+        {
+            if (data.Settings.DebugMode == E_DEBUG.NONE)
             {
                 return;
             }
 
-            if (_settings.DebugMode == E_DEBUG.NONE)
-            {
-                return;
-            }
+            UnsafeCommandBuffer cmd = context.cmd;
+            CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(cmd);
 
-            CommandBuffer cmd = CommandBufferPool.Get(nameof(LightShaft_RenderPass));
-            cmd.Blit(_colorBuffer, _TmpCopyRT);
+            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_TmpCopy);
 
-            cmd.Blit(null, _LightShaftMaskTex, _materia_LightShaft, PASS_LIGHTSHAFT_GRADIENTFOG);
-            if (_settings.DebugMode == E_DEBUG.SHAFT_ONLY)
+            nativeCmd.Blit(null, data.Tex_LightShaftMask, data.Mat_LightShaft, PASS_LIGHTSHAFT_GRADIENTFOG);
+            if (data.Settings.DebugMode == E_DEBUG.SHAFT_ONLY)
             {
-                cmd.Blit(_LightShaftMaskTex, _colorBuffer);
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_LightShaftMask, data.Tex_ActivateColor);
             }
             else
             {
-                cmd.Blit(_TmpCopyRT, _colorBuffer, _materia_LightShaft, PASS_LIGHTSHAFT_COMBINE);
+                nativeCmd.SetGlobalTexture(_LightShaftMaskTex, data.Tex_LightShaftMask);
+                nativeCmd.Blit(data.Tex_TmpCopy, data.Tex_ActivateColor, data.Mat_LightShaft, PASS_LIGHTSHAFT_COMBINE);
             }
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
-        }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            cmd.ReleaseTemporaryRT(_LightShaftMaskTex);
-            cmd.ReleaseTemporaryRT(_TmpCopyRT);
         }
 
         private Matrix4x4 FrustumCorners(Camera cam)
@@ -151,20 +187,5 @@ public class LightShaft_RenderPassFeature : ScriptableRendererFeature
             //    0  +----+ 1
             return frustumVectorsArray;
         }
-    }
-
-    [SerializeField]
-    LightShaft_RenderPassSettings _settings = null;
-    LightShaft_RenderPass _pass;
-
-    public override void Create()
-    {
-        _pass = new LightShaft_RenderPass(_settings);
-        _pass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(_pass);
     }
 }

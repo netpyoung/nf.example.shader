@@ -1,4 +1,4 @@
-﻿Shader "Hidden/LightShaft"
+﻿Shader "srp/LightShaft"
 {
     HLSLINCLUDE
     ENDHLSL
@@ -15,21 +15,21 @@
     {
         Pass // 0
         {
+            NAME "PASS_LIGHTSHAFT_GRADIENTFOG"
 
             Cull Off
             ZWrite Off
             ZTest Always
 
             HLSLPROGRAM
-            
-            #pragma vertex vert
-            #pragma fragment frag
-
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
+            #pragma vertex vert
+            #pragma fragment frag
+            
             TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
 
             float3 _CameraPositionWS;
@@ -122,17 +122,20 @@
             ENDHLSL
         }
 
-         Pass // 0
+        Pass // 1
         {
+            NAME "PASS_LIGHTSHAFT_COMBINE"
+
             Cull Off
             ZWrite Off
             ZTest Always
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            
+            #pragma vertex vert
+            #pragma fragment frag
 
             TEXTURE2D(_MainTex);            SAMPLER(sampler_MainTex);
             TEXTURE2D(_LightShaftMaskTex);  SAMPLER(sampler_LightShaftMaskTex);
