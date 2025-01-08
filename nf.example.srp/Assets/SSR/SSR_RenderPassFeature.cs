@@ -2,19 +2,28 @@ using System;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 public class SSR_RenderPassFeature : ScriptableRendererFeature
 {
-    public enum E_DEBUG
+    [SerializeField]
+    private SSR_RenderPassSettings _settings = null;
+    private SSR_RenderPass _pass;
+
+    public override void Create()
     {
-        NONE,
-        SSR_ONLY,
-        SSR_BLUR_ONLY,
-        SSR_FINAL_WITHOUT_BLUR,
-        SSR_FINAL_WITH_BLUR,
+        _pass = new SSR_RenderPass(_settings);
+        _pass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
     }
 
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+    {
+        renderer.EnqueuePass(_pass);
+    }
+
+
+    // ========================================================================================================================================
     [Serializable]
     public class SSR_RenderPassSettings
     {
@@ -25,27 +34,46 @@ public class SSR_RenderPassFeature : ScriptableRendererFeature
         public E_DEBUG DebugMode;
     }
 
-    class SSR_RenderPass : ScriptableRenderPass
+    public enum E_DEBUG
     {
-        const string RENDER_TAG = nameof(SSR_RenderPass);
-        
-        const int PASS_SSR_CALCUATE_REFLECTION = 0;
-        const int PASS_SSR_COMBINE = 1;
+        NONE,
+        SSR_ONLY,
+        SSR_BLUR_ONLY,
+        SSR_FINAL_WITHOUT_BLUR,
+        SSR_FINAL_WITH_BLUR,
+    }
 
-        const int PASS_DUALFILTER_DOWN = 0;
-        const int PASS_DUALFILTER_UP = 1;
 
-        readonly static int _TmpCopyTex = Shader.PropertyToID("_TmpCopyTex");
-        readonly static int _SsrTex = Shader.PropertyToID("_SsrTex");
-        readonly static int[] _DualFilterTexs = new int[2]{
-            Shader.PropertyToID("_DualFilterTex0"),
-            Shader.PropertyToID("_DualFilterTex1"),
-        };
+    // ========================================================================================================================================
+    private class PassData
+    {
+        public TextureHandle Tex_ActivateColor;
+        public TextureHandle Tex_Normal;
+        public TextureHandle Tex_TmpCopy;
+        public TextureHandle Tex_SSR;
+        public TextureHandle[] Tex_DualFilters;
+        public Material Mat_DualFilter;
+        public Material Mat_SSR;
+        public SSR_RenderPassSettings Settings;
+    }
 
-        SSR_RenderPassSettings _settings;
-        Material _material_SSR;
-        Material _material_DualFilter;
-        RenderTargetIdentifier _source;
+
+    // ========================================================================================================================================
+    private class SSR_RenderPass : ScriptableRenderPass
+    {
+        private const string RENDER_TAG = nameof(SSR_RenderPass);
+
+        private const int PASS_SSR_CALCUATE_REFLECTION = 0;
+        private const int PASS_SSR_COMBINE = 1;
+
+        private const int PASS_DUALFILTER_DOWN = 0;
+        private const int PASS_DUALFILTER_UP = 1;
+
+        private readonly static int _SsrTex_Id = Shader.PropertyToID("_SsrTex");
+
+        private SSR_RenderPassSettings _settings;
+        private Material _material_SSR;
+        private Material _material_DualFilter;
 
 
         public SSR_RenderPass(SSR_RenderPassSettings settings)
@@ -60,116 +88,119 @@ public class SSR_RenderPassFeature : ScriptableRendererFeature
             {
                 _material_DualFilter = CoreUtils.CreateEngineMaterial("srp/DualFilter");
             }
-            _material_SSR.SetInt("_MaxIteration", settings._MaxIteration);
-            _material_SSR.SetFloat("_MinDistance", settings._MinDistance);
-            _material_SSR.SetFloat("_MaxDistance", settings._MaxDistance);
-            _material_SSR.SetFloat("_MaxThickness", settings._MaxThickness);
         }
 
-        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            ConfigureInput(ScriptableRenderPassInput.Normal);
-        }
+            string passName = "Unsafe Pass";
 
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
-        {
-            ref CameraData cameraData = ref renderingData.cameraData;
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            this._source = cameraData.renderer.cameraColorTargetHandle;
-
-            var description = cameraData.cameraTargetDescriptor;
-            var width = description.width;
-            var height = description.height;
-
-            cmd.GetTemporaryRT(_TmpCopyTex, description);
-            cmd.GetTemporaryRT(_SsrTex, width / 4, height / 4, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
-
-            int dualFilterW = width / 8;
-            int dualFilterH = height / 8;
-            for (int i = 0; i < _DualFilterTexs.Length; ++i)
+            using (IUnsafeRenderGraphBuilder builder = renderGraph.AddUnsafePass(passName, out PassData passData))
             {
-                cmd.GetTemporaryRT(_DualFilterTexs[i], dualFilterW, dualFilterH, 0, FilterMode.Bilinear, GraphicsFormat.R16G16B16A16_SFloat);
-                dualFilterW /= 2;
-                dualFilterH /= 2;
+                ConfigureInput(ScriptableRenderPassInput.Normal);
+
+                SetupPassData(renderGraph, frameData, passData);
+
+                builder.UseTexture(passData.Tex_ActivateColor, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_TmpCopy, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_SSR, AccessFlags.ReadWrite);
+                builder.UseTexture(passData.Tex_Normal);
+                for (int i = 0; i < passData.Tex_DualFilters.Length; ++i)
+                {
+                    builder.UseTexture(passData.Tex_DualFilters[i], AccessFlags.ReadWrite);
+                }
+                builder.AllowPassCulling(value: false);
+                builder.SetRenderFunc<PassData>(ExecutePass);
             }
         }
 
-        public override void OnCameraCleanup(CommandBuffer cmd)
+        private void SetupPassData(RenderGraph renderGraph, ContextContainer frameData, PassData passData)
         {
-            cmd.ReleaseTemporaryRT(_SsrTex);
-            cmd.ReleaseTemporaryRT(_TmpCopyTex);
-            for (int i = 0; i < _DualFilterTexs.Length; ++i)
+            UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
+            UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+
+            TextureDesc td1 = renderGraph.GetTextureDesc(resourceData.activeColorTexture);
+            passData.Tex_ActivateColor = resourceData.activeColorTexture;
+            passData.Tex_Normal = resourceData.cameraNormalsTexture;
+            passData.Tex_TmpCopy = renderGraph.CreateTexture(td1);
+
+            TextureDesc td2 = td1;
+            td2.width /= 4;
+            td2.height /= 4;
+            td2.format = GraphicsFormat.R16G16B16A16_SFloat;
+            td2.filterMode = FilterMode.Bilinear;
+            passData.Tex_SSR = renderGraph.CreateTexture(td2);
+
+
+            TextureDesc td3 = td1;
+            td3.width /= 8;
+            td3.height /= 8;
+            td3.format = GraphicsFormat.R16G16B16A16_SFloat;
+            TextureHandle[] Tex_DualFilters = new TextureHandle[2];
+            for (int i = 0; i < Tex_DualFilters.Length; ++i)
             {
-                cmd.ReleaseTemporaryRT(_DualFilterTexs[i]);
+                Tex_DualFilters[i] = renderGraph.CreateTexture(td3);
+                td3.width /= 2;
+                td3.height /= 2;
             }
+            passData.Tex_DualFilters = Tex_DualFilters;
+            passData.Mat_SSR = _material_SSR;
+            _material_SSR.SetInt("_MaxIteration", _settings._MaxIteration);
+            _material_SSR.SetFloat("_MinDistance", _settings._MinDistance);
+            _material_SSR.SetFloat("_MaxDistance", _settings._MaxDistance);
+            _material_SSR.SetFloat("_MaxThickness", _settings._MaxThickness);
+            passData.Mat_DualFilter = _material_DualFilter;
+            passData.Settings = _settings;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        private static void ExecutePass(PassData data, UnsafeGraphContext context)
         {
-            if (renderingData.cameraData.isSceneViewCamera)
+            if (data.Settings.DebugMode == E_DEBUG.NONE)
             {
                 return;
             }
 
-            if (_settings.DebugMode == E_DEBUG.NONE)
+            UnsafeCommandBuffer cmd = context.cmd;
+            CommandBuffer nativeCmd = CommandBufferHelpers.GetNativeCommandBuffer(cmd);
+
+            Blitter.BlitCameraTexture(nativeCmd, data.Tex_ActivateColor, data.Tex_TmpCopy);
+
+            nativeCmd.SetGlobalTexture("_MainTex", data.Tex_Normal);
+            nativeCmd.SetGlobalTexture("_CameraNormalsTexture", data.Tex_Normal);
+            nativeCmd.SetGlobalTexture(_SsrTex_Id, data.Tex_SSR);
+            nativeCmd.Blit(data.Tex_ActivateColor, data.Tex_SSR, data.Mat_SSR, PASS_SSR_CALCUATE_REFLECTION);
+
+            if (data.Settings.DebugMode == E_DEBUG.SSR_ONLY)
             {
-                return;
+                Blitter.BlitCameraTexture(nativeCmd, data.Tex_SSR, data.Tex_ActivateColor);
             }
-
-            CommandBuffer cmd = CommandBufferPool.Get(RENDER_TAG);
-
-            cmd.CopyTexture(_source, _TmpCopyTex);
-            cmd.Blit(_source, _SsrTex, _material_SSR, PASS_SSR_CALCUATE_REFLECTION);
-
-            if (_settings.DebugMode == E_DEBUG.SSR_ONLY)
+            else if (data.Settings.DebugMode == E_DEBUG.SSR_BLUR_ONLY || data.Settings.DebugMode == E_DEBUG.SSR_FINAL_WITH_BLUR)
             {
-                cmd.Blit(_SsrTex, _source);
-            }
-            else if (_settings.DebugMode == E_DEBUG.SSR_BLUR_ONLY || _settings.DebugMode == E_DEBUG.SSR_FINAL_WITH_BLUR)
-            {
-
-                cmd.Blit(_SsrTex, _DualFilterTexs[0], _material_DualFilter, PASS_DUALFILTER_DOWN);
-                for (int i = 0; i < _DualFilterTexs.Length - 1; ++i)
+                nativeCmd.Blit(data.Tex_SSR, data.Tex_DualFilters[0], data.Mat_DualFilter, PASS_DUALFILTER_DOWN);
+                for (int i = 0; i < data.Tex_DualFilters.Length - 1; ++i)
                 {
-                    cmd.Blit(_DualFilterTexs[i], _DualFilterTexs[i + 1], _material_DualFilter, PASS_DUALFILTER_DOWN);
+                    nativeCmd.Blit(data.Tex_DualFilters[i], data.Tex_DualFilters[i + 1], data.Mat_DualFilter, PASS_DUALFILTER_DOWN);
                 }
-                for (int i = _DualFilterTexs.Length - 1; i > 0; --i)
+                for (int i = data.Tex_DualFilters.Length - 1; i > 0; --i)
                 {
-                    cmd.Blit(_DualFilterTexs[i], _DualFilterTexs[i - 1], _material_DualFilter, PASS_DUALFILTER_UP);
+                    nativeCmd.Blit(data.Tex_DualFilters[i], data.Tex_DualFilters[i - 1], data.Mat_DualFilter, PASS_DUALFILTER_UP);
                 }
-                cmd.Blit(_DualFilterTexs[0], _SsrTex, _material_DualFilter, PASS_DUALFILTER_UP);
+                nativeCmd.Blit(data.Tex_DualFilters[0], data.Tex_SSR, data.Mat_DualFilter, PASS_DUALFILTER_UP);
 
-                if (_settings.DebugMode == E_DEBUG.SSR_BLUR_ONLY)
+                if (data.Settings.DebugMode == E_DEBUG.SSR_BLUR_ONLY)
                 {
-                    cmd.Blit(_SsrTex, _source);
+                    nativeCmd.Blit(data.Tex_SSR, data.Tex_ActivateColor);
                 }
                 else
                 {
-                    cmd.Blit(_TmpCopyTex, _source, _material_SSR, PASS_SSR_COMBINE);
+                    nativeCmd.Blit(data.Tex_TmpCopy, data.Tex_ActivateColor, data.Mat_SSR, PASS_SSR_COMBINE);
                 }
             }
-            else if (_settings.DebugMode == E_DEBUG.SSR_FINAL_WITHOUT_BLUR)
+            else if (data.Settings.DebugMode == E_DEBUG.SSR_FINAL_WITHOUT_BLUR)
             {
-                cmd.Blit(_TmpCopyTex, _source, _material_SSR, PASS_SSR_COMBINE);
+                nativeCmd.Blit(data.Tex_TmpCopy, data.Tex_ActivateColor, data.Mat_SSR, PASS_SSR_COMBINE);
             }
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
         }
-    }
-
-    [SerializeField]
-    SSR_RenderPassSettings _settings = null;
-    SSR_RenderPass _pass;
-    
-    public override void Create()
-    {
-        _pass = new SSR_RenderPass(_settings);
-        _pass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        renderer.EnqueuePass(_pass);
     }
 }
