@@ -41,12 +41,11 @@
         
             float4 frag(Varyings IN) : SV_Target
             {
-            return 1;
+return 1;
                 // float4 uiColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.texcoord);
                 // float3 blitTex = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord).rgb;
                 float4 uiColor = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, IN.texcoord);
-
-return uiColor;
+return float4(1 - uiColor.rgb, 1);
                 uiColor.a = LinearToGamma22(uiColor.a);
 
                 float4 mainColor = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, IN.texcoord);
